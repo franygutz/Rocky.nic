@@ -1,0 +1,574 @@
+/* Moon Survival — Luna, 50 retos, 10 finales; motor offline + contrato frontend */
+(function(){'use strict';const CATALOG={"challenges":[{"id":1,"difficulty":1,"category":"life","categoryLabel":"Soporte vital","name":"Chequeo del aire","intro":"El sistema de ventilación registra una lectura irregular. ¿Conviene revisar antes de salir a explorar?","cause":"Inicio de la misión: primera inspección del hábitat.","science":"La calidad del aire depende de varios sistemas; una lectura no basta para diagnosticar la causa.","choices":[{"label":"Calibrar sensores y filtros","consequence":"El aire se estabiliza, pero se usa energía de mantenimiento.","delta":{"oxygen":10,"energy":-7,"health":3,"research":2},"next":[6,9],"add":[],"remove":[],"risk":0},{"label":"Confiar en el indicador","consequence":"Ahorrás energía hoy; mañana puede aparecer acumulación de CO₂ y dolor de cabeza.","delta":{"oxygen":-10,"energy":5,"health":-5},"next":[11,16,41],"add":["aire_sin_revisar"],"remove":[],"risk":2}],"rewardMin":14,"rewardMax":27},{"id":2,"difficulty":1,"category":"radiation","categoryLabel":"Radiación","name":"Un dosímetro parpadea","intro":"El medidor de una astronauta marca una anomalía antes de una salida al exterior.","cause":"Al acercarse al área de trajes.","science":"Los dosímetros registran exposición; un dato extraño debe contrastarse con el contexto y el instrumento.","choices":[{"label":"Verificar el instrumento","consequence":"Se pospone la salida y se aprende a comprobar la medición.","delta":{"energy":-4,"shield":5,"health":2,"research":4},"next":[7,12],"add":[],"remove":[],"risk":0},{"label":"Salir sin confirmar","consequence":"La misión gana tiempo, pero crece la incertidumbre sobre la exposición.","delta":{"research":2,"shield":-9,"health":-5},"next":[17,27],"add":["exposicion_sin_control"],"remove":[],"risk":2}],"rewardMin":14,"rewardMax":27},{"id":3,"difficulty":1,"category":"energy","categoryLabel":"Energía","name":"Polvo sobre los paneles","intro":"Parte de los paneles solares entrega menos energía de lo esperado.","cause":"Al revisar los sistemas exteriores.","science":"La iluminación, orientación y degradación afectan la generación solar; el polvo es un problema de mantenimiento.","choices":[{"label":"Limpiar con el robot","consequence":"Se recupera producción a cambio de gastar una pequeña reserva de batería.","delta":{"energy":11,"oxygen":-2,"research":2},"next":[8,13],"add":[],"remove":[],"risk":0},{"label":"Sobrecargar el sistema","consequence":"Aumenta la energía momentánea, pero un equipo queda exigido.","delta":{"energy":17,"shield":-4,"health":-2},"next":[18,23],"add":["red_sobrecargada"],"remove":[],"risk":2}],"rewardMin":14,"rewardMax":27},{"id":4,"difficulty":1,"category":"food","categoryLabel":"Alimentos","name":"Primeras semillas","intro":"El invernadero dispone de agua limitada y bandejas preparadas para iniciar un experimento.","cause":"Al entrar por primera vez al invernadero.","science":"La producción real de alimentos lleva tiempo: el indicador 'alimentos' incluye reservas y capacidad de producción.","choices":[{"label":"Sembrar con riego controlado","consequence":"La experiencia agrícola progresa, pero el agua se reduce.","delta":{"water":-8,"energy":-3,"food":4,"research":4,"morale":3},"next":[9,14],"add":[],"remove":[],"risk":0},{"label":"Guardar toda el agua","consequence":"Se preservan reservas, aunque se retrasa la investigación de cultivos.","delta":{"water":9,"food":-5,"morale":-2},"next":[19,24],"add":["cultivo_retrasado"],"remove":[],"risk":1}],"rewardMin":14,"rewardMax":27},{"id":5,"difficulty":2,"category":"comms","categoryLabel":"Comunicaciones","name":"Primer mensaje desde Tierra","intro":"La tripulación recibe instrucciones y fotografías; la batería de la antena compite con otras necesidades.","cause":"Después de instalarse en Luna-7.","science":"La demora normal de la señal Tierra–Luna es de aproximadamente 1,3 segundos en un solo sentido; las interrupciones mayores necesitan otra causa.","choices":[{"label":"Programar una transmisión breve","consequence":"Tierra conoce el estado de la base, a costa de energía.","delta":{"comms":11,"energy":-6,"morale":4},"next":[10,15],"add":[],"remove":[],"risk":0},{"label":"Posponer la transmisión","consequence":"Se reserva electricidad, pero se acumulan reportes pendientes.","delta":{"energy":7,"comms":-12,"morale":-3},"next":[20,25,45],"add":["reporte_pendiente"],"remove":[],"risk":1}],"rewardMin":18,"rewardMax":34},{"id":6,"difficulty":2,"category":"life","categoryLabel":"Soporte vital","name":"Filtro saturado","intro":"El módulo de soporte vital avisa que el filtro necesita atención.","cause":"Tras detectar lecturas variables de aire.","science":"La ventilación y eliminación de CO₂ forman parte del soporte vital, no solo el suministro de O₂.","choices":[{"label":"Cambiar el cartucho","consequence":"El aire mejora y se reduce el riesgo de síntomas.","delta":{"oxygen":13,"energy":-9,"health":5},"next":[16,21],"add":[],"remove":["aire_sin_revisar","tos"],"risk":0},{"label":"Reducir la ventilación","consequence":"Se ahorra energía, pero pueden aparecer molestias respiratorias.","delta":{"energy":11,"oxygen":-13,"health":-7},"next":[11,26],"add":["tos"],"remove":[],"risk":2}],"rewardMin":18,"rewardMax":34},{"id":7,"difficulty":2,"category":"radiation","categoryLabel":"Radiación","name":"Salida bajo observación","intro":"Los investigadores reportan un aumento de actividad solar; una excursión está por comenzar.","cause":"Cuando se dispone a salir del hábitat.","science":"El riesgo depende del evento solar, la ubicación y el blindaje; el juego simplifica estas variables.","choices":[{"label":"Reprogramar la salida","consequence":"La tripulación permanece protegida, pero se pierde una ventana de trabajo.","delta":{"shield":10,"health":4,"research":-3,"morale":-2},"next":[12,22],"add":[],"remove":[],"risk":0},{"label":"Hacer la excursión corta","consequence":"Se obtiene una muestra, pero aumentan los riesgos de exposición.","delta":{"research":10,"oxygen":-8,"shield":-10,"health":-5},"next":[17,32],"add":["eva_riesgosa"],"remove":[],"risk":2}],"rewardMin":18,"rewardMax":34},{"id":8,"difficulty":2,"category":"energy","categoryLabel":"Energía","name":"Batería de reserva","intro":"Una batería recién revisada puede alimentar el reciclador de agua o el laboratorio.","cause":"Al asignar la primera reserva eléctrica.","science":"Una batería almacena energía; no la crea.","choices":[{"label":"Dar prioridad al reciclador","consequence":"Se recupera agua; la investigación se retrasa.","delta":{"water":14,"energy":-8,"research":-2},"next":[13,28],"add":[],"remove":[],"risk":0},{"label":"Activar el laboratorio","consequence":"Se obtiene información científica, pero hay menos margen eléctrico.","delta":{"research":13,"energy":-12,"water":-4},"next":[18,23,43],"add":["energia_comprometida"],"remove":[],"risk":1}],"rewardMin":18,"rewardMax":34},{"id":9,"difficulty":3,"category":"food","categoryLabel":"Alimentos","name":"Brotes desiguales","intro":"Unas plántulas crecen peor que otras en el invernadero.","cause":"Después de comenzar el cultivo.","science":"El crecimiento vegetal depende conjuntamente de luz, agua, nutrientes y condiciones del ambiente.","choices":[{"label":"Revisar luz y nutrientes","consequence":"Se corrige la configuración, aunque requiere tiempo y energía.","delta":{"food":9,"energy":-7,"water":-3,"research":5},"next":[14,24],"add":[],"remove":["cultivo_retrasado"],"risk":0},{"label":"Aumentar el riego sin medir","consequence":"Algunas plantas mejoran, pero el agua se desperdicia y puede aparecer contaminación.","delta":{"food":3,"water":-14,"energy":-2},"next":[19,29],"add":["riego_excesivo"],"remove":[],"risk":2}],"rewardMin":22,"rewardMax":41},{"id":10,"difficulty":3,"category":"comms","categoryLabel":"Comunicaciones","name":"La respuesta tarda","intro":"No llega la confirmación de Tierra. ¿Es el retardo normal o una falla del enlace?","cause":"Cuando falla una confirmación.","science":"La demora de ~1,3 s por trayecto no explica una pérdida de comunicación de minutos u horas.","choices":[{"label":"Revisar el registro de señal","consequence":"Se descubre que una antena requiere ajuste y se evitan decisiones precipitadas.","delta":{"comms":8,"energy":-4,"research":4},"next":[15,30],"add":[],"remove":["reporte_pendiente"],"risk":0},{"label":"Repetir mensajes continuamente","consequence":"Aumenta la congestión y se consume más energía sin resolver la avería.","delta":{"comms":-9,"energy":-11,"morale":-3},"next":[20,25],"add":["enlace_saturado"],"remove":[],"risk":2}],"rewardMin":22,"rewardMax":41},{"id":11,"difficulty":3,"category":"life","categoryLabel":"Soporte vital","name":"Dolor de cabeza","intro":"Una astronauta presenta dolor de cabeza y fatiga; la tripulación sospecha un problema de aire o descanso.","cause":"Si se descuida el aire o la carga de trabajo.","science":"Los síntomas son inespecíficos; en el juego se investiga la causa en vez de asumir un diagnóstico.","choices":[{"label":"Comprobar aire y descansar","consequence":"Mejora el bienestar, con costo de energía y tiempo.","delta":{"health":13,"oxygen":9,"energy":-6,"morale":4},"next":[21,31],"add":[],"remove":["tos","aire_sin_revisar","fatiga"],"risk":0},{"label":"Pedirle que continúe","consequence":"Se mantiene la productividad momentánea, pero puede aparecer una crisis.","delta":{"research":6,"health":-16,"morale":-8},"next":[26,36,46],"add":["fatiga","mareos"],"remove":[],"risk":2}],"rewardMin":22,"rewardMax":41},{"id":12,"difficulty":3,"category":"radiation","categoryLabel":"Radiación","name":"Traje con protección dañada","intro":"Un aviso indica que la protección del traje de exploración podría estar comprometida.","cause":"Durante la preparación de un EVA.","science":"Un traje espacial protege ante varios peligros; la radiación es solo uno de ellos.","choices":[{"label":"Inspeccionar y cambiar piezas","consequence":"Se mejora la seguridad, consumiendo materiales y energía.","delta":{"shield":13,"energy":-8,"health":5},"next":[22,27],"add":[],"remove":["eva_riesgosa"],"risk":0},{"label":"Usarlo para una última misión","consequence":"Se obtiene una muestra, pero aumenta el riesgo para la persona que sale.","delta":{"research":11,"shield":-15,"health":-9},"next":[32,37,47],"add":["traje_comprometido"],"remove":[],"risk":2}],"rewardMin":22,"rewardMax":41},{"id":13,"difficulty":4,"category":"energy","categoryLabel":"Energía","name":"Pico de consumo","intro":"El reciclador, el invernadero y los ventiladores piden electricidad al mismo tiempo.","cause":"Cuando tres sistemas operan a la vez.","science":"El diseño de una microred requiere balancear generación, almacenamiento y demanda.","choices":[{"label":"Programar turnos de uso","consequence":"Baja la carga simultánea y se conserva energía, aunque avanza menos la investigación.","delta":{"energy":12,"water":-3,"food":-3,"research":-2},"next":[18,28],"add":[],"remove":["red_sobrecargada"],"risk":0},{"label":"Mantener todo encendido","consequence":"La producción continúa, pero se deteriora el margen eléctrico.","delta":{"food":7,"water":6,"energy":-20},"next":[23,33,48],"add":["energia_comprometida"],"remove":[],"risk":2}],"rewardMin":26,"rewardMax":48},{"id":14,"difficulty":4,"category":"food","categoryLabel":"Alimentos","name":"¿Agua para quién?","intro":"El laboratorio pide agua de riego mientras el soporte vital necesita reservas para operar.","cause":"Al repartir el agua almacenada.","science":"En una base lunar, el agua debe contabilizarse para consumo, higiene, reciclaje y procesos técnicos.","choices":[{"label":"Asignar riego medido","consequence":"Se protege el cultivo, con una disminución moderada de agua.","delta":{"food":10,"water":-11,"morale":3},"next":[24,34],"add":[],"remove":[],"risk":1},{"label":"Reservar agua para la tripulación","consequence":"Disminuye el riesgo inmediato, pero el cultivo queda comprometido.","delta":{"water":12,"health":4,"food":-12},"next":[19,29,44],"add":["cultivo_retrasado"],"remove":[],"risk":0}],"rewardMin":26,"rewardMax":48},{"id":15,"difficulty":4,"category":"comms","categoryLabel":"Comunicaciones","name":"Antena desalineada","intro":"El movimiento del módulo o una avería de orientación disminuye la calidad del enlace.","cause":"Tras perder calidad de señal.","science":"La geometría y orientación del enlace afectan las comunicaciones; no todo retraso es latencia normal.","choices":[{"label":"Recalibrar desde el interior","consequence":"Se recupera comunicación y se documenta el fallo.","delta":{"comms":18,"energy":-10,"research":4},"next":[25,30],"add":[],"remove":["enlace_saturado"],"risk":0},{"label":"Esperar otra ventana","consequence":"Se ahorra electricidad, pero una orden crítica puede llegar tarde.","delta":{"energy":8,"comms":-13,"morale":-5},"next":[20,35],"add":["sin_respuesta"],"remove":[],"risk":2}],"rewardMin":26,"rewardMax":48},{"id":16,"difficulty":4,"category":"life","categoryLabel":"Soporte vital","name":"Microfuga de presión","intro":"Un sensor detecta una pérdida lenta en un compartimento del hábitat.","cause":"Después de alertas de presión.","science":"En un hábitat presurizado, una fuga debe localizarse: producir más oxígeno no repara la causa.","choices":[{"label":"Aislar y reparar la sección","consequence":"Se preserva el aire; el equipo sacrifica energía y tiempo.","delta":{"oxygen":18,"energy":-13,"health":6},"next":[21,36],"add":[],"remove":["aire_sin_revisar"],"risk":0},{"label":"Compensar con más suministro","consequence":"La situación queda abierta y consume reservas cada turno.","delta":{"oxygen":-12,"water":-7,"energy":-5},"next":[26,31],"add":["fuga_activa"],"remove":[],"risk":2}],"rewardMin":26,"rewardMax":48},{"id":17,"difficulty":5,"category":"radiation","categoryLabel":"Radiación","name":"Alerta solar histórica","intro":"El observatorio presenta un evento solar documentado por NASA DONKI como escenario de entrenamiento.","cause":"Cuando llega el aviso del observatorio.","science":"DONKI informa eventos solares históricos; no convierte por sí solo un evento en una dosis exacta sobre la Luna.","choices":[{"label":"Activar protocolo de refugio","consequence":"Se reduce el riesgo y se gasta energía del sistema de protección.","delta":{"shield":16,"energy":-13,"health":6,"research":3},"next":[22,37],"add":[],"remove":["eva_riesgosa"],"risk":0},{"label":"Continuar tareas exteriores","consequence":"Se gana ciencia de campo, pero se asume una exposición simulada mayor.","delta":{"research":16,"oxygen":-10,"shield":-18,"health":-12},"next":[27,32],"add":["exposicion_sin_control"],"remove":[],"risk":2}],"rewardMin":30,"rewardMax":55},{"id":18,"difficulty":5,"category":"energy","categoryLabel":"Energía","name":"La sombra del cráter","intro":"La posición del Sol deja un conjunto de paneles en sombra durante una ventana de trabajo.","cause":"Al acercarse a una zona poco iluminada.","science":"En la Luna, las sombras y los ciclos de iluminación afectan directamente la generación solar.","choices":[{"label":"Mover robots y redistribuir carga","consequence":"Se reequilibra la energía, aunque se gasta oxígeno/electricidad en operaciones.","delta":{"energy":12,"oxygen":-5,"research":3},"next":[28,33],"add":[],"remove":[],"risk":0},{"label":"Conservar todos los consumos","consequence":"La batería se agota más rápido y aumenta el riesgo de apagón.","delta":{"energy":-19,"food":5},"next":[23,38],"add":["energia_comprometida"],"remove":[],"risk":2}],"rewardMin":30,"rewardMax":55},{"id":19,"difficulty":5,"category":"food","categoryLabel":"Alimentos","name":"Contaminación del cultivo","intro":"Se observan señales compatibles con contaminación en una bandeja hidropónica.","cause":"Si el control sanitario es insuficiente.","science":"La higiene alimentaria y el monitoreo de sistemas cerrados son cruciales en ambientes espaciales.","choices":[{"label":"Aislar las bandejas sospechosas","consequence":"Se pierde parte del cultivo, pero se protege el resto y la salud.","delta":{"food":-8,"water":-4,"health":7,"research":5},"next":[24,29],"add":[],"remove":["riego_excesivo"],"risk":0},{"label":"Mezclar toda la cosecha","consequence":"Se evita la pérdida inmediata, pero podría comprometer el alimento almacenado.","delta":{"food":-15,"health":-10,"morale":-6},"next":[34,39,49],"add":["contaminacion"],"remove":[],"risk":2}],"rewardMin":30,"rewardMax":55},{"id":20,"difficulty":5,"category":"comms","categoryLabel":"Comunicaciones","name":"Órdenes contradictorias","intro":"Dos mensajes llegan desordenados y proponen prioridades diferentes.","cause":"Al reanudar el enlace.","science":"La comunicación espacial requiere mensajes verificables y procedimientos autónomos ante fallas.","choices":[{"label":"Verificar marcas de tiempo","consequence":"La tripulación aclara la secuencia y coordina mejor.","delta":{"comms":8,"energy":-4,"morale":7,"research":2},"next":[30,35],"add":[],"remove":["reporte_pendiente"],"risk":0},{"label":"Ejecutar el mensaje más reciente en pantalla","consequence":"Se evita demora, pero un equipo puede apagar un sistema necesario.","delta":{"energy":-11,"oxygen":-7,"comms":-5},"next":[25,40,45],"add":["orden_erronea"],"remove":[],"risk":2}],"rewardMin":30,"rewardMax":55},{"id":21,"difficulty":6,"category":"life","categoryLabel":"Soporte vital","name":"Reciclador de agua","intro":"El sistema recupera menos agua de la prevista y los depósitos descienden.","cause":"Cuando la reserva de agua cae o aparece una avería.","science":"El reciclaje conserva recursos, pero necesita mantenimiento y energía.","choices":[{"label":"Cambiar el circuito de recuperación","consequence":"Se recupera agua y mejora la seguridad, consumiendo electricidad.","delta":{"water":19,"energy":-12,"health":4},"next":[26,36],"add":[],"remove":["deshidratacion"],"risk":0},{"label":"Racionar sin reparar","consequence":"Se conserva energía, pero aumenta la fatiga y cae la producción.","delta":{"water":-10,"energy":8,"food":-9,"health":-10},"next":[31,36],"add":["deshidratacion"],"remove":[],"risk":2}],"rewardMin":34,"rewardMax":62},{"id":22,"difficulty":6,"category":"radiation","categoryLabel":"Radiación","name":"Diseñar un refugio","intro":"La base necesita elegir qué compartimento utilizará como refugio ante un evento solar.","cause":"Al preparar el protocolo de radiación.","science":"La cantidad y distribución de material de blindaje influyen en la protección; el simulador usa una escala abstracta.","choices":[{"label":"Proteger un espacio pequeño","consequence":"Mejora la protección de la tripulación, pero limita las actividades.","delta":{"shield":20,"energy":-12,"morale":-3},"next":[27,37],"add":[],"remove":[],"risk":0},{"label":"Distribuir materiales por toda la base","consequence":"Se mantiene la movilidad, aunque la protección efectiva resulta insuficiente.","delta":{"shield":-13,"energy":-6,"morale":2},"next":[32,37],"add":["refugio_incompleto"],"remove":[],"risk":2}],"rewardMin":34,"rewardMax":62},{"id":23,"difficulty":6,"category":"energy","categoryLabel":"Energía","name":"Apagón parcial","intro":"Un circuito se desconecta y deja sin electricidad a una zona del invernadero y a un ventilador.","cause":"Tras una sobrecarga o bajo nivel de baterías.","science":"La recuperación escalonada ayuda a controlar cargas críticas.","choices":[{"label":"Reiniciar por sectores","consequence":"El soporte vital se estabiliza, con un costo de alimento y productividad.","delta":{"energy":10,"oxygen":8,"food":-9,"research":-3},"next":[28,38],"add":[],"remove":["energia_comprometida"],"risk":0},{"label":"Forzar el reinicio general","consequence":"Es más rápido, pero puede propagar la avería a otros sistemas.","delta":{"energy":-17,"oxygen":-12,"comms":-9},"next":[33,38],"add":["fallo_red"],"remove":[],"risk":2}],"rewardMin":34,"rewardMax":62},{"id":24,"difficulty":6,"category":"food","categoryLabel":"Alimentos","name":"Plantas marchitas","intro":"El agua, la luz o la temperatura del invernadero no están bien equilibradas.","cause":"Cuando disminuye la producción proyectada.","science":"Los síntomas visibles en plantas tienen múltiples causas: observar antes de actuar evita desperdicios.","choices":[{"label":"Diagnosticar la causa","consequence":"Se corrigen condiciones antes de utilizar más recursos.","delta":{"food":11,"water":-5,"energy":-6,"research":7},"next":[29,34],"add":[],"remove":["cultivo_retrasado"],"risk":0},{"label":"Aumentar todos los suministros","consequence":"El cultivo mejora a corto plazo, pero se acelera el agotamiento de reservas.","delta":{"food":15,"water":-16,"energy":-15},"next":[34,39],"add":["consumo_excesivo"],"remove":[],"risk":2}],"rewardMin":34,"rewardMax":62},{"id":25,"difficulty":7,"category":"comms","categoryLabel":"Comunicaciones","name":"Enlace inestable","intro":"La base pierde contacto durante intervalos y una actividad exterior depende de una orden.","cause":"Cuando el vínculo con Tierra falla intermitentemente.","science":"La autonomía operativa es importante porque no siempre se puede depender de control terrestre inmediato.","choices":[{"label":"Activar protocolo autónomo","consequence":"La tripulación puede continuar con reglas de seguridad y gastar menos mensajes.","delta":{"comms":5,"morale":11,"energy":-3,"research":3},"next":[30,40],"add":[],"remove":["sin_respuesta"],"risk":0},{"label":"Esperar sin plan alternativo","consequence":"El equipo pierde tiempo, aumenta el estrés y se retrasa una reparación.","delta":{"comms":-12,"morale":-11,"energy":-6},"next":[35,40,50],"add":["aislamiento"],"remove":[],"risk":2}],"rewardMin":38,"rewardMax":69},{"id":26,"difficulty":7,"category":"life","categoryLabel":"Soporte vital","name":"Respiración dificultosa","intro":"Dos tripulantes presentan mareo y molestia respiratoria durante una tarea.","cause":"Si la calidad del aire empeora o no se atienden síntomas.","science":"Los signos de malestar requieren revisar soporte vital y seguridad, no diagnosticar automáticamente una enfermedad concreta.","choices":[{"label":"Detener trabajo y revisar la atmósfera","consequence":"Se detecta un problema del ambiente y se recupera seguridad.","delta":{"health":19,"oxygen":14,"energy":-12,"morale":5},"next":[31,36],"add":[],"remove":["mareos","tos","aire_sin_revisar"],"risk":0},{"label":"Continuar hasta terminar","consequence":"Se gana tiempo, pero el estado físico del equipo empeora.","delta":{"research":9,"health":-22,"oxygen":-15,"morale":-8},"next":[36,40,46],"add":["mareos","fatiga"],"remove":[],"risk":2}],"rewardMin":38,"rewardMax":69},{"id":27,"difficulty":7,"category":"radiation","categoryLabel":"Radiación","name":"Exposición acumulada","intro":"Un resumen del dosímetro indica que la planificación de salidas debe revisarse.","cause":"Después de varias salidas o un evento solar.","science":"La exposición acumulada debe compararse con límites y condiciones; en el juego no se calculan dosis clínicas.","choices":[{"label":"Reducir EVA y revisar protección","consequence":"El equipo protege su salud, aunque se pierde una misión científica.","delta":{"shield":15,"health":9,"research":-8},"next":[32,37],"add":[],"remove":["exposicion_sin_control"],"risk":0},{"label":"Priorizar los hallazgos","consequence":"Aumentan los datos recolectados, con un costo en la seguridad.","delta":{"research":17,"shield":-20,"health":-15},"next":[37,36,47],"add":["exposicion_sin_control","fatiga"],"remove":[],"risk":2}],"rewardMin":38,"rewardMax":69},{"id":28,"difficulty":7,"category":"energy","categoryLabel":"Energía","name":"Distribución de energía","intro":"Los científicos piden encender un nuevo instrumento justo cuando bajan las baterías.","cause":"Cuando varias tareas compiten por el mismo suministro.","science":"El manejo energético es un problema de optimización con restricciones y objetivos contrapuestos.","choices":[{"label":"Asignar cuotas por sistema","consequence":"Se priorizan agua y aire sin cancelar completamente la ciencia.","delta":{"energy":14,"research":-5,"oxygen":3,"water":3},"next":[33,38],"add":[],"remove":["red_sobrecargada"],"risk":0},{"label":"Dar prioridad total al instrumento","consequence":"La investigación avanza, pero las reservas eléctricas quedan muy exigidas.","delta":{"research":19,"energy":-22,"oxygen":-7},"next":[38,36],"add":["red_sobrecargada"],"remove":[],"risk":2}],"rewardMin":38,"rewardMax":69},{"id":29,"difficulty":8,"category":"food","categoryLabel":"Alimentos","name":"Biofilm en los conductos","intro":"Se sospecha una biopelícula en parte de la línea de riego y hay que proteger el sistema alimentario.","cause":"Si hay fallos de higiene o riego.","science":"Los sistemas de agua y alimentos en ambientes cerrados necesitan vigilancia microbiológica.","choices":[{"label":"Aislar y desinfectar el circuito","consequence":"Se pierde producción, pero se protege la salud y se aprende del incidente.","delta":{"food":-10,"water":-8,"health":10,"research":7},"next":[34,39],"add":[],"remove":["contaminacion"],"risk":0},{"label":"Usar el circuito hasta el final","consequence":"Se preserva producción temporal, pero aumenta el riesgo sanitario.","delta":{"food":7,"health":-18,"water":-6},"next":[39,36],"add":["contaminacion","malestar_digestivo"],"remove":[],"risk":2}],"rewardMin":42,"rewardMax":76},{"id":30,"difficulty":8,"category":"comms","categoryLabel":"Comunicaciones","name":"Transmisión crítica","intro":"Tierra solicita un informe para organizar una eventual ayuda. El enlace requiere prioridad eléctrica.","cause":"Cuando debe enviarse un balance de emergencia.","science":"Transmitir información confiable es tan importante como transmitir rápido.","choices":[{"label":"Enviar informe comprimido","consequence":"La situación de la base queda clara y aumenta la posibilidad de coordinación.","delta":{"comms":20,"energy":-12,"morale":6,"research":2},"next":[35,40],"add":["plan_rescate"],"remove":["enlace_saturado"],"risk":0},{"label":"Reservar batería para soporte vital","consequence":"Se protege el aire, pero Tierra queda con información incompleta.","delta":{"energy":12,"oxygen":7,"comms":-16},"next":[40,35],"add":["rescate_sin_datos"],"remove":[],"risk":1}],"rewardMin":42,"rewardMax":76},{"id":31,"difficulty":8,"category":"life","categoryLabel":"Soporte vital","name":"Fatiga de la tripulación","intro":"Una astronauta está agotada y comete errores de procedimiento.","cause":"Tras varios días con sobrecarga de tareas.","science":"El descanso, el trabajo en equipo y la salud conductual son parte de la planificación espacial.","choices":[{"label":"Reducir turnos y cuidar al equipo","consequence":"Mejora la salud y baja la probabilidad de errores, pero la producción se retrasa.","delta":{"health":19,"morale":15,"research":-8,"food":-3},"next":[36,40],"add":[],"remove":["fatiga","mareos","deshidratacion"],"risk":0},{"label":"Extender los turnos","consequence":"Aumenta la productividad momentánea, pero crece la fatiga y baja la moral.","delta":{"research":14,"health":-17,"morale":-20},"next":[36,35],"add":["fatiga","aislamiento"],"remove":[],"risk":2}],"rewardMin":42,"rewardMax":76},{"id":32,"difficulty":8,"category":"radiation","categoryLabel":"Radiación","name":"EVA durante alerta","intro":"Un equipo está afuera cuando llega un aviso que requiere una respuesta coordinada.","cause":"Durante salidas exteriores con riesgo aumentado.","science":"Ante una alerta de clima espacial, la protección y el procedimiento de retorno son claves.","choices":[{"label":"Retorno inmediato y refugio","consequence":"Se deja la tarea incompleta, pero mejora la seguridad.","delta":{"shield":13,"health":13,"oxygen":-10,"research":-6},"next":[37,36],"add":[],"remove":["eva_riesgosa"],"risk":0},{"label":"Terminar primero la tarea","consequence":"Se obtiene información, pero la tripulación afronta un peligro mayor.","delta":{"research":19,"shield":-21,"oxygen":-15,"health":-14},"next":[37,40],"add":["exposicion_sin_control","fatiga"],"remove":[],"risk":2}],"rewardMin":42,"rewardMax":76},{"id":33,"difficulty":9,"category":"energy","categoryLabel":"Energía","name":"Falla de la red central","intro":"Una avería de distribución amenaza con desconectar agua, comunicaciones y ventilación.","cause":"Si una sobrecarga no se resuelve a tiempo.","science":"La redundancia evita que una única falla detenga toda la misión.","choices":[{"label":"Crear una microred de emergencia","consequence":"Se mantienen los sistemas críticos, aunque la investigación se pausa.","delta":{"energy":18,"oxygen":9,"water":5,"research":-12},"next":[38,36],"add":[],"remove":["fallo_red"],"risk":0},{"label":"Continuar con un único circuito","consequence":"El reinicio parece rápido, pero si vuelve a fallar afecta múltiples sistemas.","delta":{"energy":-19,"oxygen":-13,"water":-10,"comms":-12},"next":[38,40,48],"add":["fallo_red","apagones"],"remove":[],"risk":2}],"rewardMin":46,"rewardMax":83},{"id":34,"difficulty":9,"category":"food","categoryLabel":"Alimentos","name":"La última cosecha","intro":"Las bandejas cultivadas antes del inicio de la misión pueden aportar alimento, pero deben inspeccionarse.","cause":"Cuando se agotan reservas y hay cultivos ya maduros.","science":"Una cosecha en siete días solo es plausible para plantas que ya estaban creciendo; el cultivo iniciado en el día 1 no madura de golpe.","choices":[{"label":"Cosechar solo lo seguro","consequence":"Se gana una reserva modesta y se protege la salud.","delta":{"food":19,"health":8,"water":-4,"research":3},"next":[39,40],"add":[],"remove":["contaminacion"],"risk":0},{"label":"Cosechar todo sin inspección","consequence":"La reserva aumenta, pero existe riesgo de malestar por alimento comprometido.","delta":{"food":26,"health":-15,"morale":-3},"next":[39,36],"add":["malestar_digestivo"],"remove":[],"risk":2}],"rewardMin":46,"rewardMax":83},{"id":35,"difficulty":9,"category":"comms","categoryLabel":"Comunicaciones","name":"¿Pedir evacuación?","intro":"El equipo debe decidir si solicita un retorno anticipado o continúa esperando suministros.","cause":"Ante incertidumbre sobre las reservas y la conexión.","science":"La decisión de terminar una misión debe considerar seguridad, logística y comunicaciones verificables.","choices":[{"label":"Solicitar ayuda con datos completos","consequence":"Tierra puede planear una respuesta; se consume la reserva de comunicaciones.","delta":{"comms":12,"energy":-10,"morale":8},"next":[40,36],"add":["evacuacion_solicitada"],"remove":[],"risk":0},{"label":"Mantener la misión sin informar","consequence":"Se conserva energía y autonomía, pero se retrasa una posible ayuda.","delta":{"energy":10,"comms":-11,"morale":-12},"next":[40,36,50],"add":["rescate_retrasado"],"remove":[],"risk":2}],"rewardMin":46,"rewardMax":83},{"id":36,"difficulty":9,"category":"life","categoryLabel":"Soporte vital","name":"Crisis de soporte vital","intro":"Dos sistemas esenciales presentan fallos al mismo tiempo y el margen operativo es mínimo.","cause":"Si se acumulan problemas de aire y agua.","science":"En operaciones de emergencia, la prioridad es mantener sistemas críticos, no maximizar investigación.","choices":[{"label":"Aplicar protocolo de emergencia","consequence":"Se prioriza el aire y el agua, sacrificando energía y experimentos.","delta":{"oxygen":23,"water":14,"energy":-20,"research":-13,"health":9},"next":[40,35],"add":["protocolo_emergencia"],"remove":["fuga_activa","mareos"],"risk":0},{"label":"Improvisar para salvar los experimentos","consequence":"Se conservan datos científicos, pero se compromete la seguridad de la base.","delta":{"research":19,"oxygen":-22,"water":-18,"health":-18},"next":[40,35,46],"add":["crisis_sin_resolver"],"remove":[],"risk":2}],"rewardMin":46,"rewardMax":83},{"id":37,"difficulty":10,"category":"radiation","categoryLabel":"Radiación","name":"Evento solar severo","intro":"El equipo aplica un escenario extremo inspirado en registros científicos de clima espacial.","cause":"Durante una alerta grave en un tramo avanzado.","science":"Los escenarios de radiación son educativos: no sustituyen cálculos específicos de dosis lunar.","choices":[{"label":"Permanecer en refugio protegido","consequence":"La tripulación reduce el riesgo, aunque cae la generación y se pierden actividades.","delta":{"shield":21,"health":13,"energy":-17,"research":-8},"next":[40,36],"add":["refugio_exitoso"],"remove":["exposicion_sin_control"],"risk":0},{"label":"Salir a reparar en ese momento","consequence":"Se recupera parte de la energía, a costa de mayor exposición simulada.","delta":{"energy":17,"shield":-24,"health":-20,"oxygen":-9},"next":[40,36,47],"add":["exposicion_sin_control"],"remove":[],"risk":2}],"rewardMin":50,"rewardMax":90},{"id":38,"difficulty":10,"category":"energy","categoryLabel":"Energía","name":"Racionamiento extremo","intro":"Quedan pocas reservas eléctricas y tres sistemas importantes requieren energía.","cause":"Cuando la producción solar ya no cubre la demanda.","science":"En una red de recursos limitados se deben definir cargas críticas y cargas aplazables.","choices":[{"label":"Mantener primero aire y agua","consequence":"Se salva el soporte vital y se suspenden tareas secundarias.","delta":{"oxygen":14,"water":11,"energy":-10,"food":-8,"research":-10},"next":[40,36],"add":["prioridad_vital"],"remove":[],"risk":0},{"label":"Alimentar todas las tareas por igual","consequence":"Ningún sistema recibe lo suficiente y aumenta el riesgo de apagón total.","delta":{"energy":-21,"oxygen":-13,"water":-10,"comms":-12},"next":[40,36],"add":["apagones"],"remove":[],"risk":2}],"rewardMin":50,"rewardMax":90},{"id":39,"difficulty":10,"category":"food","categoryLabel":"Alimentos","name":"Semillas o comida","intro":"Quedan reservas limitadas: la tripulación debe decidir qué conservar para el futuro de la base.","cause":"Cuando hay que escoger entre corto y largo plazo.","science":"La seguridad alimentaria integra disponibilidad inmediata y resiliencia del sistema de producción.","choices":[{"label":"Preservar semillas y racionar","consequence":"Se protege la sostenibilidad a largo plazo, pero cae la comida inmediata.","delta":{"food":-10,"water":5,"research":13,"morale":5},"next":[40,36],"add":["semillas_conservadas"],"remove":[],"risk":1},{"label":"Consumir todas las reservas disponibles","consequence":"Se mejora la comida inmediata, aunque se sacrifica la capacidad de continuar cultivando.","delta":{"food":20,"health":6,"research":-12,"morale":-5},"next":[40,36,49],"add":["sin_semillas"],"remove":[],"risk":1}],"rewardMin":50,"rewardMax":90},{"id":40,"difficulty":10,"category":"comms","categoryLabel":"Comunicaciones","name":"La última ventana de contacto","intro":"Al completar la misión, Tierra necesita un informe final para organizar el siguiente paso.","cause":"Al acercarse el final de la campaña.","science":"La calidad de una misión también depende del registro y comunicación del conocimiento adquirido.","choices":[{"label":"Transmitir telemetría y decisiones","consequence":"Se documenta lo aprendido y mejora la coordinación, a costa de electricidad.","delta":{"comms":19,"energy":-12,"research":12,"morale":8},"next":[],"add":["informe_final"],"remove":[],"risk":0},{"label":"Guardar la energía restante","consequence":"Se protege la última reserva energética, pero Tierra recibe menos información.","delta":{"energy":13,"comms":-16,"morale":-5},"next":[],"add":["informe_incompleto"],"remove":[],"risk":1}],"rewardMin":50,"rewardMax":90},{"id":41,"difficulty":4,"category":"life","categoryLabel":"Soporte vital","name":"Agua para generar oxígeno","intro":"El generador de oxígeno por electrólisis necesita agua mientras los depósitos de consumo disminuyen.","cause":"El depósito de oxígeno entra en modo de demanda alta.","science":"La electrólisis requiere agua y electricidad; la simulación simplifica los flujos reales.","choices":[{"label":"Ajustar producción y recuperar agua","consequence":"El sistema mantiene el aire con un uso controlado de depósitos.","delta":{"oxygen":10,"water":-9,"energy":-7,"health":3},"next":[21,46],"add":[],"remove":[],"risk":0},{"label":"Exigir producción máxima","consequence":"Sube el oxígeno, pero se agotan las reservas hídricas y se abre una crisis.","delta":{"oxygen":17,"water":-23,"energy":-14},"next":[21,46],"add":["deshidratacion"],"remove":[],"risk":2}],"rewardMin":26,"rewardMax":48},{"id":42,"difficulty":5,"category":"radiation","categoryLabel":"Radiación","name":"Informe del dosímetro extraviado","intro":"Una científica perdió el historial de dosis antes de planificar una nueva salida.","cause":"Una alerta de radiación coincide con la planificación de EVA.","science":"Las lecturas de dosis permiten tomar decisiones informadas; no predicen por sí solas un desenlace.","choices":[{"label":"Reconstruir lecturas y detener EVA","consequence":"Se protege al equipo y el reporte queda documentado.","delta":{"shield":10,"research":7,"comms":-3,"morale":1},"next":[27,47],"add":[],"remove":["exposicion_sin_control"],"risk":0},{"label":"Autorizar sin historial","consequence":"Se adelanta la expedición, pero el riesgo sin evaluar permanece.","delta":{"research":8,"shield":-15,"health":-8},"next":[32,47],"add":["eva_riesgosa","exposicion_sin_control"],"remove":[],"risk":2}],"rewardMin":30,"rewardMax":55},{"id":43,"difficulty":6,"category":"energy","categoryLabel":"Energía","name":"El dilema de los módulos","intro":"Solo queda potencia suficiente para mantener activados dos de tres módulos: reciclador, cultivo y antena.","cause":"El consumo supera la potencia disponible.","science":"La gestión eléctrica debe priorizar cargas críticas, no solo la comodidad.","choices":[{"label":"Priorizar reciclador y antena","consequence":"La tripulación conserva agua y contacto; los cultivos se retrasan.","delta":{"water":12,"comms":9,"food":-12,"energy":-7},"next":[44,45],"add":["cultivo_retrasado"],"remove":[],"risk":0},{"label":"Priorizar cultivo y laboratorio","consequence":"Avanza la ciencia y crecen las reservas de comida, pero falla la distribución.","delta":{"food":11,"research":7,"energy":-18,"water":-7,"comms":-8},"next":[48,33],"add":["energia_comprometida"],"remove":[],"risk":2}],"rewardMin":34,"rewardMax":62},{"id":44,"difficulty":6,"category":"food","categoryLabel":"Alimentos","name":"Falta de nutrientes","intro":"Las plantas están vivas, pero el sistema hidropónico tiene una mezcla incorrecta de nutrientes.","cause":"El rendimiento del invernadero disminuye.","science":"La hidroponía depende de agua, nutrientes y control microbiológico.","choices":[{"label":"Analizar solución y corregir dosis","consequence":"Se estabiliza el cultivo, gastando energía y materiales.","delta":{"food":14,"water":-8,"energy":-5,"research":6},"next":[34,49],"add":[],"remove":["cultivo_retrasado"],"risk":0},{"label":"Usar una mezcla sin revisar","consequence":"Parece ahorrar tiempo, pero compromete las bandejas y aumenta la incertidumbre.","delta":{"food":-18,"health":-5,"water":-6},"next":[29,49],"add":["contaminacion"],"remove":[],"risk":2}],"rewardMin":34,"rewardMax":62},{"id":45,"difficulty":7,"category":"comms","categoryLabel":"Comunicaciones","name":"Mensaje duplicado: ¿orden real?","intro":"Llega una instrucción repetida y el equipo no sabe si corresponde a la situación actual.","cause":"Dos paquetes de comunicaciones parecen contradictorios.","science":"La latencia física Tierra–Luna no es lo mismo que una falla o mensaje duplicado.","choices":[{"label":"Validar sello temporal y versión","consequence":"Evitan ejecutar dos veces una orden y dejan respaldo.","delta":{"comms":11,"research":6,"energy":-4},"next":[40,50],"add":[],"remove":["orden_erronea"],"risk":0},{"label":"Ejecutar sin verificar","consequence":"Se alteran prioridades y la red se congestiona aún más.","delta":{"energy":-14,"comms":-13,"morale":-8},"next":[33,50],"add":["orden_erronea","enlace_saturado"],"remove":[],"risk":2}],"rewardMin":38,"rewardMax":69},{"id":46,"difficulty":7,"category":"life","categoryLabel":"Soporte vital","name":"Descompresión del módulo médico","intro":"Una junta falla. La presión cae y un astronauta necesita asistencia inmediata.","cause":"Tras ignorar una fuga o detectarse un sello comprometido.","science":"Una despresurización puede comprometer rápidamente el soporte vital; sus números están simplificados.","choices":[{"label":"Sellar, aislar y asistir","consequence":"Se contienen pérdidas; la salud requiere vigilancia.","delta":{"oxygen":12,"energy":-15,"health":10,"morale":4},"next":[36,41],"add":[],"remove":["fuga_activa","mareos"],"risk":0},{"label":"Retrasar el aislamiento","consequence":"La fuga se agrava, aparece confusión y peligra la tripulación.","delta":{"oxygen":-34,"health":-25,"energy":-7,"morale":-10},"next":[36,41],"add":["fuga_activa","crisis_sin_resolver","hipoxia_grave"],"remove":[],"risk":2}],"rewardMin":38,"rewardMax":69},{"id":47,"difficulty":8,"category":"radiation","categoryLabel":"Radiación","name":"Regreso desde el cráter","intro":"Una astronauta está lejos de la base cuando recibe un aviso de peligro y se detecta un problema de sellado en el traje.","cause":"Se acumulan avisos de radiación y fallas de traje.","science":"Un traje mal sellado implica riesgos inmediatos de presión y oxígeno; el evento solar contextualiza la decisión, pero no se infiere una dosis letal.","choices":[{"label":"Regresar con asistencia del rover","consequence":"La astronauta vuelve a un área segura; la expedición se interrumpe.","delta":{"shield":12,"oxygen":-8,"health":5,"energy":-9},"next":[37,46],"add":[],"remove":["traje_comprometido","eva_riesgosa","eva_sin_rescate"],"risk":0},{"label":"Terminar la recolección","consequence":"La EVA se prolonga con un traje comprometido y el riesgo se vuelve extremo.","delta":{"shield":-29,"oxygen":-18,"health":-22,"research":9},"next":[32,37],"add":["traje_comprometido","eva_sin_rescate"],"remove":[],"risk":2}],"rewardMin":42,"rewardMax":76},{"id":48,"difficulty":8,"category":"energy","categoryLabel":"Energía","name":"Apagón en cascada","intro":"La red está sobrecargada. El ventilador, el reciclador y las comunicaciones están a punto de detenerse.","cause":"El mal balance de cargas y las fallas previas se combinan.","science":"Sin distribución eléctrica estable, los equipos de soporte vital pueden verse afectados.","choices":[{"label":"Aislar circuitos y reiniciar","consequence":"Se recuperan funciones básicas y queda limitada la investigación.","delta":{"energy":10,"oxygen":10,"water":8,"research":-7},"next":[46,50],"add":[],"remove":["fallo_red","apagones"],"risk":0},{"label":"Reiniciar todo a la vez","consequence":"La sobrecarga afecta tres sistemas y se aceleran los efectos sobre la tripulación.","delta":{"energy":-29,"oxygen":-17,"water":-15,"health":-9},"next":[36,46],"add":["apagones","crisis_sin_resolver"],"remove":[],"risk":2}],"rewardMin":42,"rewardMax":76},{"id":49,"difficulty":9,"category":"food","categoryLabel":"Alimentos","name":"Ración sospechosa","intro":"Dos tripulantes tienen malestar digestivo después de compartir un alimento posiblemente contaminado.","cause":"El invernadero sufrió problemas de limpieza y almacenamiento.","science":"Ante sospecha de contaminación alimentaria se identifica y aísla el producto, no se diagnostica solo por síntomas.","choices":[{"label":"Aislar alimento y dar asistencia","consequence":"Se evita más exposición, aunque se pierde parte de la comida.","delta":{"health":13,"food":-17,"water":-8,"morale":6},"next":[34,46],"add":[],"remove":["contaminacion","malestar_digestivo"],"risk":0},{"label":"Seguir repartiendo raciones","consequence":"Aparecen más síntomas y se reduce la capacidad de trabajo.","delta":{"food":8,"health":-27,"water":-11,"morale":-14},"next":[31,36],"add":["malestar_digestivo","deshidratacion","contaminacion"],"remove":[],"risk":2}],"rewardMin":46,"rewardMax":83},{"id":50,"difficulty":10,"category":"comms","categoryLabel":"Comunicaciones","name":"La última orden sin respuesta","intro":"La base requiere coordinar una evacuación; el enlace es intermitente y una nueva instrucción podría no llegar a tiempo.","cause":"El equipo acumuló demoras o problemas eléctricos y de antena.","science":"La autonomía de la tripulación es esencial porque la comunicación puede perderse.","choices":[{"label":"Aplicar plan local y enviar señal","consequence":"Se mantiene autonomía operativa y se envía el mejor informe disponible.","delta":{"comms":14,"energy":-13,"morale":10,"health":5},"next":[],"add":[],"remove":["sin_respuesta"],"risk":0},{"label":"Esperar sin actuar","consequence":"Se agotan reservas críticas y el rescate se retrasa.","delta":{"comms":-22,"energy":-14,"health":-20,"oxygen":-13,"morale":-12},"next":[],"add":["rescate_retrasado","crisis_sin_resolver"],"remove":[],"risk":2}],"rewardMin":50,"rewardMax":90}],"items":[{"id":"agua","name":"💧 Reserva de agua","price":35,"desc":"+18 agua; ayuda a recuperar un depósito.","delta":{"water":18},"remove":["deshidratacion"],"limit":3},{"id":"bateria","name":"🔋 Batería portátil","price":42,"desc":"+20 energía para sistemas esenciales.","delta":{"energy":20},"remove":["energia_comprometida"],"limit":3},{"id":"oxigeno","name":"🫁 Cartucho de oxígeno","price":49,"desc":"+20 oxígeno; ayuda ante niveles bajos.","delta":{"oxygen":20},"remove":["aire_sin_revisar"],"limit":3},{"id":"botiquin","name":"🧰 Botiquín médico","price":58,"desc":"+18 salud; alivia fatiga y mareos.","delta":{"health":18},"remove":["fatiga","mareos"],"limit":2},{"id":"escudo","name":"🛡️ Kit de refugio","price":72,"desc":"+22 protección; repara fallas preventivas.","delta":{"shield":22},"remove":["refugio_incompleto"],"limit":2},{"id":"comms","name":"📡 Módulo de antena","price":55,"desc":"+20 comunicaciones; resuelve saturación.","delta":{"comms":20},"remove":["enlace_saturado"],"limit":2},{"id":"huerto","name":"🌿 Kit hidropónico","price":46,"desc":"+17 alimentos y +3 investigación.","delta":{"food":17,"research":3},"remove":["cultivo_retrasado"],"limit":2}],"endings":{"1":{"title":"Aurora de Luna-7","description":"La tripulación concluye estable y con importantes resultados científicos."},"2":{"title":"Jardín de estrellas","description":"El invernadero y las reservas quedan preparados para el siguiente equipo."},"3":{"title":"Conocimiento para la Tierra","description":"La misión aporta valiosa investigación a pesar de las dificultades."},"4":{"title":"El puente restaurado","description":"La comunicación permite coordinar la siguiente fase de la misión."},"5":{"title":"Una tripulación unida","description":"La cooperación y el cuidado de las personas sostuvieron la base."},"6":{"title":"Rescate imperfecto","description":"La misión llega al cierre con dificultades y un plan de apoyo."},"7":{"title":"Silencio controlado","description":"El equipo conserva la seguridad, pero el enlace con Tierra sigue comprometido."},"8":{"title":"Retirada de emergencia","description":"La tripulación interrumpe la misión científica y activa procedimientos de emergencia."},"9":{"title":"Silencio en el hábitat","description":"Una crisis grave de soporte vital termina con el fallecimiento de un astronauta y el cierre de la misión."},"10":{"title":"La última caminata","description":"Una exploración con el traje comprometido termina con el fallecimiento de una astronauta."}},"facts":[{"id":"donki","topic":"storm","keywords":["tormenta","solar","radiacion","donki","particulas","sol"],"answer":"DONKI registra observaciones y análisis de eventos solares, como partículas energéticas solares (SEP) y eyecciones de masa coronal (CME). Una alerta es motivo para revisar el plan de refugio y las tareas exteriores; el riesgo lunar exacto requiere cálculos adicionales.","source":"NASA CCMC DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/tools/DONKI/","kind":"hecho_cientifico"},{"id":"oxygen","topic":"life","keywords":["oxigeno","aire","respirar","co2","fuga","tanque"],"answer":"El soporte vital no solo aporta oxígeno: también controla la atmósfera y ayuda a retirar dióxido de carbono. Si aparece una fuga, añadir oxígeno no sustituye reparar la fuente de la pérdida.","source":"NASA Open Science / material educativo del reto","sourceUrl":"https://science.nasa.gov/biological-physical/data/osdr/","kind":"explicacion_educativa"},{"id":"plant","topic":"food","keywords":["planta","semilla","riego","comida","alimento","cultivo","agua"],"answer":"Un cultivo necesita combinar agua, luz, nutrientes y control de su ambiente. Usar más agua no garantiza mejor crecimiento. Los alimentos de la base incluyen reservas, porque una planta recién sembrada no se cosecha al instante.","source":"Canadian Space Agency · Food production","sourceUrl":"https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/","kind":"explicacion_educativa"},{"id":"comms","topic":"comms","keywords":["comunicacion","mensaje","antena","latencia","tierra","retraso","señal"],"answer":"Hay una demora física en la señal entre la Luna y la Tierra, pero una pérdida prolongada de contacto normalmente indica otras limitaciones, como antenas, orientación, energía o procedimientos de comunicación. En el juego, los retrasos por turnos son una simplificación.","source":"NASA · documentación del desafío y principios de comunicaciones espaciales","sourceUrl":"https://www.nasa.gov/","kind":"explicacion_educativa"},{"id":"power","topic":"energy","keywords":["energia","bateria","panel","electricidad","apagón","circuito"],"answer":"Una batería almacena energía; no la fabrica. Si varios sistemas consumen a la vez, hay que decidir qué carga tiene prioridad. Para proteger la tripulación suelen priorizarse las funciones de soporte vital.","source":"NASA · desafíos de energía de una base lunar","sourceUrl":"https://www.nasa.gov/","kind":"explicacion_educativa"},{"id":"sources","topic":"sources","keywords":["fuente","dato real","nasa","registro","medicion","investigacion"],"answer":"En Moon Survival se distingue entre registros históricos NASA, explicaciones científicas y números inventados para el juego. Un evento solar de DONKI no es una dosis medida directamente dentro de un hábitat lunar.","source":"NASA Open APIs · DONKI","sourceUrl":"https://api.nasa.gov/","kind":"metodologia"}],"events":[{"id":"2024-05-12T21:00:00-GST-001","type":"GST","observedAt":"2024-05-12T21:00Z","title":"GST · 2024-05-12T21:00:00-GST-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/GST/30798/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.681Z","location":"Magnetosfera terrestre","summary":"Registro GST de DONKI. Índices Kp observados: 6.33, 5.67, 6.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-12T13:00:00-CME-001","type":"CME","observedAt":"2024-05-12T13:00Z","title":"CME · 2024-05-12T13:00:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30830/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.130Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-12T03:48:00-CME-001","type":"CME","observedAt":"2024-05-12T03:48Z","title":"CME · 2024-05-12T03:48:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30755/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.124Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-12T02:00:00-CME-001","type":"CME","observedAt":"2024-05-12T02:00Z","title":"CME · 2024-05-12T02:00:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30779/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.116Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T18:00:00-CME-001","type":"CME","observedAt":"2024-05-11T18:00Z","title":"CME · 2024-05-11T18:00:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30765/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.108Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T16:24:00-CME-001","type":"CME","observedAt":"2024-05-11T16:24Z","title":"CME · 2024-05-11T16:24:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30742/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.100Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T04:07:00-SEP-001","type":"SEP","observedAt":"2024-05-11T04:07Z","title":"SEP · 2024-05-11T04:07:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.726Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T03:12:00-CME-002","type":"CME","observedAt":"2024-05-11T03:12Z","title":"CME · 2024-05-11T03:12:00-CME-002","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30793/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.093Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T02:36:00-CME-001","type":"CME","observedAt":"2024-05-11T02:36Z","title":"CME · 2024-05-11T02:36:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30744/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.085Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T02:10:00-SEP-001","type":"SEP","observedAt":"2024-05-11T02:10Z","title":"SEP · 2024-05-11T02:10:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30714/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.718Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-11T01:36:00-CME-001","type":"CME","observedAt":"2024-05-11T01:36Z","title":"CME · 2024-05-11T01:36:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30719/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.078Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T23:13:00-CME-001","type":"CME","observedAt":"2024-05-10T23:13Z","title":"CME · 2024-05-10T23:13:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30784/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.071Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T21:28:00-CME-001","type":"CME","observedAt":"2024-05-10T21:28Z","title":"CME · 2024-05-10T21:28:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30753/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.065Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T21:17:00-CME-001","type":"CME","observedAt":"2024-05-10T21:17Z","title":"CME · 2024-05-10T21:17:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30751/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.060Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"20240510-AL-016","type":"GST","title":"Tormenta geomagnética de mayo de 2024 (Kp 8.67)","observedAt":"2024-05-10T21:00:00Z","source":"NASA CCMC DONKI · notificación 20240510-AL-016","sourceUrl":"https://kauai.ccmc.gsfc.nasa.gov/DONKI/view/Alert/30703/1","datasetType":"registro_historico_verificado","retrievedAt":null,"summary":"DONKI registró Kp 8.67 en la magnetosfera terrestre durante el intervalo 18:00–21:00 UTC del 10 de mayo de 2024.","location":"Magnetosfera terrestre","note":"Kp describe actividad geomagnética cerca de la Tierra. No mide directamente la radiación de una base lunar."},{"id":"2024-05-10T16:36:00-CME-001","type":"CME","observedAt":"2024-05-10T16:36Z","title":"CME · 2024-05-10T16:36:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30786/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.053Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T15:00:00-GST-001","type":"GST","observedAt":"2024-05-10T15:00Z","title":"GST · 2024-05-10T15:00:00-GST-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/GST/30693/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.668Z","location":"Magnetosfera terrestre","summary":"Registro GST de DONKI. Índices Kp observados: 7.67, 8.67, 9, 9, 8.33, 8.67, 9, 8.67, 8.33, 7.33, 7.33, 6.67, 7.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T14:50:00-SEP-001","type":"SEP","observedAt":"2024-05-10T14:50Z","title":"SEP · 2024-05-10T14:50:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30684/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.712Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T13:35:00-SEP-001","type":"SEP","observedAt":"2024-05-10T13:35Z","title":"SEP · 2024-05-10T13:35:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30677/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.707Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T13:02:00-SEP-001","type":"SEP","observedAt":"2024-05-10T13:02Z","title":"SEP · 2024-05-10T13:02:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30676/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.700Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T12:59:00-SEP-001","type":"SEP","observedAt":"2024-05-10T12:59Z","title":"SEP · 2024-05-10T12:59:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30675/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.694Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T07:12:00-CME-001","type":"CME","observedAt":"2024-05-10T07:12Z","title":"CME · 2024-05-10T07:12:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30670/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.046Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-10T02:12:00-CME-001","type":"CME","observedAt":"2024-05-10T02:12Z","title":"CME · 2024-05-10T02:12:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30788/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.040Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-09T18:23:00-CME-001","type":"CME","observedAt":"2024-05-09T18:23Z","title":"CME · 2024-05-09T18:23:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30655/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.033Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-09T14:25:00-SEP-001","type":"SEP","observedAt":"2024-05-09T14:25Z","title":"SEP · 2024-05-09T14:25:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30610/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.688Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-09T13:59:00-SEP-001","type":"SEP","observedAt":"2024-05-09T13:59Z","title":"SEP · 2024-05-09T13:59:00-SEP-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30609/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:55:30.678Z","location":"Observación solar","summary":"Registro SEP de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."},{"id":"2024-05-09T09:24:00-CME-001","type":"CME","observedAt":"2024-05-09T09:24Z","title":"CME · 2024-05-09T09:24:00-CME-001","source":"NASA Open API / DONKI","sourceUrl":"https://ccmc.gsfc.nasa.gov/DONKI/view/CME/30619/-1","datasetType":"registro_nasa_descargado","retrievedAt":"2026-11-14T20:51:19.024Z","location":"Observación solar","summary":"Registro CME de DONKI.","note":"La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados."}]};
+// Motor puro, sin Node, HTTP, base de datos ni conexión. Reutilizable en navegador.
+function createEngine(catalog) {
+  const challenges = catalog.challenges;
+  const items = catalog.items;
+  const endings = catalog.endings;
+  const facts = catalog.facts || [];
+  const challengeMap = new Map(challenges.map(c => [c.id, c]));
+  const itemMap = new Map(items.map(i => [i.id, i]));
+  const clamp = (n, min=0, max=100) => Math.max(min, Math.min(max, n));
+  const has = (g, key) => g.statuses.includes(key);
+  const add = (g,key) => {if (!has(g,key)) g.statuses.push(key)};
+  const remove = (g,key) => {g.statuses=g.statuses.filter(s=>s!==key)};
+  const clone = obj => structuredClone(obj);
+  const seedNum = seed => {
+    if (typeof seed==='number' && Number.isSafeInteger(seed)) return seed>>>0 || 1;
+    const str=String(seed ?? 'Luna7');let h=2166136261;
+    for(const c of str){h^=c.codePointAt(0);h=Math.imul(h,16777619)}
+    return h>>>0 || 1;
+  };
+  const nextRoll = g => {g.rngState=(Math.imul(g.rngState,1664525)+1013904223)>>>0;return g.rngState/4294967296};
+  const randInt = (g,lo,hi) => lo+Math.floor(nextRoll(g)*(hi-lo+1));
+  const queue = (g,id,reason,urgent=false)=>{
+    if(!challengeMap.has(id)||g.visited.includes(id)||g.currentMissionId===id||g.queue.some(x=>x.id===id))return;
+    g.queue.push({id,reason,urgent,at:g.turn});
+  };
+  function snapshot(g) {
+    const s=clone(g);delete s.snapshots;delete s.receipts;return s;
+  }
+  function saveCheckpoint(g){g.snapshots[String(g.day)]=snapshot(g)}
+  function createGame({id,seed=1,scienceEvents=[]}={}) {
+    const normalized = seedNum(seed);
+    const g={id:id||`offline-${Date.now()}-${Math.floor(Math.random()*1e7)}`, schemaVersion:3,
+      phase:'active',turn:0,day:1,maxTurns:14,maxDays:7,seed, rngState:normalized,skill:2,
+      metrics:{oxygen:78,water:76,energy:78,food:71,shield:74,comms:75,health:90,morale:80,research:0},
+      statuses:[],visited:[],queue:[],currentMissionId:1,consecutiveRisk:0,
+      coins:25,earned:0,spent:0,inventory:{},missionResults:{},history:[],
+      purchases:[],performance:{completed:0,partial:0,failed:0,skipped:0,hints:0,safeChoices:0,riskyChoices:0,scores:[],mastery:50},
+      daySummaries:[],science:{sourceMode:scienceEvents.length?'archivo_real_nasa':'sin_datos',registeredEvent:null},
+      events:[],messages:[],communicationSequence:0,npcHelpCount:0,endingId:null,
+      createdAt:new Date().toISOString(),snapshots:{},receipts:{},criticalAlert:null,weather:null};
+    g.scienceEventPool=scienceEvents.filter(x=>x&&typeof x.id==='string'&&['SEP','CME','GST'].includes(x.type)).map(e=>({id:e.id,type:e.type,observedAt:e.observedAt,title:e.title,source:e.source,sourceUrl:e.sourceUrl,summary:e.summary,datasetType:e.datasetType,location:e.location,note:e.note}));
+    saveCheckpoint(g);
+    return g;
+  }
+  function assertGame(g,allowFinished=false){
+    if(g.schemaVersion!==3)throw new Error('OLD_SAVE_VERSION: se requiere partida v0.3');
+    if(!allowFinished && g.phase!=='active')throw new Error('GAME_FINISHED: no se puede modificar una partida terminada');
+  }
+  const currentMission = g=>g.phase==='active'?challengeMap.get(g.currentMissionId)||null:null;
+  function missionModifiers(g,c){
+    let time=1,cost=1;const reasons=[];
+    if((c.category==='radiation'||c.category==='life')&&has(g,'fuga_activa')){time*=0.8;reasons.push('Fuga activa: menos margen operativo')}
+    if(c.category==='radiation'&&has(g,'traje_comprometido')){time*=0.75;reasons.push('Traje comprometido: EVA requiere protocolo extra')}
+    if(c.category==='comms'&&(has(g,'reporte_pendiente')||has(g,'enlace_saturado'))){time*=0.85;reasons.push('Retraso previo en comunicaciones')}
+    if(c.category==='food'&&has(g,'cultivo_retrasado')){cost*=1.15;reasons.push('Cultivo retrasado: tareas consumen más recursos')}
+    if(c.category==='energy'&&has(g,'energia_comprometida')){cost*=1.15;reasons.push('Red inestable: más gasto de recursos')}
+    if(has(g,`reparacion_pendiente_${c.category}`)){time*=0.9;reasons.push('Reparación anterior incompleta')}
+    return {timeMultiplier:Math.round(time*100)/100,resourceCostMultiplier:Math.round(cost*100)/100,reasons,note:'Reglas simplificadas de jugabilidad, no parámetros físicos NASA.'};
+  }
+  function nextMission(g){const c=currentMission(g);return c?{next:{...c,status:'available',day:g.day,turn:g.turn+1,modifiers:missionModifiers(g,c),options:c.choices.map((o,i)=>({id:i?'B':'A',label:o.label,consequence:o.consequence}))},pendingCount:1}:{next:null,pendingCount:0}}
+  function crisisTriggers(g) {
+    const m=g.metrics;
+    if(m.oxygen<38)queue(g,26,'Nivel bajo de aire',true);
+    if(m.oxygen<52&&has(g,'fuga_activa'))queue(g,46,'Despresurización',true);
+    if(m.water<38)queue(g,21,'Falta de agua',true);
+    if(m.energy<38)queue(g,23,'Escasez de energía',true);
+    if(m.energy<35&&has(g,'apagones'))queue(g,48,'Apagón en cascada',true);
+    if(m.food<34||has(g,'contaminacion'))queue(g,29,'Higiene alimentaria',true);
+    if(m.shield<34)queue(g,27,'Protección insuficiente',true);
+    if(m.shield<50&&has(g,'traje_comprometido'))queue(g,47,'Traje comprometido',true);
+    if(m.comms<34)queue(g,25,'Enlace débil',true);
+    if(m.comms<33)queue(g,50,'Sin respuesta',true);
+    if(m.health<43)queue(g,31,'Fatiga',true);
+    if(m.morale<30)queue(g,35,'Baja moral',false);
+    if(has(g,'fuga_activa'))queue(g,36,'Fuga pendiente',true);
+    if(has(g,'red_sobrecargada'))queue(g,23,'Red sobrecargada',false);
+  }
+  function selectNext(g) {
+    crisisTriggers(g);
+    // Dosificamos retos: empezamos fácil y los niveles 9-10 son posibles con buen dominio.
+    const completed=g.performance.completed;
+    const gradualCap=Math.min(10,g.skill+1,2+Math.floor(completed*0.68));
+    const critical=has(g,'fuga_activa')||has(g,'hipoxia_grave')||has(g,'eva_sin_rescate')||g.metrics.oxygen<20||g.metrics.health<20;
+    const emergencyCap=critical?Math.max(7,gradualCap):gradualCap;
+    const candidates=g.queue.filter(q=>!g.visited.includes(q.id));
+    const easiest=(a,b)=>challengeMap.get(a.id).difficulty-challengeMap.get(b.id).difficulty||a.at-b.at||a.id-b.id;
+    const target=Math.min(gradualCap,g.skill);
+    const nearest=(a,b)=>Math.abs(challengeMap.get(a.id).difficulty-target)-Math.abs(challengeMap.get(b.id).difficulty-target)||a.at-b.at||a.id-b.id;
+    let choice=candidates.filter(q=>q.urgent&&challengeMap.get(q.id).difficulty<=emergencyCap).sort(easiest)[0];
+    if(!choice)choice=candidates.filter(q=>challengeMap.get(q.id).difficulty<=gradualCap).sort(nearest)[0];
+    if(choice){g.queue=g.queue.filter(q=>q!==choice);return choice.id}
+    const maxWanted=Math.min(10,Math.max(1,g.skill));
+    const pool=challenges.filter(c=>!g.visited.includes(c.id)&&c.difficulty<=gradualCap);
+    if(!pool.length)return challenges.find(c=>!g.visited.includes(c.id))?.id||null;
+    pool.sort((a,b)=>Math.abs(a.difficulty-maxWanted)-Math.abs(b.difficulty-maxWanted)||a.difficulty-b.difficulty||a.id-b.id);
+    const preferred=pool.filter(c=>Math.abs(c.difficulty-maxWanted)===Math.abs(pool[0].difficulty-maxWanted)).slice(0,5);
+    return preferred[Math.floor(nextRoll(g)*preferred.length)].id;
+  }
+  const failureStatus={life:'fuga_activa',radiation:'traje_comprometido',energy:'energia_comprometida',food:'cultivo_retrasado',comms:'reporte_pendiente'};
+  function assess(performance) {
+    if(performance===undefined||performance===null)return {status:'completed',score:null,mode:'decision_only',hintsUsed:0};
+    if(typeof performance!=='object'||Array.isArray(performance))throw Error('INVALID_PERFORMANCE');
+    const {completed,accuracy,mistakes=0,hintsUsed=0}=performance;
+    if(typeof completed!=='boolean'||typeof accuracy!=='number'||!Number.isFinite(accuracy)||accuracy<0||accuracy>100||!Number.isInteger(mistakes)||mistakes<0||mistakes>100||!Number.isInteger(hintsUsed)||hintsUsed<0||hintsUsed>20)throw Error('INVALID_PERFORMANCE');
+    const score=clamp(Math.round(accuracy*0.75+(completed?25:0)-mistakes*5-hintsUsed*3));
+    return {status:completed&&score>=75?'completed':score>=45?'partial':'failed',score,mode:'minigame',hintsUsed};
+  }
+  function upkeep(g) {
+    const daily={oxygen:-4,water:-4,energy:5,food:-3,morale:-1};
+    for(const[k,v]of Object.entries(daily))g.metrics[k]=clamp(g.metrics[k]+v);
+    if(has(g,'fuga_activa'))g.metrics.oxygen=clamp(g.metrics.oxygen-7);
+    if(has(g,'contaminacion')){g.metrics.food=clamp(g.metrics.food-5);g.metrics.health=clamp(g.metrics.health-3)}
+    if(has(g,'fatiga'))g.metrics.health=clamp(g.metrics.health-3);
+    if(has(g,'deshidratacion'))g.metrics.health=clamp(g.metrics.health-4);
+    if(has(g,'apagones'))g.metrics.energy=clamp(g.metrics.energy-9);
+    if(has(g,'red_sobrecargada'))g.metrics.energy=clamp(g.metrics.energy-5);
+    if(has(g,'fallo_red'))g.metrics.energy=clamp(g.metrics.energy-6);
+    if(g.metrics.oxygen<28||g.metrics.water<25)g.metrics.health=clamp(g.metrics.health-6);
+    if(g.metrics.health<25)g.metrics.morale=clamp(g.metrics.morale-6);
+    const result={day:g.day,metrics:clone(g.metrics),statuses:[...g.statuses],coins:g.coins,skill:g.skill};
+    g.daySummaries.push(result);return result;
+  }
+  function messageTick(g) {
+    for(const m of g.messages){
+      if(m.status==='pending'&&m.arrivalTurn<=g.turn){
+        if(g.metrics.comms<25||has(g,'sin_respuesta')){
+          m.arrivalTurn+=1;m.delayCount++;
+          g.events.push({type:'COMMS_DELAY',turn:g.turn,messageId:m.id,reason:'averia_de_enlace'});
+        }else{
+          m.status='acknowledged';m.receivedTurn=g.turn;
+          g.events.push({type:'COMMS_ACK',turn:g.turn,messageId:m.id});
+          if(m.type==='rescue_request')add(g,'plan_rescate');
+          if(m.type==='status_report')remove(g,'reporte_pendiente');
+        }
+      }
+    }
+  }
+  function scriptedWeather(g) {
+    if(g.day!==5||g.events.some(e=>e.type==='WEATHER_TRAINING'))return;
+    const eligible=g.scienceEventPool.filter(e=>e.type==='SEP'||e.type==='CME');
+    const nasaEvent=eligible.length?eligible[Math.floor(nextRoll(g)*eligible.length)]:null;
+    g.science={sourceMode:nasaEvent?'registro_historico_nasa':'escenario_didactico_sin_registro',registeredEvent:nasaEvent};
+    g.weather={pending:true,day:g.day,event:nasaEvent,mode:g.science.sourceMode,choices:['shelter','continue_eva'],note:'Escenario ficticio de entrenamiento inspirado en observaciones. No es pronóstico de riesgo lunar.'};
+    g.events.push({type:'WEATHER_TRAINING',day:g.day,turn:g.turn,scenario:'ensayo_de_protocolo_de_refugio',sourceMode:g.science.sourceMode,nasaEventId:nasaEvent?.id||null,explanation:'Evento histórico como referencia, riesgo y efectos son hipotéticos; no se calculan dosis lunares.'});
+    queue(g,17,'Entrenamiento con datos DONKI',false);
+  }
+  function deathType(g){const m=g.metrics;
+    if(m.shield<=15&&m.oxygen<=55&&has(g,'eva_sin_rescate'))return 10;
+    if(m.oxygen<=14&&m.health<=45&&(has(g,'fuga_activa')||has(g,'hipoxia_grave')||has(g,'crisis_sin_resolver')))return 9;
+    return 0;
+  }
+  function isCritical(g){return Boolean(deathType(g))||g.metrics.oxygen<=7||g.metrics.water<=7||g.metrics.health<=7}
+  function endingFor(g) {
+    const death=deathType(g);if(death)return death;
+    const m=g.metrics;if(isCritical(g)||m.health<25)return 8;
+    if(m.comms<25&&m.health>=35)return 7;
+    if(m.health>=70&&['oxygen','water','energy','food','shield','comms'].filter(k=>m[k]>=45).length>=5&&m.research>=30)return 1;
+    if(m.food>=67&&m.water>=48&&m.energy>=15&&m.health>=45)return 2;
+    if(m.research>=55&&m.health>=42&&m.oxygen>=35&&m.comms>=40)return 3;
+    if(m.comms>=75&&m.health>=45&&m.energy>=15)return 4;
+    if(m.health>=45&&m.morale>=62&&m.oxygen>=30&&m.water>=30)return 5;
+    return 6;
+  }
+  function explanationFor(g,endingId) {
+    const m=g.metrics;const notes=[];
+    const low=Object.entries(m).filter(([,n])=>n<30).map(([k,v])=>`${k} (${v}/100)`);
+    if(low.length)notes.push(`Recursos o indicadores comprometidos: ${low.join(', ')}.`);
+    if(g.statuses.length)notes.push(`Estados pendientes: ${g.statuses.join(', ')}.`);
+    if(g.performance.failed||g.performance.skipped)notes.push(`Hubo ${g.performance.failed} retos fallidos y ${g.performance.skipped} omitidos.`);
+    if(g.messages.some(x=>x.type==='rescue_request'&&x.status==='acknowledged'))notes.push('La solicitud de ayuda obtuvo confirmación de Tierra.');
+    if(g.messages.some(x=>x.status==='pending'))notes.push('Quedan mensajes pendientes de confirmación.');
+    if(!notes.length)notes.push('La tripulación terminó sin alertas persistentes y conservó el equilibrio de recursos.');
+    const reasons={
+      1:['Salud ≥ 70','Cinco de seis sistemas básicos ≥ 45','Investigación ≥ 30'],
+      2:['Alimentos ≥ 67','Agua ≥ 48','Energía ≥ 15','Salud ≥ 45'],
+      3:['Investigación ≥ 55','Salud ≥ 42','Oxígeno ≥ 35','Comunicaciones ≥ 40'],
+      4:['Comunicaciones ≥ 75','Energía ≥ 15','Salud ≥ 45'],
+      5:['Salud ≥ 45','Moral ≥ 62','Oxígeno y agua ≥ 30'],
+      6:['No se alcanzaron otros criterios','Salud suficiente para finalizar sin retirada crítica'],
+      7:['Comunicaciones < 25','Salud ≥ 35'],
+      8:['Soporte vital o salud cayó a umbral crítico; o salud < 25 al cierre'],
+      9:['Oxígeno ≤ 14','Salud ≤ 45','Fuga, hipoxia grave o crisis pendiente'],
+      10:['Protección ≤ 15','Oxígeno ≤ 55','EVA sin rescate inmediato']
+    };
+    return {criteria:reasons[endingId]||[],evidence:notes,endingId,priorityNote:'Se evalúan primero las crisis graves y luego los criterios de final. Los umbrales son ficticios del videojuego.'};
+  }
+  function endTurn(g) {
+    g.turn++;
+    let daySummary=null;
+    if(g.turn%2===0){daySummary=upkeep(g)}
+    messageTick(g);
+    if(isCritical(g)||g.turn>=g.maxTurns){g.phase='completed';g.endingId=endingFor(g);g.currentMissionId=null;g.day=Math.min(7,Math.ceil(g.turn/2));}
+    else{
+      g.day=Math.floor(g.turn/2)+1;
+      scriptedWeather(g);
+      g.currentMissionId=selectNext(g);
+      if(!g.currentMissionId){g.phase='completed';g.endingId=endingFor(g)}
+      if(g.turn%2===0&&g.phase==='active')saveCheckpoint(g);
+    }
+    return daySummary;
+  }
+  function recordResult(g,c,result) {
+    g.visited.push(c.id);g.missionResults[c.id]=result;g.history.push(result);
+    if(result.status==='completed')g.performance.completed++;
+    if(result.status==='partial')g.performance.partial++;
+    if(result.status==='failed')g.performance.failed++;
+    if(result.status==='missed')g.performance.skipped++;
+  }
+  function resolveMission(original,missionId,choiceId,{performance,hintUsed=false}={}) {
+    assertGame(original);
+    if(original.weather?.pending)throw Error('WEATHER_RESPONSE_REQUIRED');
+    const c=challengeMap.get(Number(missionId));
+    if(!c)throw Error('MISSION_NOT_FOUND');
+    if(c.id!==original.currentMissionId)throw Error('NOT_CURRENT_MISSION');
+    const idx=choiceId==='A'||choiceId===0?0:choiceId==='B'||choiceId===1?1:-1;
+    if(idx<0)throw Error('INVALID_CHOICE');
+    if(typeof hintUsed!=='boolean')throw Error('INVALID_HINT');
+    const assessment=assess(performance),o=c.choices[idx],g=clone(original),before=clone(g.metrics);
+    const factor=assessment.status==='completed'?1:assessment.status==='partial'?0.5:0;
+    const modifiers=missionModifiers(g,c);
+    for(const[k,d]of Object.entries(o.delta))g.metrics[k]=clamp(g.metrics[k]+Math.round(d>0?d*factor:d*modifiers.resourceCostMultiplier));
+    for(const st of o.add)add(g,st);
+    if(assessment.status==='completed'){for(const st of o.remove)remove(g,st);remove(g,`reparacion_pendiente_${c.category}`)}
+    if(assessment.status==='failed')add(g,failureStatus[c.category]);
+    if(assessment.status==='partial')add(g,`reparacion_pendiente_${c.category}`);
+    for(const id of o.next)queue(g,id,`Consecuencia del reto ${c.id}`,false);
+    const lowCount=m=>['oxygen','water','energy','food','shield','comms','health'].filter(k=>m[k]<30).length;
+    g.consecutiveRisk=o.risk===2?g.consecutiveRisk+1:0;
+    const quality=assessment.score;
+    if(assessment.status==='failed'||lowCount(g.metrics)>lowCount(before)||g.consecutiveRisk>=2)g.skill=Math.max(1,g.skill-1);
+    else if(assessment.status==='completed' && ((quality===null&&o.risk===0)||(quality!==null&&quality>=82)))g.skill=Math.min(10,g.skill+1);
+    else if(assessment.status==='partial')g.skill=Math.max(1,g.skill-1);
+    if(quality!==null){g.performance.scores.push(quality);g.performance.scores=g.performance.scores.slice(-10);g.performance.mastery=Math.round(g.performance.scores.reduce((a,b)=>a+b,0)/g.performance.scores.length)}
+    if(o.risk===2)g.performance.riskyChoices++;if(o.risk===0)g.performance.safeChoices++;
+    const totalHints=assessment.hintsUsed+(hintUsed?1:0);
+    g.performance.hints+=totalHints;
+    const baseReward=randInt(g,c.rewardMin,c.rewardMax);
+    const reward=assessment.status==='completed'?baseReward:assessment.status==='partial'?Math.floor(baseReward/2):0;
+    g.coins+=reward;g.earned+=reward;
+    const result={missionId:c.id,name:c.name,day:g.day,turn:g.turn+1,difficulty:c.difficulty,category:c.category,status:assessment.status,
+      assessmentMode:assessment.mode,qualityScore:quality,choiceId:idx?'B':'A',risk:o.risk,consequence:o.consequence,
+      attemptedDelta:clone(o.delta),modifiersApplied:modifiers,metricsBefore:before,metricsAfter:clone(g.metrics),addedStatuses:[...o.add],removedStatuses:assessment.status==='completed'?[...o.remove]:[],
+      nextCandidates:[...o.next],coinsAwarded:reward,hintsUsed:totalHints,skillAfter:g.skill};
+    if(c.id===17)result.scienceReference=clone(g.science);
+    recordResult(g,c,result);
+    const daySummary=endTurn(g);
+    return {state:g,result,daySummary};
+  }
+  function skipMission(original){
+    assertGame(original);
+    if(original.weather?.pending)throw Error('WEATHER_RESPONSE_REQUIRED');
+    const c=currentMission(original);if(!c)throw Error('NO_CURRENT_MISSION');
+    const g=clone(original);g.skill=Math.max(1,g.skill-1);g.consecutiveRisk=0;
+    add(g,failureStatus[c.category]);
+    const penalty={life:{oxygen:-8},radiation:{shield:-7},energy:{energy:-8},food:{food:-7},comms:{comms:-8}}[c.category];
+    for(const[k,v]of Object.entries(penalty))g.metrics[k]=clamp(g.metrics[k]+v);
+    for(const id of c.choices[1].next)queue(g,id,`Omisión de ${c.id}`,false);
+    const result={missionId:c.id,name:c.name,day:g.day,turn:g.turn+1,difficulty:c.difficulty,category:c.category,status:'missed',choiceId:null,qualityScore:null,
+      coinsAwarded:0,reason:'reto_omitido',penalty,addedStatuses:[failureStatus[c.category]],metricsAfter:clone(g.metrics),skillAfter:g.skill};
+    recordResult(g,c,result);const daySummary=endTurn(g);
+    return {state:g,result,daySummary};
+  }
+  function purchase(original,itemId) {
+    assertGame(original);const item=itemMap.get(itemId);if(!item)throw Error('ITEM_NOT_FOUND');
+    const used=original.inventory[item.id]||0;if(used>=item.limit)throw Error('OUT_OF_STOCK');
+    if(original.coins<item.price)throw Error('INSUFFICIENT_COINS');
+    const g=clone(original);g.coins-=item.price;g.spent+=item.price;g.inventory[item.id]=used+1;
+    for(const[k,v]of Object.entries(item.delta))g.metrics[k]=clamp(g.metrics[k]+v);
+    for(const st of item.remove)remove(g,st);
+    const result={itemId:item.id,name:item.name,price:item.price,day:g.day,turn:g.turn,delta:clone(item.delta),removedStatuses:clone(item.remove),coinsAfter:g.coins};
+    g.purchases.push(result);return {state:g,result};
+  }
+  function respondWeather(original,choice){
+    assertGame(original);
+    if(!original.weather?.pending)throw Error('NO_PENDING_WEATHER');
+    if(!['shelter','continue_eva'].includes(choice))throw Error('INVALID_WEATHER_CHOICE');
+    const g=clone(original);
+    const deltas=choice==='shelter'?{energy:-8,shield:11,research:-5}:{research:9,oxygen:-5,shield:-12,health:-7};
+    for(const[k,v]of Object.entries(deltas))g.metrics[k]=clamp(g.metrics[k]+v);
+    if(choice==='shelter'){remove(g,'eva_riesgosa');remove(g,'exposicion_sin_control')}
+    else{add(g,'eva_riesgosa');add(g,'exposicion_sin_control')}
+    g.weather.pending=false;g.weather.choice=choice;
+    const result={choice,day:g.day,turn:g.turn,delta:deltas,reference:g.weather.event?.id||null,
+      note:'Consecuencias numéricas ficticias, no cálculo de dosis NASA.'};
+    g.events.push({type:'WEATHER_DECISION',...result});
+    if(isCritical(g)){g.phase='completed';g.endingId=endingFor(g);g.currentMissionId=null}
+    return {state:g,result};
+  }
+  function sendMessage(original,type){
+    assertGame(original);
+    const allowed=['status_report','science_report','rescue_request'];if(!allowed.includes(type))throw Error('INVALID_MESSAGE_TYPE');
+    if(original.metrics.energy<5)throw Error('INSUFFICIENT_ENERGY');
+    const g=clone(original);g.metrics.energy-=5;
+    const signalPoor=g.metrics.comms<45||has(g,'enlace_saturado')||has(g,'sin_respuesta');
+    const delay=signalPoor?3:1; // turnos de trabajo por interrupciones/protocolos, NO tiempo-luz físico.
+    const message={id:`msg-${++g.communicationSequence}`,type,sentTurn:g.turn,arrivalTurn:g.turn+delay,status:'pending',delayCount:0,simulatedDelayTurns:delay};
+    g.messages.push(message);g.events.push({type:'MESSAGE_SENT',turn:g.turn,messageId:message.id,messageType:type});
+    return {state:g,result:message};
+  }
+  function repeatDay(original,requestedDay=original.day){
+    assertGame(original,true);
+    const n=Number(requestedDay),snap=original.snapshots[String(n)];
+    if(!Number.isInteger(n)||n<1||n>original.day||!snap)throw Error('INVALID_REPLAY_DAY');
+    const restored=clone(snap);restored.snapshots={};
+    for(const[k,v]of Object.entries(original.snapshots)){if(Number(k)<=n)restored.snapshots[k]=clone(v)}
+    restored.receipts={};restored.events.push({type:'DAY_REPEATED',day:n,previousTurn:original.turn});
+    return {state:restored,result:{replayedDay:n,turn:restored.turn,day:restored.day,warning:'La repetición restaura recursos, decisiones, compras y aleatoriedad de ese día y elimina cambios posteriores del estado activo.'}};
+  }
+  // LUNI funciona sin Internet y solo utiliza el catálogo y eventos ya descargados.
+  function npcAsk(original,question,{hint=false}={}){
+    if(typeof question!=='string'||question.length>350||question.trim().length<2)throw Error('INVALID_QUESTION');
+    const g=clone(original);
+    const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+    const q=norm(question);
+    const hasWord=word=>(' '+q+' ').includes(' '+norm(word)+' ');
+    const any=(...words)=>words.some(hasWord);
+    const current=currentMission(g);
+    const groups={
+      donki:['donki','tormenta','tormentas','solar','solares','sol','sep','cme','gst','kp','radiacion','dosimetro','particula','particulas','refugio'],
+      oxygen:['oxigeno','aire','respirar','co2','dioxido','fuga','fugas','tanque','tanques','presion','ventilacion'],
+      plant:['agua','riego','cultivo','cultivos','comida','alimento','alimentos','invernadero','semilla','semillas','planta','plantas','hidroponia'],
+      power:['energia','bateria','baterias','panel','paneles','electricidad','apagon','apagones','circuito'],
+      comms:['comunicacion','comunicaciones','mensaje','mensajes','antena','antenas','latencia','retraso','senal','transmitir'],
+      sources:['fuente','fuentes','referencias','bibliografia']
+    };
+    const scores=Object.fromEntries(Object.entries(groups).map(([id,terms])=>[id,terms.filter(hasWord).length]));
+    const topic=Object.entries(scores).filter(([id])=>id!=='sources').sort((a,b)=>b[1]-a[1])[0];
+    const nasaAsk=any('nasa','donki','evento solar','eventos solares','tormenta','tormentas','cme','sep','gst','kp','actividad solar','clima espacial')||(any('evento','eventos','registro','registros')&&any('ultimo','ultima','reciente','hoy','ayer','2024','2025','2026'));
+    const askMission=any('que hago','que hago ahora','que debo hacer','que deberia hacer','pista','ayuda','ayudame','esta mision','este reto','mi reto','consejo');
+    const askStatus=any('como voy','como va mi base','como esta mi base','como esta la base','estado de la base','mi estado','mis recursos','cuanta energia','cuanto oxigeno','cuanta agua','cuanta comida','cuanto queda');
+    const askHello=any('hola','buenas','gracias','quien eres','como te llamas');
+    const type=any('sep','particulas energeticas')?'SEP':any('cme','eyeccion de masa')?'CME':any('gst','kp','geomagnetica')?'GST':null;
+    const archived=(g.scienceEventPool||[]).slice();
+    if(g.science?.registeredEvent&&!archived.some(x=>x.id===g.science.registeredEvent.id))archived.push(g.science.registeredEvent);
+    archived.sort((a,b)=>String(b.observedAt||'').localeCompare(String(a.observedAt||'')));
+    const year=(q.match(/\b20\d{2}\b/)||[])[0]||null;
+    const matching=archived.filter(e=>(!type||e.type===type)&&(!year||String(e.observedAt||'').startsWith(year)));
+    const event=matching[0]||null;
+    const sources=[];
+    const source=(name,url,kind)=>{if(url?.startsWith('https://')&&!sources.some(s=>s.url===url))sources.push({title:name,url,kind})};
+    let answer='',observation=null,matchedTopic=null;
+    if(askHello&&!nasaAsk){
+      answer='¡Hola! Soy LUNI, el robot de Luna-7. Podés preguntarme por oxígeno, energía, agua, cultivos, comunicaciones y tormentas solares. También puedo ofrecer pistas sobre el reto actual o mostrar datos archivados de NASA.';
+    }else if(askStatus&&!nasaAsk){
+      answer=`Día ${g.day}: oxígeno ${g.metrics.oxygen}/100, agua ${g.metrics.water}/100, energía ${g.metrics.energy}/100, comida ${g.metrics.food}/100, salud ${g.metrics.health}/100 y comunicaciones ${g.metrics.comms}/100. Estas escalas son inventadas para el videojuego, no medidas de NASA.`;
+      if(g.statuses.length)answer+=' Alertas pendientes: '+g.statuses.slice(0,3).join(', ')+'.';
+    }else if(askMission&&!nasaAsk&&(!topic||topic[1]===0)&&current){
+      answer=`Tu reto #${current.id} es «${current.name}». ${current.intro} ${current.science} Para decidir, compará las consecuencias para las personas y los recursos: una solución rápida puede ocasionar problemas después.`;
+      const f=facts.find(f=>f.topic===current.category);if(f)source(f.source,f.sourceUrl,f.kind);
+      matchedTopic=current.category;
+    }else if(nasaAsk&&(any('nasa','donki','evento','eventos','solar','solares','tormenta','tormentas','sep','cme','gst','kp','clima espacial'))){
+      const f=facts.find(f=>f.id==='donki');
+      matchedTopic='storm';
+      answer=f?.answer||'DONKI es el registro de clima espacial de NASA.';
+      source(f?.source||'NASA DONKI',f?.sourceUrl||'https://ccmc.gsfc.nasa.gov/tools/DONKI/','hecho_cientifico');
+      if(event){
+        const date=String(event.observedAt||'fecha no disponible').slice(0,10);
+        observation={id:event.id,type:event.type,title:event.title,observedAt:event.observedAt,source:event.source,sourceUrl:event.sourceUrl,disclaimer:event.note||'No mide la dosis lunar.'};
+        answer+=`\n\nDe los ${archived.length} registros guardados en esta partida, encontré: ${event.title} (${event.type}), con fecha ${date}. ${event.summary||''}`;
+        source(event.source,event.sourceUrl,'registro_nasa_descargado');
+      }else answer+=archived.length?'\n\nNo hay eventos guardados del tipo o año solicitado.':'\n\nNo hay eventos DONKI cargados en esta partida.';
+      answer+='\n\nLos registros son de archivo, no una consulta NASA en vivo ni mediciones de radiación en la base lunar.';
+    }else if(scores.sources>0){
+      const f=facts.find(f=>f.id==='sources');answer=f?.answer||'Las referencias científicas acompañan a los retos.';
+      if(f)source(f.source,f.sourceUrl,f.kind);
+    }else if(topic&&topic[1]>0){
+      const f=facts.find(f=>f.id===topic[0]);
+      if(f){
+        answer=f.answer;matchedTopic=f.topic;source(f.source,f.sourceUrl,f.kind);
+        const metric={donki:'shield',oxygen:'oxygen',plant:'food',power:'energy',comms:'comms'}[topic[0]];
+        if(metric)answer+=`\n\nEn esta partida, el indicador de ${metric} está en ${g.metrics[metric]}/100. Es una escala didáctica.`;
+      }
+    }
+    if(!answer)answer='No tengo una ficha científica verificable para esa pregunta todavía. Probá preguntarme por oxígeno, agua, cultivos, baterías, comunicaciones, radiación, DONKI o por el reto actual. Prefiero reconocer mis límites a inventar datos.';
+    if(hint){g.npcHelpCount++;g.performance.hints++}
+    const response={npc:'LUNI',mode:'asistente_educativo_por_reglas_sin_IA_generativa',answer,observation,matchedTopic,
+      hint:hint&&current?`Pista del reto #${current.id}: ${current.science} Pensá qué recursos y qué riesgos cambian.`:null,
+      sources,disclaimer:'LUNI no utiliza IA generativa y no consulta DONKI en vivo. Los datos NASA son registros históricos; los indicadores de la base son simulaciones ficticias.'};
+    return {state:g,response};
+  }
+  function report(g){
+    if(g.phase!=='completed')throw Error('REPORT_NOT_READY');
+    return {gameId:g.id,endingId:g.endingId,ending:{id:g.endingId,...endings[g.endingId]},why:explanationFor(g,g.endingId),day:g.day,
+      turnsPlayed:g.turn,metrics:g.metrics,statuses:g.statuses,coins:g.coins,earned:g.earned,spent:g.spent,
+      inventory:g.inventory,performance:g.performance,missions:g.history,daySummaries:g.daySummaries,science:g.science,messages:g.messages};
+  }
+  function shop(g){return items.map(i=>({...i,purchased:g.inventory[i.id]||0,remaining:i.limit-(g.inventory[i.id]||0),affordable:g.coins>=i.price,available:g.phase==='active'&&g.coins>=i.price&&(g.inventory[i.id]||0)<i.limit}))}
+  return {createGame,nextMission,resolveMission,skipMission,purchase,sendMessage,respondWeather,repeatDay,npcAsk,report,shop,endingFor,assess,currentMission,challengeMap};
+}
+
+/**
+ * Contrato sencillo para frontend HTML/CSS/JavaScript o Phaser.
+ * No introduce reglas nuevas: delega las decisiones al motor lunar existente.
+ * Independiente de Node, SQLite, HTML y Phaser.
+ */
+function createFrontendBridge(engine, {
+  storage = undefined,
+  storageKey = 'moon-survival-partida-v03',
+  now = () => Date.now(),
+  autoStart = true,
+  seed = undefined,
+} = {}) {
+  if (!engine || typeof engine.createGame !== 'function' || typeof engine.resolveMission !== 'function') {
+    throw new Error('INVALID_ENGINE');
+  }
+  const clone = object => structuredClone(object);
+  const listeners = new Set();
+  let game = null;
+  let pendingChoice = null;
+  let lastResult = null;
+  let lastLuni = null;
+  let storageAvailable = false;
+  let storageError = null;
+  const getStorage = () => {
+    if (storage !== undefined) return storage;
+    try { return typeof localStorage === 'undefined' ? null : localStorage; }
+    catch { return null; }
+  };
+  const store = getStorage();
+  function notify(action, extra = {}) {
+    const view = getView();
+    for (const fn of listeners) fn(view, {action, ...extra});
+  }
+  function save() {
+    if (!store) {storageAvailable = false; storageError = 'STORAGE_UNAVAILABLE'; return false;}
+    try {
+      store.setItem(storageKey, JSON.stringify({format:'moon-frontend-bridge-1', game, pendingChoice, updatedAt:now()}));
+      storageAvailable = true; storageError = null;
+      return true;
+    } catch {
+      storageAvailable = false; storageError = 'STORAGE_WRITE_FAILED';
+      return false;
+    }
+  }
+  function restore() {
+    if (!store) return false;
+    try {
+      // Compatibilidad con la primera demo offline, que utilizaba otra clave.
+      const raw = store.getItem(storageKey) ?? (storageKey === 'moon-survival-partida-v03' ? store.getItem('moon-survival-v03-offline') : null);
+      if (!raw) { storageAvailable = true; return false; }
+      const parsed = JSON.parse(raw);
+      // Admite también el guardado anterior de v0.3, que contenía directamente game.
+      const saved = parsed && parsed.format === 'moon-frontend-bridge-1' ? parsed.game : parsed;
+      if (!saved || saved.schemaVersion !== 3 || !Array.isArray(saved.statuses) || !saved.metrics || !Number.isInteger(saved.turn)) {
+        storageAvailable = true; return false;
+      }
+      game = clone(saved);
+      pendingChoice = parsed?.format === 'moon-frontend-bridge-1' && ['A','B'].includes(parsed.pendingChoice) ? parsed.pendingChoice : null;
+      storageAvailable = true;
+      return true;
+    } catch {
+      storageAvailable = false; storageError = 'STORAGE_READ_FAILED'; return false;
+    }
+  }
+  function requireGame() { if (!game) throw new Error('NO_GAME'); return game; }
+  function commit(output, action) {
+    game = output.state;
+    pendingChoice = null;
+    lastResult = output.result ?? null;
+    save(); notify(action, {result:lastResult});
+    return {view:getView(), result:lastResult, state:getState()};
+  }
+  function newGame({seed:chosenSeed, scienceEvents} = {}) {
+    const actualSeed = chosenSeed ?? seed ?? `luna-${now()}-${Math.random().toString(36).slice(2)}`;
+    const events = scienceEvents ?? engine.catalog?.events ?? [];
+    game = engine.createGame({seed:actualSeed, scienceEvents:events});
+    pendingChoice = null; lastResult = null; lastLuni = null;
+    save(); notify('NEW_GAME');
+    return getView();
+  }
+  function getState() { return game ? clone(game) : null; }
+  function getView() {
+    if (!game) return {phase:'not_started', storage:{available:storageAvailable,error:storageError}};
+    const next = engine.nextMission(game).next;
+    let ending = null;
+    if (game.phase === 'completed') {
+      try { ending = engine.report(game); } catch { ending = null; }
+    }
+    return {
+      gameId:game.id, phase:game.phase, scene:game.phase==='completed'?'ending':game.weather?.pending?'weather':'mission',
+      day:game.day, turn:game.turn, maxDays:game.maxDays, maxTurns:game.maxTurns,
+      daysCompleted:Math.floor(game.turn/2), seed:game.seed, skill:game.skill,
+      metrics:clone(game.metrics), statuses:[...game.statuses],
+      coins:game.coins, inventory:clone(game.inventory), shop:engine.shop(game),
+      mission:next?{id:next.id, name:next.name, intro:next.intro, cause:next.cause, science:next.science,
+        category:next.category, difficulty:next.difficulty, options:next.choices.map((choice,index)=>({
+          id:index===0?'A':'B', label:choice.label, consequence:choice.consequence,
+          delta:clone(choice.delta), risk:choice.risk
+        })), modifiers:clone(next.modifiers)}:null,
+      pendingChoice,
+      weather:game.weather?clone(game.weather):null,
+      science:clone(game.science),
+      messages:clone(game.messages), events:clone(game.events),
+      performance:clone(game.performance),
+      lastResult:lastResult?clone(lastResult):null,
+      lastLuni:lastLuni?clone(lastLuni):null,
+      ending,
+      storage:{available:storageAvailable,error:storageError}
+    };
+  }
+  function subscribe(fn, {immediate=true} = {}) {
+    if (typeof fn !== 'function') throw new TypeError('Listener must be a function');
+    listeners.add(fn);
+    if (immediate) fn(getView(), {action:'SUBSCRIBED'});
+    return () => listeners.delete(fn);
+  }
+  function validateChoice(id) {
+    if (!['A','B'].includes(id)) throw new Error('INVALID_CHOICE');
+    const current = engine.nextMission(requireGame()).next;
+    if (!current) throw new Error('NO_CURRENT_MISSION');
+    if (game.weather?.pending) throw new Error('WEATHER_RESPONSE_REQUIRED');
+    return current.id;
+  }
+  // Para una carta SIN minijuego: resuelve en un solo paso.
+  function chooseCard(choiceId, {performance, hintUsed=false} = {}) {
+    const id = validateChoice(choiceId);
+    return commit(engine.resolveMission(game,id,choiceId,{performance,hintUsed}), 'CHOOSE_CARD');
+  }
+  // Para carta CON minijuego: separar selección y resultado visual sin avanzar turnos al elegir.
+  function prepareMinigame(choiceId) {
+    validateChoice(choiceId);
+    pendingChoice = choiceId;
+    save(); notify('PREPARE_MINIGAME');
+    return getView();
+  }
+  function finishMinigame(performance, {hintUsed=false} = {}) {
+    if (!pendingChoice) throw new Error('NO_PENDING_MINIGAME');
+    const id = validateChoice(pendingChoice);
+    return commit(engine.resolveMission(game,id,pendingChoice,{performance,hintUsed}), 'FINISH_MINIGAME');
+  }
+  function skipCard() { return commit(engine.skipMission(requireGame()), 'SKIP_CARD'); }
+  function buy(itemId) { return commit(engine.purchase(requireGame(),itemId), 'BUY'); }
+  function respondWeather(choice) { return commit(engine.respondWeather(requireGame(),choice), 'WEATHER'); }
+  function sendMessage(type) { return commit(engine.sendMessage(requireGame(),type), 'MESSAGE'); }
+  function repeatDay(day=undefined) {
+    return commit(engine.repeatDay(requireGame(),day ?? game.day), 'REPEAT_DAY');
+  }
+  function askLuni(question,{hint=false}={}) {
+    const output=engine.npcAsk(requireGame(),question,{hint});
+    game=output.state;lastLuni=output.response;
+    save();notify('LUNI_ANSWER', {response:clone(output.response)});
+    return clone(output.response);
+  }
+  function refreshNASA(events) {
+    if (!Array.isArray(events)) throw new Error('INVALID_SCIENCE_EVENTS');
+    const g=clone(requireGame());
+    const existing=new Map((g.scienceEventPool||[]).map(e=>[e.id,e]));
+    for(const e of events) {
+      if (!e || typeof e.id !== 'string' || !['SEP','CME','GST'].includes(e.type) || !e.observedAt || typeof e.sourceUrl !== 'string' || !/^https:\/\/([a-z0-9.-]+\.)?nasa\.gov(\/|$)/i.test(e.sourceUrl)) continue;
+      existing.set(e.id,clone(e));
+    }
+    g.scienceEventPool=[...existing.values()];
+    game=g;save();notify('NASA_REFRESH');
+    return {count:g.scienceEventPool.length,view:getView()};
+  }
+  function clearProgress() {
+    game=null;pendingChoice=null;lastLuni=null;lastResult=null;
+    try {store?.removeItem(storageKey);if(storageKey==='moon-survival-partida-v03')store?.removeItem('moon-survival-v03-offline');storageAvailable=!!store;storageError=null;}
+    catch {storageAvailable=false;storageError='STORAGE_DELETE_FAILED';}
+    notify('CLEAR_PROGRESS');
+    return getView();
+  }
+  const restored=restore();
+  if (!restored && autoStart) newGame();
+  return {newGame,getState,getView,subscribe,save,chooseCard,prepareMinigame,finishMinigame,skipCard,buy,
+    respondWeather,sendMessage,repeatDay,askLuni,refreshNASA,clearProgress};
+}
+
+const engine={...createEngine(CATALOG),catalog:CATALOG};
+window.MoonSurvival=engine;
+window.MoonSurvivalFrontend=(options)=>createFrontendBridge(engine,options);
+})();

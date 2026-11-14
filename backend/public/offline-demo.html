@@ -1,0 +1,38 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#172941"><title>Moon Survival · Offline Demo</title><link rel="manifest" href="./manifest.webmanifest"><style>
+:root{color-scheme:dark;font:16px system-ui;background:#0c172a;color:#eaf4fc}body{max-width:900px;margin:0 auto;padding:20px}h1{color:#83dfcb}.panel{background:#192b45;border:1px solid #38516b;padding:16px;border-radius:15px;margin-bottom:16px}button{background:#3d617e;color:white;border:1px solid #79d9c7;padding:12px;border-radius:10px;cursor:pointer;margin:3px}button:disabled{opacity:.45}input{padding:13px;border-radius:8px;background:#101f34;color:white;border:1px solid #6b8da5;width:60%}.muted{color:#b7cde2;font-size:13px}.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{background:#102039;padding:8px;border-radius:9px;font-size:13px}.shop{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:7px}.shop button{width:100%}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:540px){.choices{grid-template-columns:1fr}input{width:100%}}</style></head>
+<body><h1>🌕 Moon Survival · Motor offline</h1><p class="muted">Demo técnica sin gráficos. Los valores de recursos son simulados. Los registros DONKI citados son históricos, no mediciones de radiación lunar.</p>
+<div class="panel"><div id="summary"></div><div id="stats" class="stats"></div></div>
+<div class="panel" id="mission"></div>
+<div class="panel"><h2>🤖 LUNI · Mascota científica</h2><input id="question" value="¿Qué dice NASA sobre las tormentas solares?" aria-label="Tu pregunta"><button id="ask">Preguntar</button><button id="hint">Pista</button><p class="muted">Preguntas de ejemplo: <button class="example" data-question="¿Qué pasó en DONKI?">DONKI</button><button class="example" data-question="¿Cómo va mi base?">Mis recursos</button><button class="example" data-question="¿Qué hago en este reto?">Mi reto</button><button class="example" data-question="¿Qué sabes de las plantas?">Cultivos</button></p><div id="answer" style="white-space:pre-wrap"></div><div id="answer-sources" class="muted"></div></div>
+<div class="panel"><h2>🛒 Tienda</h2><div class="shop" id="shop"></div></div>
+<div class="panel"><button id="repeat">Repetir día actual</button><button id="report">Ver resumen</button><button id="restart">Nueva partida</button><button id="erase">Borrar progreso</button><pre id="log" style="white-space:pre-wrap;font-size:12px"></pre></div>
+<script src="./offline-engine.js"></script><script>
+const E=window.MoonSurvival;const KEY='moon-survival-v03-offline';let game;const byId=id=>document.getElementById(id);
+function load(){try{const saved=localStorage.getItem(KEY);return saved?JSON.parse(saved):null}catch{return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(game))}catch{byId('log').textContent='Tu navegador bloquea almacenamiento en este contexto. Usá npm.cmd run serve:offline.'}}
+game=load()||E.createGame({seed:'offline-demo',scienceEvents:E.catalog.events});
+// Si DONKI se actualizó y recompilaste la demo, también se actualiza una partida guardada.
+if(game?.schemaVersion===3){const known=new Map((game.scienceEventPool||[]).map(e=>[e.id,e]));for(const e of E.catalog.events||[])known.set(e.id,e);game.scienceEventPool=[...known.values()];}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){save();const m=game.metrics;byId('summary').textContent=`Día ${game.day}/7 · Turno ${game.turn}/14 · Habilidad ${game.skill}/10 · Monedas ${game.coins}`;
+byId('stats').innerHTML=Object.entries(m).map(([k,v])=>`<span class="stat">${esc(k)}: ${v}/100</span>`).join('');
+const c=E.nextMission(game).next;
+if(game.weather?.pending){byId('mission').innerHTML=`<h2>☀️ Alerta de clima espacial de entrenamiento</h2><p>${esc(game.weather.event?.title||'Escenario simulado; sin registro NASA')} · No representa una dosis lunar.</p><button id="shelter">Activar refugio (gasta energía)</button><button id="eva">Continuar EVA (más riesgos)</button>`;byId('shelter').onclick=()=>{game=E.respondWeather(game,'shelter').state;render()};byId('eva').onclick=()=>{game=E.respondWeather(game,'continue_eva').state;render()};byId('shop').innerHTML=E.shop(game).map(i=>`<div class="stat">${esc(i.name)} · ${i.price} 🪙</div>`).join('');return;}
+
+byId('mission').innerHTML=c?`<h2>Reto #${c.id} (nivel ${c.difficulty}/10): ${esc(c.name)}</h2><p>${esc(c.intro)}</p><label>Calidad del minijuego (demo): <input type="number" id="accuracy" min="0" max="100" value="95"></label><div class="choices">${c.choices.map((o,i)=>`<button data-choice="${i?'B':'A'}">${i?'B':'A'} · ${esc(o.label)}</button>`).join('')}</div><button id="skip">Omitir reto</button>`:`<h2>Partida completada</h2><p>Final ${game.endingId}: ${esc(E.catalog.endings[game.endingId]?.title||'')}</p>`;
+byId('mission').querySelectorAll('[data-choice]').forEach(btn=>btn.onclick=()=>{
+ try{const accuracy=Number(byId('accuracy').value);game=E.resolveMission(game,c.id,btn.dataset.choice,{performance:{completed:accuracy>=40,accuracy,mistakes:0,hintsUsed:0}}).state;render()}catch(e){alert(e.message)}
+});
+if(c)byId('skip').onclick=()=>{game=E.skipMission(game).state;render()};
+byId('shop').innerHTML=E.shop(game).map(i=>`<div class="stat"><div>${esc(i.name)} · ${i.price} 🪙</div><button data-buy="${esc(i.id)}" ${!i.available?'disabled':''}>Comprar (${i.purchased}/${i.limit})</button></div>`).join('');
+byId('shop').querySelectorAll('[data-buy]').forEach(btn=>btn.onclick=()=>{try{game=E.purchase(game,btn.dataset.buy).state;render()}catch(e){alert(e.message)}})
+}
+byId('ask').onclick=()=>ask(false);byId('hint').onclick=()=>ask(true);
+function ask(hint){try{const r=E.npcAsk(game,byId('question').value,{hint});game=r.state;byId('answer').textContent=r.response.answer+(r.response.hint?'\n\n'+r.response.hint:'');const host=byId('answer-sources');host.textContent='';if(r.response.sources?.length){host.append(document.createTextNode('Fuentes: '));r.response.sources.forEach((s,i)=>{if(i)host.append(document.createTextNode(' · '));const a=document.createElement('a');a.textContent=s.title;a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';host.append(a)})}render()}catch(e){alert(e.message)}}
+document.querySelectorAll('[data-question]').forEach(b=>b.onclick=()=>{byId('question').value=b.dataset.question;ask(false)});
+byId('repeat').onclick=()=>{try{game=E.repeatDay(game).state;render()}catch(e){alert(e.message)}};
+byId('report').onclick=()=>{byId('log').textContent=game.phase==='completed'?JSON.stringify(E.report(game),null,2):JSON.stringify({current:game.day,events:game.events.slice(-5),history:game.history.slice(-5)},null,2)};
+byId('restart').onclick=()=>{game=E.createGame({seed:'offline-demo',scienceEvents:E.catalog.events});render()};
+byId('erase').onclick=()=>{try{localStorage.removeItem(KEY)}catch{};game=E.createGame({seed:'offline-demo',scienceEvents:E.catalog.events});render()};
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});render();
+</script></body></html>

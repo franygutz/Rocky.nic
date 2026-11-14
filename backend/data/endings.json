@@ -1,0 +1,42 @@
+{
+  "1": {
+    "title": "Aurora de Luna-7",
+    "description": "La tripulación concluye estable y con importantes resultados científicos."
+  },
+  "2": {
+    "title": "Jardín de estrellas",
+    "description": "El invernadero y las reservas quedan preparados para el siguiente equipo."
+  },
+  "3": {
+    "title": "Conocimiento para la Tierra",
+    "description": "La misión aporta valiosa investigación a pesar de las dificultades."
+  },
+  "4": {
+    "title": "El puente restaurado",
+    "description": "La comunicación permite coordinar la siguiente fase de la misión."
+  },
+  "5": {
+    "title": "Una tripulación unida",
+    "description": "La cooperación y el cuidado de las personas sostuvieron la base."
+  },
+  "6": {
+    "title": "Rescate imperfecto",
+    "description": "La misión llega al cierre con dificultades y un plan de apoyo."
+  },
+  "7": {
+    "title": "Silencio controlado",
+    "description": "El equipo conserva la seguridad, pero el enlace con Tierra sigue comprometido."
+  },
+  "8": {
+    "title": "Retirada de emergencia",
+    "description": "La tripulación interrumpe la misión científica y activa procedimientos de emergencia."
+  },
+  "9": {
+    "title": "Silencio en el hábitat",
+    "description": "Una crisis grave de soporte vital termina con el fallecimiento de un astronauta y el cierre de la misión."
+  },
+  "10": {
+    "title": "La última caminata",
+    "description": "Una exploración con el traje comprometido termina con el fallecimiento de una astronauta."
+  }
+}

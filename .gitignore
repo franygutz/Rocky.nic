@@ -1,0 +1,9 @@
+@"
+**/.env
+**/node_modules/
+**/*.sqlite
+**/*.sqlite-wal
+**/*.sqlite-shm
+**/.DS_Store
+**/Thumbs.db
+"@ | Set-Content .gitignore
