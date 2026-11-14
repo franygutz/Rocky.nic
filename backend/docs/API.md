@@ -1,4 +1,4 @@
-# Moon Survival v0.3 — Contrato de API (Sara / Solieth / Farid)
+# Moon Survival v0.4.1 — Contrato de API (Sara / Solieth / Farid)
 
 Base URL local: `http://127.0.0.1:3001`
 
@@ -14,7 +14,7 @@ JSON en todas las respuestas. Solicitudes POST usan `Content-Type: application/j
 | GET | `/api/v1/shop` | catálogo de tienda |
 | GET | `/api/v1/science-events` | registros históricos NASA y datos sincronizados |
 | GET | `/api/v1/science/facts` | fichas científicas que usa LUNI |
-| GET | `/api/v1/science/sources` | enlaces de origen |
+| GET | `/api/v1/science/sources` | enlaces de origen (DONKI, Open APIs, OSDR, RadLab, JPL Horizons, CSA) |
 | GET | `/api/v1/games/:id` | estado actual y próximo reto |
 | GET | `/api/v1/games/:id/next-mission` | misión activa |
 | GET | `/api/v1/games/:id/shop` | precios, compras, disponibilidad |
@@ -84,7 +84,7 @@ Los artículos tienen `limit`, `price`, `delta`, `remove` definidos en `data/sho
 
 - Estado de recursos: `game.metrics`.
 - Tienda: `GET .../shop` (o `window.MoonSurvival.shop(game)` offline).
-- Dialogar NPC: respuesta `npc.answer`, `npc.hint`, `npc.observation`, `npc.sources`.
+- Dialogar NPC: respuesta `npc.answer`, `npc.hint`, `npc.observation`, `npc.sources` y `npc.suggestions` (2 o 3 preguntas que LUNI sabe responder, para mostrarlas como botones).
 - Final: `report.ending`, `report.why.criteria`, `report.why.evidence`.
 - Avisos: si `game.weather?.pending`, mostrar elección del clima espacial antes del siguiente reto.
 - Guardar: con API local el backend almacena automáticamente en SQLite; con motor offline el frontend hace `localStorage.setItem(key,JSON.stringify(game))` después de cada acción.

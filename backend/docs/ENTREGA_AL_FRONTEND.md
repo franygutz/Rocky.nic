@@ -1,6 +1,6 @@
 # Moon Survival — Contrato de integración para frontend (Luna)
 
-**Versión de integración: parche v0.4, sobre motor v0.3.1 + LUNI conversacional.**
+**Versión de integración: v0.4.1** (puente v0.4 + LUNI con glosario, sugerencias y datos verificados de la Luna).
 
 ## Decisiones definitivas del juego
 
@@ -79,7 +79,7 @@ Las categorías de los 50 retos son `life`, `radiation`, `energy`, `food`, `comm
 const respuesta = juego.askLuni('¿Cuál es el último evento DONKI guardado?');
 console.log(respuesta.answer);      // Texto seguro de la mascota
 console.log(respuesta.sources);     // [{title,url,...}]
-console.log(respuesta.suggestions); // Otras preguntas
+console.log(respuesta.suggestions); // 2 o 3 preguntas que LUNI sabe responder (mostrar como botones)
 ```
 
 Usar `textContent` para el texto del chat. Para enlaces, validar que `url` sea `https:` o `http:`. No insertar respuestas como HTML no confiable.
@@ -102,6 +102,7 @@ if (vista.scene === 'weather') {
 - El adaptador intenta guardar en `localStorage` con la clave compatible `moon-survival-partida-v03`.
 - Las partidas previas guardadas como JSON de estado v0.3 se pueden volver a abrir.
 - Si el navegador bloquea almacenamiento, la partida sigue y `juego.getView().storage.available` será `false`. Mostrar un aviso al niño.
+- **La partida no vence:** queda guardada hasta que el niño toca "Borrar progreso" (`juego.clearProgress()`) o se borran los datos del navegador.
 - No se envían datos de menores a ningún servidor. SQLite es **opcional** para pruebas y la API de desarrollo, no es requisito del frontend.
 - Luego de cambiar o importar datos DONKI, ejecutar **otra vez** `npm.cmd run build:offline`; el frontend debe recibir la nueva copia del JS para incorporar esos datos.
 
@@ -119,4 +120,4 @@ if (vista.scene === 'weather') {
 
 ## Nota para backend
 
-Este parche agrega una **capa de presentación**; no cambia los 50 retos ni las reglas del motor. Los 49 tests existentes deberían conservarse y se agregan pruebas nuevas del puente. Las partidas y registros NASA del usuario no se incluyen en el ZIP por privacidad y para evitar sobrescritura.
+Este parche agrega una **capa de presentación**; no cambia los 50 retos ni las reglas del motor. En v0.4.1 hay **58 pruebas** (45 del backend y 13 del puente) y todas pasan. Las partidas y registros NASA del usuario no se incluyen en el ZIP por privacidad y para evitar sobrescritura.

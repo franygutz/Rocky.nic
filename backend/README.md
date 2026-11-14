@@ -1,152 +1,173 @@
-# Moon Survival — Backend v0.3.1
+# Moon Survival — Backend v0.4.1
 
-**Responsable del backend:** Farid · Proyecto NASA Space Apps Challenge
+**Responsable del backend:** Farid · Proyecto NASA Space Apps Challenge 2026 · reto *Junior Astronaut Mission Trainer*
 
-**Estado:** prototipo funcional de integración; 50 retos originales y tienda; **44 pruebas automatizadas aprobadas** el 14 de noviembre de 2026 en Node.js v22.16.0. Es un punto de partida técnicamente funcional, no un sistema de producción ni un simulador validado de ingeniería espacial.
+**Estado:** prototipo funcional de integración para la **base lunar Luna-7**. **58 pruebas automatizadas aprobadas** el 14 de noviembre de 2026 (Node.js v26.13.0; requiere Node.js 22.13 o superior). Es un punto de partida técnicamente funcional, no un sistema de producción ni un simulador validado de ingeniería espacial.
 
 ## 1. Qué incluye
 
-- Catálogo exacto del HTML: **50 retos, 10 dificultades, dos opciones por reto**, **7 artículos de tienda y 10 finales**.
-- **7 días terrestres** de campaña, 2 retos por día: máximo **14 turnos**; emergencias pueden finalizar antes.
-- **9 medidores**: oxígeno, agua, energía, comida, protección, comunicaciones, salud, moral e investigación.
-- **Dificultad adaptativa**: comienza en retos sencillos; avance según resultados del minijuego, uso de ayudas y estado de la base; una crisis puede imponer una misión especial.
-- **Semilla aleatoria reproducible:** mismo valor `seed` + mismas decisiones y minijuegos = misma secuencia de selección y premios; `id` y fecha no forman parte de la secuencia.
-- **Minijuegos:** `performance` con `accuracy`, `completed`, `mistakes`, `hintsUsed`; entrega `completed`, `partial`, `failed`. Si el frontend solo manda A/B, el motor lo deja como `decision_only` sin afirmar que hubo precisión medida.
-- **Fallos y omisiones** crean consecuencias en recursos y estados persistentes; los siguientes retos pueden depender de ellas.
-- **Tienda**: 7 artículos, monedas, stock, consumo inmediato, compras verificadas. Doble clic protegible con `requestId` idempotente.
-- **Comunicaciones:** mensajes `status_report`, `science_report`, `rescue_request`, entrega/confirmación en turnos y posibles retrasos por fallos. **Estos turnos representan operación/protocolos, NO segundos de viaje-luz Luna–Tierra.**
-- **Clima espacial:** escenario de entrenamiento en día 5 respaldado por evento histórico DONKI (si hay evento SEP/CME), con elección refugio/salida y consecuencias **ficticias**. No convierte datos DONKI en una dosis lunar.
-- **10 finales**: el backend escoge el desenlace mediante las reglas acordadas y devuelve indicadores, estados y un `why` explicativo.
-- **Repetir día:** vuelve al comienzo de cualquier día ya alcanzado, deshaciendo decisiones, compras y recursos posteriores, y restaurando el estado de la semilla. La auditoría técnica puede conservar que hubo repetición.
-- **Mascota LUNI:** diálogo educativo, búsqueda de temas, referencias DONKI y pistas sin dar necesariamente A/B. Funciona sin red, **no es un modelo generativo**.
-- **Dos modalidades:** API local Node + SQLite; módulo offline reutilizable en HTML/JS con localStorage, PWA/service worker opcional.
-- **Registros científicos NASA**: dos eventos históricos archivados y verificables preincluidos, más importador para DONKI actual/histórico.
+- Catálogo exacto del HTML de diseño: **50 retos, 10 dificultades, dos opciones por reto**, **7 artículos de tienda y 10 finales**.
+- **7 días terrestres** de campaña, 2 retos por día: máximo **14 turnos**; una emergencia puede terminar la partida antes.
+- **9 medidores**: oxígeno, agua, energía, comida, protección, comunicaciones, salud, moral e investigación (escalas de juego de 0 a 100).
+- **Dificultad adaptativa**: empieza con retos sencillos y avanza según el resultado de los minijuegos, las ayudas usadas y el estado de la base; una crisis puede imponer una misión especial.
+- **Semilla reproducible:** mismo `seed` + mismas decisiones y minijuegos = misma secuencia de retos y premios.
+- **Minijuegos:** `performance` con `completed`, `accuracy`, `mistakes`, `hintsUsed` → `completed`, `partial` o `failed`. Si el frontend solo manda A/B, el motor lo marca `decision_only` sin fingir que midió precisión.
+- **Fallos y omisiones** dejan consecuencias en recursos y estados persistentes; los retos siguientes pueden depender de ellas.
+- **Tienda**: 7 artículos, monedas, límites, compras verificadas y `requestId` para evitar dobles clics.
+- **Comunicaciones:** mensajes `status_report`, `science_report` y `rescue_request` con confirmación en turnos. **Los turnos son protocolos de operación, no el tiempo-luz real** (que es de ~1,3 s, ver sección 6).
+- **Clima espacial:** en el día 5, escenario de entrenamiento con un registro histórico de DONKI (SEP o CME), elección refugio / salida y consecuencias **ficticias**. No convierte datos DONKI en una dosis lunar.
+- **10 finales** elegidos por reglas, con indicadores, estados y un `why` que explica el resultado.
+- **Repetir día:** vuelve al inicio de cualquier día alcanzado y restaura recursos, compras y semilla.
+- **LUNI v0.4:** mascota educativa por reglas, **sin IA generativa y sin internet**. Saluda, informa el estado de la base, da pistas sin revelar la respuesta, explica **CME, SEP, GST, Kp y DONKI**, busca los registros DONKI guardados, responde con **datos verificados de la Luna** y siempre devuelve `sources` y `suggestions`.
+- **Dos modalidades:** API local Node + SQLite, o módulo offline para HTML/JS/Phaser con `localStorage` (PWA básica opcional).
+- **Datos NASA:** 27 registros DONKI archivados y verificables, importador de DONKI, y datos verificados de RadLab y JPL Horizons para la Luna.
 
-## 2. Instalar en Windows con Visual Studio Code
+## 2. Instalar y probar
 
-1. Instalar **Node.js 24 LTS** de https://nodejs.org/ (también probado con Node 22.16.0; puede mostrar advertencia experimental de SQLite).
-2. Descomprimir el ZIP y abrir **la carpeta que contiene `package.json`** con **Archivo → Abrir carpeta** en VS Code. El ZIP NO tiene una segunda subcarpeta.
-3. Abrir **Terminal → New Terminal**.
-4. Ejecutar:
+Necesitás **Node.js 22.13 o superior** (recomendado Node.js 24 LTS de https://nodejs.org/). Abrí en VS Code **la carpeta `backend`**, la que contiene `package.json`, y abrí **Terminal → New Terminal**.
+
+**Windows (PowerShell):**
 
 ```powershell
 node -v
-dir package.json
 npm.cmd test
 npm.cmd run demo
 npm.cmd start
 ```
 
-Dejá `npm.cmd start` en ejecución; visitar:
+> PowerShell suele bloquear `npm.ps1`. Si pasa, usá **`npm.cmd`** en vez de `npm`.
+
+**Linux / macOS:**
+
+```bash
+node -v
+npm test
+npm run demo
+npm start
+```
+
+Dejá `start` corriendo y visitá:
 
 - http://127.0.0.1:3001/health
 - http://127.0.0.1:3001/api/v1/missions
 - http://127.0.0.1:3001/api/v1/shop
 - http://127.0.0.1:3001/api/v1/science-events
+- http://127.0.0.1:3001/api/v1/science/sources
 
-No es un error si muestra JSON en vez de juego: eso es el backend.
+No es un error si se ve JSON en vez del juego: eso es el backend. Todas las rutas están en `docs/API.md`.
 
-> PowerShell suele bloquear `npm.ps1`. Si sucede, ejecutá **`npm.cmd`**, no `npm`.
+## 3. Probar el videojuego offline incluido
 
-## 3. Probar videojuego offline ya incluido
-
-El paquete incorpora `public/offline-demo.html`, un **panel técnico jugable** para probar las decisiones, tienda, NPC y repetición de días sin el frontend artístico.
+`public/offline-demo.html` es un **panel técnico jugable** para probar decisiones, tienda, LUNI y repetición de días sin el frontend artístico.
 
 ```powershell
 npm.cmd run build:offline
 npm.cmd run serve:offline
 ```
 
-Abrí **http://127.0.0.1:4173**. El servidor es local y funciona **aunque no tengas Internet**. Se necesita mantener Node ejecutándose para servir las páginas de esta modalidad. El navegador guarda la partida en `localStorage`.
+Abrí **http://127.0.0.1:4173**. Funciona **sin internet** mientras Node sirve las páginas. También podés abrir `public/offline-standalone.html` directamente (un solo HTML con todo adentro), pero algunos navegadores limitan `localStorage` en `file://`; para probar el guardado, usá `127.0.0.1:4173`.
 
-También podés abrir `public/offline-standalone.html` directamente (un solo archivo HTML con el motor integrado), pero algunos navegadores limitan el almacenamiento de páginas `file://`; para comprobar el guardado, usá la dirección `127.0.0.1:4173`.
+Para el frontend se entrega **`public/offline-engine.js`**: se carga con `<script src="offline-engine.js"></script>` y expone `window.MoonSurvival` (motor) y `window.MoonSurvivalFrontend()` (puente con suscripción y guardado). Sirve para HTML/CSS/JavaScript o Phaser; no requiere React. La guía es `docs/ENTREGA_AL_FRONTEND.md` y la prueba del puente, `public/frontend-bridge-demo.html`.
 
-La versión offline se entrega como **`public/offline-engine.js`**, más `public/offline-standalone.html` para mostrar una demo completa con un solo archivo. Se puede cargar con `<script src="offline-engine.js"></script>` y usar `window.MoonSurvival` desde **HTML/CSS/JavaScript o Phaser**. No requiere React.
+`public/sw.js` guarda estos archivos en caché en un origen local o HTTPS después de la primera visita (PWA básica). Para publicar como PWA en producción conviene agregar iconos y servir por HTTPS.
 
-`public/sw.js` permite almacenar estos archivos en caché en un origen local/HTTPS después de la primera visita (PWA básica, no un instalador completo). Para publicar como PWA en producción se recomienda agregar iconos e instalar por HTTPS.
+**Guardado en el navegador:** la partida queda en `localStorage` **sin fecha de vencimiento**: sigue ahí hasta que el niño toca "Borrar progreso" (`clearProgress()`) o se borran los datos del navegador. No se guarda ningún dato personal.
 
 ## 4. Cómo funciona SQLite
 
-**No instalés MySQL, SQL Server ni un servicio SQLite.** Node.js incluye `node:sqlite` y crea automáticamente el archivo de base de datos al arrancar la API:
+**No instalés MySQL, SQL Server ni un servicio SQLite.** Node.js trae `node:sqlite` y crea el archivo al arrancar la API:
 
 `data/moon-v03.sqlite`
 
-La extensión `.sqlite` se abre con una extensión SQLite Viewer en VS Code o con la aplicación gratuita SQLite Browser (opcional). Consultá el resumen sin instalar nada adicional:
+(El nombre se conserva para no perder partidas de versiones anteriores.) Se puede abrir con una extensión SQLite Viewer de VS Code o con SQLite Browser. Resumen sin instalar nada:
 
 ```powershell
 npm.cmd run db:status
 ```
 
-El sistema crea tablas `games`, `mission_history`, `purchase_history`, `audit_events` y `science_events`. Guarda el estado completo en `games.state_json`. La partida persiste aunque se cierre la terminal y se vuelva a iniciar el servidor. **No borrés el archivo `.sqlite` si querés conservar las partidas**.
+Tablas: `games`, `mission_history`, `purchase_history`, `audit_events` y `science_events`. El estado completo va en `games.state_json` y persiste aunque se cierre la terminal. **No borrés el `.sqlite` si querés conservar las partidas.**
 
-SQLite no se comparte automáticamente con otros equipos. Para usar una API en Internet necesitarán hosting, autenticación básica/seguridad para las partidas y una estrategia de persistencia del servidor. Para hackathon con frontend offline, la versión de navegador evita esos requisitos.
+SQLite no se comparte con otras computadoras. Una API pública necesitaría hosting, autenticación y persistencia en el servidor; para el hackatón, el motor offline evita esos requisitos.
 
-## 5. NASA: cómo conseguir registros DONKI
+## 5. NASA DONKI: cómo actualizar los registros
 
-Se incluyen dos **notificaciones reales y archivadas** del sistema NASA CCMC DONKI correspondientes a mayo de 2024. Una SEP observada por STEREO A y una GST observada en la magnetosfera terrestre. **No se presentan como mediciones en la Luna ni datos actuales**.
+`data/nasa-events.json` trae **27 registros** de la tormenta solar de mayo de 2024 (9 al 12 de mayo): **16 CME, 8 SEP y 3 GST**, 26 descargados de la API de NASA el 14-11-2026 y 1 registro histórico verificado a mano. **No se presentan como mediciones en la Luna ni como datos actuales.**
 
-1. Conseguir clave gratuita en https://api.nasa.gov/ (botón de generación de API key). La clave es personal: no compartirla en Git ni escribirla en HTML.
-2. Crear archivo `.env` copiando `.env.example` y editándolo (si querés un intervalo histórico, por ejemplo mayo de 2024). En Windows:
+1. Conseguí una clave gratuita en https://api.nasa.gov/. Es personal: no la compartas en Git ni la escribas en HTML.
+2. Copiá el ejemplo y editá `NASA_API_KEY`, `NASA_START_DATE` y `NASA_END_DATE` (máximo 30 días):
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-3. Editar `NASA_API_KEY`, `NASA_START_DATE` y `NASA_END_DATE` en `.env`.
-4. Ejecutar **con carga explícita de variables**:
+```bash
+cp .env.example .env
+```
+
+3. Importá **con carga explícita de variables**:
 
 ```powershell
 node --env-file=.env scripts/sync-donki.js
 ```
 
-5. Verificar `data/nasa-events.json` y `npm.cmd run db:status`. Para que los registros importados funcionen **sin Internet** después, ejecutar `npm.cmd run build:offline` de nuevo.
-6. Reiniciar `npm.cmd start` si el servidor ya estaba ejecutándose y querés que relea archivos actualizados. Los eventos sincronizados con SQLite pueden consultarse en el endpoint sin reiniciar.
+4. Revisá `data/nasa-events.json` y `npm.cmd run db:status`. Para que los registros nuevos funcionen **sin internet**, corré `npm.cmd run build:offline` otra vez.
+5. Reiniciá `npm.cmd start` si el servidor ya estaba corriendo. Los eventos que llegan a SQLite se ven en el endpoint sin reiniciar.
 
-El importador consulta **SEP, CME y GST** usando la API de NASA, valida que la respuesta sea un arreglo, guarda fecha de observación y de descarga, URL de fuente y tipo. Si NASA falla, conserva el archivo histórico sin fabricar valores. Requiere conexión **solamente en el momento de sincronizar**, no al jugar.
+El importador consulta **SEP, CME y GST**, valida que la respuesta sea un arreglo, guarda fecha de observación, fecha de descarga, URL de fuente y tipo. Si NASA falla, conserva el archivo sin inventar valores. Solo necesita internet al sincronizar, no al jugar.
 
-### Datos y límites científicos
+## 6. Datos verificados de la Luna (LUNI)
 
-- NASA DONKI registra actividad espacial; una alerta SEP, CME o tormenta geomagnética no proporciona automáticamente una **dosis exacta** dentro de un hábitat lunar.
-- `science-events` devuelve fuente, fecha, tipo y la diferencia entre `registro_historico_verificado` y `registro_nasa_descargado`.
-- Las barras de 0–100, penalizaciones, probabilidades, retrasos por turno y recompensas son **mecánicas educativas inventadas**, no cifras de NASA.
-- Una GST/Kp observada en Tierra **no debe** describirse como radiación medida en Luna.
+Descargados y verificados el 14-11-2026; están en `data/science-facts.json` con su fuente y la consulta exacta (`verified`):
 
-Fuentes NASA: https://api.nasa.gov/ · https://ccmc.gsfc.nasa.gov/tools/DONKI/ · https://ccmc.gsfc.nasa.gov/storms/may2024/ .
+| Dato | Valor | Fuente |
+|---|---|---|
+| Retraso de la señal Tierra–Luna | **1,35 s** el 14-11-2026 (Luna a 405 616 km); de 1,19 a 1,36 s entre noviembre y diciembre de 2026 | NASA/JPL Horizons |
+| Radiación en un día normal | **13,22 μGy/h** (1–2 de enero de 2020) | NASA OSDR RadLab · LRO CRaTER |
+| Radiación en la tormenta del 11-09-2017 | **19 481,6 μGy/h**, unas **1732 veces** lo normal | NASA OSDR RadLab · LRO CRaTER |
 
-## 6. NPC LUNI
+CRaTER mide **en órbita lunar, no dentro de un hábitat**; LUNI lo aclara siempre. El detalle está en `docs/DATOS_NASA.md`.
 
-No necesita API de IA ni recopila datos personales. Busca temas definidos en `data/science-facts.json`, agrega referencias científicas e incorpora registros de DONKI cuando corresponde. Puede dar una pista científica del reto activo (`hint:true`) sin revelar directamente la opción óptima. Solo se guarda el contador de ayudas, **no el texto completo que escribió el niño**.
+### Límites científicos
 
-Si quieren una mascota con IA generativa real, eso es otra fase: necesita proveedor/modelo, una clave **solo en el backend**, filtros para menores, políticas de costo y privacidad, y una capa de recuperación de información con fuentes. **No está implementada en v0.3.**
+- DONKI registra actividad solar; una alerta SEP, CME o una tormenta geomagnética no da una **dosis exacta** dentro de un hábitat lunar.
+- Una GST o un índice Kp se mide en la Tierra: **no** describe radiación en la Luna.
+- Las barras de 0 a 100, penalizaciones, probabilidades, retrasos por turno y recompensas son **mecánicas educativas inventadas**, no cifras de NASA.
 
-## 7. Archivos más importantes
+Fuentes: https://api.nasa.gov/ · https://ccmc.gsfc.nasa.gov/tools/DONKI/ · https://ccmc.gsfc.nasa.gov/storms/may2024/ · https://visualization.osdr.nasa.gov/radlab/gui/data-api/ · https://ssd.jpl.nasa.gov/horizons/
 
-- `src/core/engine.js`: motor **puro** compatible con navegador.
+## 7. LUNI
+
+No necesita API de IA ni recopila datos personales. Usa los temas de `data/science-facts.json`, el glosario de clima espacial del motor y los registros DONKI guardados. Puede dar una pista del reto activo (`hint:true`) sin revelar la opción óptima. Solo se guarda el contador de ayudas, **no el texto que escribió el niño**. Si no sabe algo, lo dice en vez de inventar.
+
+Una mascota con IA generativa sería otra fase: proveedor y modelo, clave **solo en el backend**, filtros para menores, políticas de costo y privacidad, y recuperación de fuentes. **No está implementada.**
+
+## 8. Archivos más importantes
+
+- `src/core/engine.js`: motor **puro** (sin Node, HTTP ni base de datos), compatible con navegador; incluye LUNI.
+- `src/core/frontend-bridge.js`: contrato para el frontend (vista, suscripción, guardado local).
 - `src/server.js`: API HTTP + SQLite.
 - `data/challenges.json`: los 50 retos originales, sin cambiar sus textos A/B.
-- `data/shop.json`, `data/endings.json`: tienda y finales del HTML.
-- `data/nasa-events.json`: registros DONKI archivados / nuevos importados.
-- `data/science-facts.json`: respuestas base de LUNI.
-- `scripts/sync-donki.js`: importación de NASA.
-- `scripts/build-offline.js`: compila el mismo motor para HTML.
-- `public/offline-demo.html`: demo offline funcional.
-- `docs/API.md`: endpoints con ejemplos.
-- `docs/INTEGRACION_FRONTEND.md`: cómo conectar Sara y Solieth.
-- `tests/backend.test.js`: 39 pruebas.
+- `data/shop.json`, `data/endings.json`, `data/status-names.json`: tienda, finales y nombres de estados.
+- `data/nasa-events.json`: registros DONKI archivados e importados.
+- `data/science-facts.json`: fichas de LUNI, con datos verificados.
+- `scripts/sync-donki.js`: importación de NASA. `scripts/build-offline.js`: compila el motor para HTML.
+- `public/offline-engine.js`, `public/offline-standalone.html`, `public/offline-demo.html`, `public/frontend-bridge-demo.html`: versión offline y demos.
+- `docs/API.md`, `docs/ENTREGA_AL_FRONTEND.md`, `docs/INTEGRACION_FRONTEND.md`, `docs/DATOS_NASA.md`.
+- `tests/backend.test.js` (45 pruebas) y `tests/frontend-bridge.test.js` (13 pruebas).
+- `.env.example`: variables para importar DONKI y configurar el servidor.
 
-## 8. Lo que todavía necesita el equipo
+## 9. Lo que todavía necesita el equipo
 
-**No se suministran automáticamente minijuegos visuales ni assets.** Sara y Solieth deben implementar el mapa, las interacciones y enviar el resultado `performance` de cada minijuego. Franya y Angie deben confirmar qué tareas miden los minijuegos y si ciertos umbrales o consecuencias cambian.
+**No se incluyen minijuegos visuales ni assets.** Sara y Solieth implementan el mapa, las interacciones y envían el `performance` de cada minijuego. Franya y Angie confirman qué miden los minijuegos y si cambian umbrales o consecuencias.
 
-**Privacidad y despliegue:** la API local no implementa login/autorización ni protección de partidas si se hace pública. Por seguridad no hay perfiles reales de menores. Para publicación pública, preferí el motor offline/PWA o añadí controles de acceso antes de subir Node a Internet.
+**Privacidad y despliegue:** la API local no tiene login ni protección de partidas si se hace pública. No hay perfiles reales de menores. Para publicar, preferí el motor offline/PWA o agregá controles de acceso antes de subir Node a internet.
 
-**No se garantiza que todas las rutas narrativas hayan sido testeadas con niños ni que las reglas de supervivencia sean científicamente precisas.** Las 39 pruebas verifican funcionamiento técnico representativo. Las reglas se mantienen editables.
+**No se garantiza que todas las rutas narrativas se hayan probado con niños ni que las reglas de supervivencia sean científicamente precisas.** Las 58 pruebas verifican el funcionamiento técnico. Las reglas siguen siendo editables.
 
+## 10. Historial de versiones
 
-## Actualización LUNI 0.3.1
+- **0.4.1** (pulido): LUNI con glosario de clima espacial y `suggestions`; datos verificados de la Luna (RadLab · LRO CRaTER y JPL Horizons) con su consulta; `/api/v1/science/sources` incluye RadLab y Horizons; `.env.example`; `.gitignore` de la raíz arreglado; versión offline recompilada; caché del service worker renovada; README y docs al día.
+- **0.4:** puente para el frontend (`frontend-bridge.js`), minijuegos en dos pasos, guardado local compatible con v0.3, importación de 26 registros DONKI de mayo de 2024.
+- **0.3.1:** LUNI distingue saludos, estado de la partida, pistas, temas STEM y preguntas sobre DONKI, y reconoce sus límites.
 
-LUNI ahora distingue saludos, estado de la partida, consejos sobre el reto activo, temas de STEM y preguntas sobre datos NASA DONKI. Si no entiende algo, **no** vuelve automáticamente a la ficha de oxígeno; reconoce sus límites. Los eventos consultados proceden de la caché descargada y muestra fecha/fuente, nunca afirma consultar NASA en tiempo real.
-
-Para actualizar sin perder SQLite ni tu descarga DONKI, aplicá el parche de archivos de código sobre la misma carpeta (no reemplaces `data/`, `.env` o `*.sqlite`). Después ejecutá `npm.cmd run build:offline`, `npm.cmd test` y reiniciá `npm.cmd start`. En el navegador offline recargá para que se actualice el service worker. El servidor integra los eventos que llegaron a SQLite incluso en partidas iniciadas antes de la sincronización.
-
-LUNI **sigue sin ser un modelo de IA generativa**. Para responder cualquier pregunta con lenguaje libre hará falta una integración adicional con un modelo y recuperación verificable de datos, con controles de privacidad adecuados para menores.
+**Para actualizar sin perder partidas ni descargas:** aplicá los archivos de código sobre la misma carpeta (no reemplaces `data/nasa-events.json`, `.env` ni `*.sqlite`), corré `npm.cmd run build:offline` y `npm.cmd test`, y reiniciá `npm.cmd start`. En el navegador, recargá para que se actualice el service worker.
