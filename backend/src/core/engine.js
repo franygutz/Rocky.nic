@@ -306,6 +306,24 @@ export function createEngine(catalog) {
     restored.receipts={};restored.events.push({type:'DAY_REPEATED',day:n,previousTurn:original.turn});
     return {state:restored,result:{replayedDay:n,turn:restored.turn,day:restored.day,warning:'La repetición restaura recursos, decisiones, compras y aleatoriedad de ese día y elimina cambios posteriores del estado activo.'}};
   }
+  // Glosario de clima espacial de LUNI (v0.4). Definiciones generales, sin cifras inventadas.
+  const GLOSSARY={
+    CME:'Una CME (eyección de masa coronal) es una nube enorme de gas con carga eléctrica y campo magnético que el Sol lanza al espacio. DONKI registra cuándo sale y a qué velocidad viaja.',
+    SEP:'Las SEP (partículas energéticas solares) son protones y otras partículas que el Sol acelera a gran velocidad. Fuera de la protección magnética de la Tierra pueden aumentar la radiación; por eso una base lunar necesita un refugio.',
+    GST:'Una GST es una tormenta geomagnética: el campo magnético de la Tierra se agita cuando llega una CME o viento solar rápido. Ocurre alrededor de la Tierra, así que no mide la radiación en la Luna.',
+    KP:'El índice Kp va de 0 a 9 y mide cuánto se agita el campo magnético de la Tierra. Desde Kp 5 se considera tormenta geomagnética. Es una medida de la Tierra, no de la Luna.',
+    DONKI:'DONKI (Space Weather Database Of Notifications, Knowledge, Information) es la base de datos de clima espacial de NASA, del Community Coordinated Modeling Center (CCMC). Guarda eventos como CME, SEP y tormentas geomagnéticas.'
+  };
+  // Preguntas que LUNI sugiere después de cada respuesta, según el tema.
+  const SUGGESTIONS={
+    storm:['¿Qué significa SEP?','¿Cuál es el último evento DONKI guardado?','¿Qué es el índice Kp?'],
+    life:['¿Qué pasa si hay una fuga?','¿Cómo va mi base?','¿Qué significa CME?'],
+    food:['¿Cuánta agua necesitan las plantas?','¿Cómo va mi base?','¿Qué hago en este reto?'],
+    energy:['¿Para qué sirven las baterías?','¿Cómo va mi base?','¿Qué hago en este reto?'],
+    comms:['¿Cuánto tarda un mensaje a la Tierra?','¿Qué significa CME?','¿Cómo va mi base?'],
+    radiation:['¿Qué significa SEP?','¿Cuál es el último evento DONKI guardado?','¿Qué hago en este reto?'],
+    default:['¿Qué significa CME?','¿Cómo va mi base?','¿Qué hago en este reto?']
+  };
   // LUNI funciona sin Internet y solo utiliza el catálogo y eventos ya descargados.
   function npcAsk(original,question,{hint=false}={}){
     if(typeof question!=='string'||question.length>350||question.trim().length<2)throw Error('INVALID_QUESTION');
@@ -330,6 +348,8 @@ export function createEngine(catalog) {
     const askStatus=any('como voy','como va mi base','como esta mi base','como esta la base','estado de la base','mi estado','mis recursos','cuanta energia','cuanto oxigeno','cuanta agua','cuanta comida','cuanto queda');
     const askHello=any('hola','buenas','gracias','quien eres','como te llamas');
     const type=any('sep','particulas energeticas')?'SEP':any('cme','eyeccion de masa')?'CME':any('gst','kp','geomagnetica')?'GST':null;
+    const askDefinition=any('que significa','que es','que son','que quiere decir','significado','definicion','define');
+    const term=hasWord('kp')?'KP':type||(hasWord('donki')?'DONKI':null);
     const archived=(g.scienceEventPool||[]).slice();
     if(g.science?.registeredEvent&&!archived.some(x=>x.id===g.science.registeredEvent.id))archived.push(g.science.registeredEvent);
     archived.sort((a,b)=>String(b.observedAt||'').localeCompare(String(a.observedAt||'')));
@@ -348,6 +368,18 @@ export function createEngine(catalog) {
       answer=`Tu reto #${current.id} es «${current.name}». ${current.intro} ${current.science} Para decidir, compará las consecuencias para las personas y los recursos: una solución rápida puede ocasionar problemas después.`;
       const f=facts.find(f=>f.topic===current.category);if(f)source(f.source,f.sourceUrl,f.kind);
       matchedTopic=current.category;
+    }else if(askDefinition&&term&&!askMission){
+      // Glosario de clima espacial (v0.4): definiciones cortas para niños, con fuente NASA.
+      matchedTopic='storm';
+      answer=GLOSSARY[term];
+      source('NASA CCMC DONKI','https://ccmc.gsfc.nasa.gov/tools/DONKI/','glosario');
+      const ofType=term==='DONKI'?archived:archived.filter(e=>e.type===(term==='KP'?'GST':term));
+      if(ofType.length){
+        const e=ofType[0];
+        observation={id:e.id,type:e.type,title:e.title,observedAt:e.observedAt,source:e.source,sourceUrl:e.sourceUrl,disclaimer:e.note||'No mide la dosis lunar.'};
+        answer+=`\n\nEn esta partida hay ${ofType.length} registro${ofType.length===1?'':'s'} ${term==='DONKI'?'de DONKI':e.type} guardado${ofType.length===1?'':'s'}; el más reciente es del ${String(e.observedAt||'').slice(0,10)}. Son registros de archivo, no una consulta NASA en vivo.`;
+        source(e.source,e.sourceUrl,'registro_nasa_descargado');
+      }
     }else if(nasaAsk&&(any('nasa','donki','evento','eventos','solar','solares','tormenta','tormentas','sep','cme','gst','kp','clima espacial'))){
       const f=facts.find(f=>f.id==='donki');
       matchedTopic='storm';
@@ -373,9 +405,11 @@ export function createEngine(catalog) {
     }
     if(!answer)answer='No tengo una ficha científica verificable para esa pregunta todavía. Probá preguntarme por oxígeno, agua, cultivos, baterías, comunicaciones, radiación, DONKI o por el reto actual. Prefiero reconocer mis límites a inventar datos.';
     if(hint){g.npcHelpCount++;g.performance.hints++}
+    const asked=norm(question);
+    const suggestions=(SUGGESTIONS[matchedTopic]||SUGGESTIONS.default).filter(s=>norm(s)!==asked).slice(0,3);
     const response={npc:'LUNI',mode:'asistente_educativo_por_reglas_sin_IA_generativa',answer,observation,matchedTopic,
       hint:hint&&current?`Pista del reto #${current.id}: ${current.science} Pensá qué recursos y qué riesgos cambian.`:null,
-      sources,disclaimer:'LUNI no utiliza IA generativa y no consulta DONKI en vivo. Los datos NASA son registros históricos; los indicadores de la base son simulaciones ficticias.'};
+      sources,suggestions,disclaimer:'LUNI no utiliza IA generativa y no consulta DONKI en vivo. Los datos NASA son registros históricos; los indicadores de la base son simulaciones ficticias.'};
     return {state:g,response};
   }
   function report(g){
