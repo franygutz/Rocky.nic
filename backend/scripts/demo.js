@@ -1,6 +1,6 @@
 import {engine,curatedEvents} from '../src/server.js';
 let g=engine.createGame({seed:'Farid-demo',scienceEvents:curatedEvents});
-console.log('MOON SURVIVAL 0.3 · Prueba sin frontend · semilla',g.seed);
+console.log('MOON SURVIVAL 0.4.1 · Prueba sin frontend · semilla',g.seed);
 console.log('LUNI:',engine.npcAsk(g,'¿Qué dice NASA sobre las tormentas solares?').response.answer);
 const b=engine.sendMessage(g,'status_report');g=b.state;
 for(let turn=1;turn<=14&&g.phase==='active';turn++){

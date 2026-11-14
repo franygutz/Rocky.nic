@@ -68,7 +68,7 @@ export function createApp({db=openDatabase(':memory:'),allowedOrigins=origins}={
     if(req.method==='OPTIONS'){res.writeHead(origin&&!allowedOrigins.includes(origin)?403:204);res.end();return}
     try{
       const url=new URL(req.url,'http://127.0.0.1');const path=url.pathname;
-      if(req.method==='GET'&&(path==='/'||path==='/health'))return send(res,200,{ok:true,service:'moon-survival-backend',version:'0.3.1',api:'/api/v1',offline:'public/offline-demo.html'});
+      if(req.method==='GET'&&(path==='/'||path==='/health'))return send(res,200,{ok:true,service:'moon-survival-backend',version:'0.4.1',api:'/api/v1',offline:'public/offline-demo.html'});
       if(req.method==='GET'&&path==='/api/v1/catalog')return send(res,200,{missions:catalog.challenges.length,shop:catalog.items.length,endings:Object.keys(catalog.endings).length,scienceEvents:scienceEvents(db).length});
       if(req.method==='GET'&&path==='/api/v1/missions'){
         const difficulty=url.searchParams.get('difficulty');const category=url.searchParams.get('category');
@@ -110,5 +110,5 @@ export function createApp({db=openDatabase(':memory:'),allowedOrigins=origins}={
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
   const db=openDatabase();const {server}=createApp({db,allowedOrigins:(process.env.FRONTEND_ORIGINS||origins.join(',')).split(',').map(s=>s.trim())});
   const host=process.env.HOST||'127.0.0.1',port=Number(process.env.PORT||3001);
-  server.listen(port,host,()=>console.log(`Moon Survival v0.3 disponible en http://${host}:${port}/health · SQLite ${process.env.DATABASE_PATH||'./data/moon-v03.sqlite'}`));
+  server.listen(port,host,()=>console.log(`Moon Survival v0.4.1 disponible en http://${host}:${port}/health · SQLite ${process.env.DATABASE_PATH||'./data/moon-v03.sqlite'}`));
 }
