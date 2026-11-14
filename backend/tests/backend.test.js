@@ -264,3 +264,12 @@ test('LUNI ve los eventos NASA importados después de crear una partida en SQLit
  assert.equal(resp.status,200);assert.equal(resp.json.npc.observation.id,evt.id);
  assert.ok(resp.json.game.scienceEventPool.some(e=>e.id===evt.id));
 }));
+test('LUNI usa datos verificados de la Luna: radiación de LRO CRaTER y retraso de la señal (Horizons)',()=>{
+ const g=make();
+ const rad=engine.npcAsk(g,'¿Cuánta radiación hay cerca de la Luna?').response;
+ assert.match(rad.answer,/CRaTER/);assert.match(rad.answer,/1732 veces/);assert.match(rad.answer,/órbita lunar/);
+ assert.ok(rad.sources.some(s=>s.url.startsWith('https://visualization.osdr.nasa.gov/radlab/')));
+ const com=engine.npcAsk(g,'¿Cuánto tarda un mensaje a la Tierra?').response;
+ assert.match(com.answer,/1,35 s/);assert.ok(com.sources.some(s=>s.url.startsWith('https://ssd.jpl.nasa.gov/')));
+ for(const f of facts.filter(f=>f.kind==='dato_verificado'))assert.ok(f.verified?.retrievedAt&&f.sourceUrl.startsWith('https://'),f.id);
+});

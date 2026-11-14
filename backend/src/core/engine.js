@@ -334,7 +334,7 @@ export function createEngine(catalog) {
     const any=(...words)=>words.some(hasWord);
     const current=currentMission(g);
     const groups={
-      donki:['donki','tormenta','tormentas','solar','solares','sol','sep','cme','gst','kp','radiacion','dosimetro','particula','particulas','refugio'],
+      donki:['donki','tormenta','tormentas','solar','solares','sol','sep','cme','gst','kp','radiacion','dosimetro','dosis','particula','particulas','refugio','crater'],
       oxygen:['oxigeno','aire','respirar','co2','dioxido','fuga','fugas','tanque','tanques','presion','ventilacion'],
       plant:['agua','riego','cultivo','cultivos','comida','alimento','alimentos','invernadero','semilla','semillas','planta','plantas','hidroponia'],
       power:['energia','bateria','baterias','panel','paneles','electricidad','apagon','apagones','circuito'],
@@ -396,7 +396,9 @@ export function createEngine(catalog) {
       const f=facts.find(f=>f.id==='sources');answer=f?.answer||'Las referencias científicas acompañan a los retos.';
       if(f)source(f.source,f.sourceUrl,f.kind);
     }else if(topic&&topic[1]>0){
-      const f=facts.find(f=>f.id===topic[0]);
+      // Preguntas por radiación o dosis usan la ficha medida cerca de la Luna (RadLab · LRO CRaTER).
+      const wantsDose=topic[0]==='donki'&&any('radiacion','dosis','dosimetro','crater');
+      const f=(wantsDose&&facts.find(f=>f.id==='radiation'))||facts.find(f=>f.id===topic[0]);
       if(f){
         answer=f.answer;matchedTopic=f.topic;source(f.source,f.sourceUrl,f.kind);
         const metric={donki:'shield',oxygen:'oxygen',plant:'food',power:'energy',comms:'comms'}[topic[0]];
