@@ -241,3 +241,17 @@ body.reduced #place.show span { animation: none; opacity: 1; transform: none; }
 #iris { position: fixed; inset: 0; z-index: 25; pointer-events: none; opacity: 0; --x: 50%; --y: 50%; --r: 0px;
   background: radial-gradient(circle at var(--x) var(--y), transparent calc(var(--r) - 2px), #171426 var(--r)); }
 
+/* Mapa (Tab) */
+.mapsheet h2 { display: flex; align-items: center; gap: 8px; }
+.here-line { font-size: 20px; margin: 4px 0 10px; }
+.mapview { display: grid; place-items: center; background: #171426; border: 3px solid var(--ink); border-radius: var(--r); padding: 8px; }
+.mapimg { position: relative; width: 100%; max-height: 46vh; max-width: min(100%, calc(46vh * 1.6)); background-size: 100% 100%; image-rendering: pixelated; border: 2px solid var(--ink); }
+.mapimg .you { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; pointer-events: none; }
+.mapimg .you i { width: 18px; height: 18px; border-radius: 50%; background: #FFC93C; border: 3px solid var(--ink); box-shadow: 0 0 0 4px rgba(255, 201, 60, .45); animation: you-pulse 1.2s ease-in-out infinite; }
+.mapimg .you b { margin-top: 3px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 0 7px; font-size: 14px; }
+@keyframes you-pulse { 50% { box-shadow: 0 0 0 9px rgba(255, 201, 60, 0); } }
+.mapplaces { list-style: none; margin: 6px 0 4px; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+.mapplaces li { display: flex; align-items: center; gap: 6px; background: #fff; border: 2px solid var(--ink); border-radius: var(--r); padding: 4px 10px; font-size: 15px; }
+.mapplaces li.here { background: #FFC93C; box-shadow: 0 3px 0 var(--ink); }
+.mapplaces li em { font-style: normal; font-size: 12px; font-weight: 700; }
+body.reduced .mapimg .you i { animation: none; }

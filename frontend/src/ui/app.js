@@ -86,6 +86,7 @@ const scr = {
   glossary: () => ({ id: 'glossary', html: () => S.glossaryHTML() }),
   teachers: () => ({ id: 'teachers', html: () => S.teachersHTML(view()) }),
   settings: () => ({ id: 'settings', html: () => S.settingsHTML(session.settings, view().storage?.available !== false, confirmErase) }),
+  map: () => ({ id: 'map', html: () => S.mapHTML(session.world) }),
   pause: () => ({ id: 'pause', html: () => S.pauseHTML(view()) }),
   create: () => ({ id: 'create', cls: 'start', html: () => S.createHTML({ draft, cat: draftCat, editing }) }),
   bag: () => ({ id: 'bag', html: () => S.bagHTML(view()) }),
@@ -417,6 +418,7 @@ function onAction(a, el) {
       break;
     case 'statuses': open(scr.statuses()); break;
     case 'luni': openLuni(); break;
+    case 'map': if (topIs('map')) onAction('back'); else if (session.mode === 'map' && !session.overlay) open(scr.map()); break;
     case 'closeLuni': closeLuni(); break;
     case 'luniAsk': ask(el.dataset.q); break;
     case 'setLang':
@@ -662,6 +664,12 @@ export function boot() {
   }, true);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Tab' && stack.length) {
+    // Tab abre y cierra el mapa mientras se juega (con una pantalla abierta, Tab sigue moviendo el foco).
+    if (e.key === 'Tab' && !e.ctrlKey && !e.altKey && !e.metaKey && (topIs('map') || (session.mode === 'map' && !session.overlay && !luniOpen() && !/INPUT|TEXTAREA/.test(document.activeElement?.tagName || '')))) {
+      e.preventDefault();
+      onAction('map');
+      return;
+    }
       const f = [...$('#screen').querySelectorAll('button, a[href], input, summary, [tabindex]:not([tabindex="-1"])')].filter((n) => !n.disabled && n.offsetParent !== null);
       if (f.length) {
         const first = f[0], lastEl = f[f.length - 1];

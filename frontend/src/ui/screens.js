@@ -510,3 +510,19 @@ export function fichaHTML(fact, point, v) {
     <div class="row">${m && pl ? '<button class="btn go" data-action="guideClose">Guíame al reto</button>' : ''}<button class="btn" data-action="back" autofocus>Seguir explorando</button></div>
   </div>`;
 }
+
+// ── Mapa (Tab): la escena actual con tu posición y la lista de lugares ──
+const MAP_IMG = { exterior: 'exterior', zora: 'zora', invernadero: 'invernadero', paneles: 'paneles', crater: 'crater' };
+export function mapHTML(world) {
+  const id = SCENES[world?.scene] ? world.scene : 'exterior';
+  const sc = SCENES[id];
+  const px = Math.max(0, Math.min(100, ((world?.x ?? sc.spawn.x) / sc.w) * 100));
+  const py = Math.max(0, Math.min(100, ((world?.y ?? sc.spawn.y) / sc.h) * 100));
+  const places = Object.keys(SCENES).map((k) => `<li class="${k === id ? 'here' : ''}"${k === id ? ' aria-current="location"' : ''}><span aria-hidden="true">${k === id ? '📍' : '▫️'}</span><b>${esc(tr(SCENES[k].name))}</b>${k === id ? `<em>${t('map.here')}</em>` : ''}</li>`).join('');
+  return `<div class="sheet wide enter mapsheet">${close()}<h2>${pix('map', { size: 26 })} ${t('map.title')}</h2>
+    <p class="here-line">📍 ${t('map.here')}: <b>${esc(tr(sc.name))}</b></p>
+    <div class="mapview"><div class="mapimg" style="aspect-ratio:${sc.w} / ${sc.h};background-image:url(${import.meta.env.BASE_URL}assets/mapas/${MAP_IMG[id]}.png)" role="img" aria-label="${esc(tr(sc.name))}">
+      <span class="you" style="left:${px.toFixed(1)}%;top:${py.toFixed(1)}%"><i></i><b>${t('map.you')}</b></span></div></div>
+    <h3 class="sub">${t('map.places')}</h3><ul class="mapplaces">${places}</ul>
+    <p class="muted small">${t('map.hint')}</p></div>`;
+}

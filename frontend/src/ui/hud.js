@@ -23,9 +23,10 @@ function build() {
         <span class="vl-pips" data-ref="pips" role="img">${Array.from({ length: 14 }, () => '<i></i>').join('')}</span>
       </div>
       <span class="vl-spacer"></span>
-      <div class="vl-plate vl-coins" role="group" aria-label="Monedas">${icon(ICON.coin)}<b data-ref="coins"></b></div>
-      <button class="vl-btn" data-action="statuses" data-ref="alerts" aria-label="Alertas de la base"></button>
-      <button class="vl-btn" data-action="pause" aria-label="Pausa">${pix('pause')}</button>
+      <div class="vl-plate vl-coins" role="group" aria-label="${esc(t('coins'))}">${icon(ICON.coin)}<b data-ref="coins"></b></div>
+      <button class="vl-btn" data-action="statuses" data-ref="alerts" aria-label="${esc(t('hud.alertas_de_la_base'))}"></button>
+      <button class="vl-btn" data-action="map" aria-label="${esc(t('map.open'))}" title="${esc(t('map.open'))}">${pix('map')}</button>
+      <button class="vl-btn" data-action="pause" aria-label="${esc(t('hud.pausa'))}">${pix('pause')}</button>
     </div>
     <div class="vl-rail" role="group" aria-label="Indicadores de la base">
       ${METRICS.map((m) => `<div class="vl-m" data-m="${m.key}" role="meter" aria-label="${esc(m.label)}" aria-valuemin="0" aria-valuemax="100" title="${esc(m.label)}">
