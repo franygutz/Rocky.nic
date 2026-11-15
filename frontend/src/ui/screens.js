@@ -406,53 +406,53 @@ export function sourcesHTML() {
   const facts = catalog.facts;
   const ev = catalog.events.slice().sort((a, b) => String(b.observedAt).localeCompare(String(a.observedAt)));
   const byType = ev.reduce((acc, e) => ((acc[e.type] = (acc[e.type] || 0) + 1), acc), {});
-  return `<div class="sheet wide enter">${close}
-    <h2>📚 Datos y fuentes</h2>
-    <p>Los indicadores de la base son inventados para el juego. Los datos de abajo son reales y vienen de la NASA y la Agencia Espacial Canadiense.</p>
-    <h3>Fichas científicas de LUNI</h3>
+  return `<div class="sheet wide enter">${close()}
+    <h2>${t('sources')}</h2>
+    <p>${t('screen.los_indicadores_de_la_base')}</p>
+    <h3>${t('screen.fichas_cientificas_de_kita')}</h3>
     <div class="list">${facts.map((f) => {
       const url = safeUrl(f.sourceUrl);
-      return `<div class="src"><b>${esc(f.source)}</b><span>${withTerms(f.answer)}</span><br>
-      <small>${f.verified?.retrievedAt ? `Verificado el ${esc(fmtDate(f.verified.retrievedAt))} · ` : ''}${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url.replace(/^https:\/\//, '').slice(0, 48))}</a>` : ''}</small></div>`;
+      return `<div class="src"><b>${esc(tr(f.source))}</b><span>${withTerms(loc('facts', f.id, 'answer', f.answer))}</span><br>
+      <small>${f.verified?.retrievedAt ? `${t('screen.verificado_el')} ${esc(fmtDate(f.verified.retrievedAt))} · ` : ''}${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url.replace(/^https:\/\//, '').slice(0, 48))}</a>` : ''}</small></div>`;
     }).join('')}</div>
-    <h3>Registros de clima espacial (NASA DONKI)</h3>
-    <p>${ev.length} registros guardados: ${Object.entries(byType).map(([k, n]) => `${n} ${esc(k)}`).join(', ')}. Se usan en la alerta del día 5 y en las respuestas de LUNI.</p>
+    <h3>${t('screen.registros_de_clima_espacial_nasa')}</h3>
+    <p>${t('recordsSaved', { n: ev.length, list: Object.entries(byType).map(([k, n]) => `${n} ${esc(k)}`).join(', ') })}</p>
     <div class="list">${ev.map((e) => {
       const url = safeUrl(e.sourceUrl);
-      return `<div class="src"><b>${esc(e.type)} · ${esc(fmtDate(e.observedAt))}</b><span>${esc(e.summary || e.title)}</span><br>
-      <small>${esc(e.source || '')}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">Ver registro</a>` : ''}</small></div>`;
+      return `<div class="src"><b>${esc(e.type)} · ${esc(fmtDate(e.observedAt))}</b><span>${esc(trEvent(e.summary) || e.title)}</span><br>
+      <small>${esc(tr(e.source || ''))}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">${t('screen.ver_registro')}</a>` : ''}</small></div>`;
     }).join('')}</div>
-    <p class="muted small">Los registros son de archivo: no son una consulta en vivo ni miden la radiación en Luna-7.</p>
+    <p class="muted small">${t('screen.los_registros_son_de_archivo')}</p>
   </div>`;
 }
 
 export function glossaryHTML() {
-  return `<div class="sheet enter">${close}
-    <h2>🔎 Glosario</h2>
-    <p class="muted">Tocá una palabra subrayada con puntos en cualquier parte del juego para ver qué significa.</p>
-    <dl class="glossary">${GLOSSARY.map((g) => `<dt>${esc(g.term)}</dt><dd>${esc(g.def)}</dd>`).join('')}</dl>
+  return `<div class="sheet enter">${close()}
+    <h2>${t('glossary')}</h2>
+    <p class="muted">${t('screen.toca_una_palabra_subrayada_con')}</p>
+    <dl class="glossary">${GLOSSARY.map((g) => `<dt>${esc(tr(g.term))}</dt><dd>${esc(tr(g.def))}</dd>`).join('')}</dl>
   </div>`;
 }
 
 export function teachersHTML(v) {
   const plant = catalog.facts.find((f) => f.id === 'plant');
   const url = safeUrl(plant?.sourceUrl);
-  return `<div class="sheet enter">${close}
-    <h2>🍎 Para docentes</h2>
-    <p>Vita Lunae es un juego gratis para el navegador, para estudiantes de 7 a 12 años. No necesita cuenta ni descarga.</p>
-    <h3>Qué practican</h3>
+  return `<div class="sheet enter">${close()}
+    <h2>${t('teachers')}</h2>
+    <p>${t('screen.vita_lunae_es_un_juego')}</p>
+    <h3>${t('screen.que_practican')}</h3>
     <ul>
-      <li>Decisiones con costo: cada opción gasta oxígeno, agua, energía, comida o seguridad.</li>
-      <li>Pensamiento sistémico: lo que se decide hoy cambia los retos de mañana.</li>
-      <li>Clima espacial con registros reales de NASA DONKI.</li>
-      <li>Aprender del error: se puede repetir cualquier día ya jugado.</li>
+      <li>${t('screen.decisiones_con_costo_cada_opcion')}</li>
+      <li>${t('screen.pensamiento_sistemico_lo_que_se')}</li>
+      <li>${t('screen.clima_espacial_con_registros_reales')}</li>
+      <li>${t('screen.aprender_del_error_se_puede')}</li>
     </ul>
-    <h3>Código de misión</h3>
-    <p>Con un mismo código (por ejemplo <b>AULA-1</b>), toda la clase juega la misma misión. Después pueden comparar decisiones.</p>
-    ${v?.seed ? `<div class="stat code"><span>Código de la misión actual</span><b>${esc(v.seed)}</b></div>` : ''}
-    <h3>Privacidad</h3>
-    <p>La partida se guarda solo en este dispositivo y no vence: queda hasta tocar "Borrar mi progreso". No se envía ningún dato del estudiante. LUNI responde con fichas preparadas: no es una inteligencia artificial generativa.</p>
-    ${url ? `<p><a href="${esc(url)}" target="_blank" rel="noopener">Recursos de producción de alimentos de la Agencia Espacial Canadiense</a></p>` : ''}
+    <h3>${t('screen.codigo_de_mision')}</h3>
+    <p>${t('screen.con_un_mismo_codigo_por')}</p>
+    ${v?.seed ? `<div class="stat code"><span>${t('screen.codigo_de_la_mision_actual')}</span><b>${esc(v.seed)}</b></div>` : ''}
+    <h3>${t('screen.privacidad')}</h3>
+    <p>${t('screen.la_partida_se_guarda_solo')}</p>
+    ${url ? `<p><a href="${esc(url)}" target="_blank" rel="noopener">${t('screen.recursos_de_produccion_de_alimentos')}</a></p>` : ''}
   </div>`;
 }
 
