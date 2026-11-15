@@ -48,7 +48,12 @@ export class MiniGame extends Phaser.Scene {
     g.fillStyle(C.sky, 1).fillRect(px + 2, py + 2, pw - 4, 52).lineStyle(3, C.outline, 1).lineBetween(px + 2, py + 54, px + pw - 2, py + 54);
 
     const fs = (n) => Math.round(Math.max(15, Math.min(n, pw / 22))) + 'px';
-    this.add.text(px + 20, py + 8, (this.data_.title || '').replace(/^[^\p{L}\p{N}¿¡]+/u, ''), { fontFamily: FONT_PIX, fontSize: '36px', color: '#FFF3DC', stroke: '#27234C', strokeThickness: 4, wordWrap: { width: pw - 200 } });
+    // Título en una sola línea: si no cabe (celular), se achica hasta 18 px y, si aún no cabe, se corta con «…».
+    const narrow = pw < 520;
+    const titleRoom = pw - (narrow ? 150 : 200);
+    let title = (this.data_.title || '').replace(/^[^\p{L}\p{N}¿¡]+/u, '');
+    const tt = this.add.text(px + 16, py + 27, title, { fontFamily: FONT_PIX, fontSize: '36px', color: '#FFF3DC', stroke: '#27234C', strokeThickness: 4 }).setOrigin(0, 0.5);
+    for (let size = 36; tt.width > titleRoom && size > 18; size -= 2) tt.setFontSize(size);
     this.hint = this.add.text(px + 22, py + 64, this.instructions(), { fontFamily: FONT, fontSize: fs(19), fontStyle: '700', color: '#27234C', wordWrap: { width: pw - 44 } });
     if (this.tired) this.add.text(px + 22, py + 96, t('game.cansancio_este_trabajo_pide_un'), { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700' });
 
