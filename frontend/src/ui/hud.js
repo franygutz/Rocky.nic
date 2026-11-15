@@ -45,6 +45,10 @@ function build() {
   last = {};
 }
 
+// Los tres recursos centrales que recomienda el reto: soporte vital (aire), energía y blindaje. El resto se pliega,
+// pero un indicador plegado aparece solo si baja a nivel de alerta.
+export const CORE = ['oxygen', 'energy', 'shield'];
+
 const FLAG = { ok: '', low: '▲', crit: '‼' };
 const level = (key, val) => (key === 'research' ? 'ok' : val < 15 ? 'crit' : val < 30 ? 'low' : 'ok');
 
