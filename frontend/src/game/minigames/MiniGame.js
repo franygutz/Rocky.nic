@@ -60,7 +60,7 @@ export class MiniGame extends Phaser.Scene {
     if (this.tired) { const tx = this.add.text(px + 18, below, t('game.cansancio_este_trabajo_pide_un'), { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700', wordWrap: { width: pw - 36 } }); below = tx.y + tx.height + 6; }
 
     // Rendirse: cuenta como reto no terminado.
-    const bx = px + pw - 78, by = py + 28;
+    const bw = narrow ? 104 : 124, bx = px + pw - bw / 2 - 16, by = py + 28;
     const btn = this.add.container(bx, by);
     const bg = this.add.graphics();
     bg.fillStyle(C.white, 1).fillRoundedRect(-62, -20, 124, 40, 6).lineStyle(3, C.outline, 1).strokeRoundedRect(-62, -20, 124, 40, 6);
