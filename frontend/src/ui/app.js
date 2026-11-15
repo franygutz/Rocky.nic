@@ -3,7 +3,8 @@
 import { bus, session } from '../bus.js';
 import { createBridge } from '../engine.js';
 import { hasMinigame, minigameSeconds, suitFactor, isTired, randomCode, cleanCode, CATEGORY, METRICS, setStatusNames } from '../rules.js';
-import { renderHud, renderDock, resetHud, setSuit, CORE } from './hud.js';
+import { renderHud, renderDock, resetHud, setSuit, CORE, syncFullButton } from './hud.js';
+import { toggleFull, onFullChange, fsSupported, isFull, isStandalone } from './fullscreen.js';
 import { SCENES, OUTSIDE, placeOf, POINTS, nextHop } from '../world/scenes.js';
 import { defaultAvatar, normalizeAvatar, PRESETS, CATEGORIES } from '../world/avatar.js';
 import { createKita } from '../game/kita.js';
@@ -86,6 +87,7 @@ const scr = {
   glossary: () => ({ id: 'glossary', html: () => S.glossaryHTML() }),
   teachers: () => ({ id: 'teachers', html: () => S.teachersHTML(view()) }),
   settings: () => ({ id: 'settings', html: () => S.settingsHTML(session.settings, view().storage?.available !== false, confirmErase) }),
+  fullHelp: () => ({ id: 'fullHelp', html: () => S.fullHelpHTML() }),
   map: () => ({ id: 'map', html: () => S.mapHTML(session.world) }),
   pause: () => ({ id: 'pause', html: () => S.pauseHTML(view()) }),
   create: () => ({ id: 'create', cls: 'start', html: () => S.createHTML({ draft, cat: draftCat, editing }) }),
@@ -345,13 +347,18 @@ function fail(e) {
 }
 
 // ── Acciones de botones ──
+// En celular, al empezar o continuar se pasa solo a pantalla completa (el toque del jugador lo permite).
+function autoFull() {
+  if (document.body.classList.contains('touchy') && fsSupported() && !isFull() && !isStandalone()) toggleFull();
+}
+
 function onAction(a, el) {
   sfx.unlock();
   if (a !== 'choose') sfx.tap();
   const b = session.bridge;
   switch (a) {
-    case 'new': newGame(); break;
-    case 'continue': route(); break;
+    case 'new': autoFull(); newGame(); break;
+    case 'continue': autoFull(); route(); break;
     case 'code': codeError = ''; open(scr.code()); break;
     case 'album': open(scr.album()); break;
     case 'sources': open(scr.sources()); break;
@@ -450,6 +457,9 @@ function onAction(a, el) {
       break;
     }
     case 'readAloud': readAloud(el); break;
+    case 'fullscreen':
+      toggleFull().then((r) => { if (r === 'unsupported') open(scr.fullHelp()); });
+      break;
     case 'setLang':
       try { b.setLanguage(el.dataset.lang); } catch (e) { fail(e); break; }
       if (!document.getElementById('drawer').hidden) clearLuni();
@@ -728,6 +738,8 @@ export function boot() {
     if (OUTSIDE.has(d.to) && !OUTSIDE.has(d.from)) { const s = view().world?.suit; toast(t('afterOut', { n: Math.ceil(s?.eva ?? 0) })); }
   });
   bus.on('openLuni', () => openLuni());
+  // Al entrar o salir de pantalla completa: ícono del HUD, textos de los botones y medidas del mapa.
+  onFullChange(() => { syncFullButton(); if (stack.length) render(); measure(); });
   kita = createKita($('#kita'), { reducedMotion: () => !!session.settings.reducedMotion });
   setupTouch($('#touch'));
   startClock();
