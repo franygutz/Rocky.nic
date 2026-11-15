@@ -2,13 +2,14 @@
 // Fuente de verdad: backend/data/challenges.json. Aquí solo se agregan los campos técnicos del mundo.
 import { placeOf, SCENES } from './scenes.js';
 import { MINIGAME_OF, CATEGORY } from '../rules.js';
+import { t } from '../i18n/index.js';
 
 export const PUZZLE_NAME = {
-  Leak: 'Tapar fugas en orden',
-  Dust: 'Limpiar el polvo de los paneles',
-  Water: 'Repetir la secuencia de riego',
-  Dose: 'Leer el dosímetro en la zona verde',
-  Antenna: 'Orientar la antena hacia la Tierra'
+  get Leak() { return t('world.tapar_fugas_en_orden'); },
+  get Dust() { return t('world.limpiar_el_polvo_de_los'); },
+  get Water() { return t('world.repetir_la_secuencia_de_riego'); },
+  get Dose() { return t('world.leer_el_dosimetro_en_la'); },
+  get Antenna() { return t('world.orientar_la_antena_hacia_la'); }
 };
 
 // Estado de cada tarea según la partida: bloqueada, disponible, activa, completada o fallida.
@@ -21,7 +22,10 @@ export function taskState(game, id) {
   return 'bloqueada';
 }
 
-export const STATE_LABEL = { activa: 'En curso', disponible: 'Disponible', completada: 'Hecha', fallida: 'No salió', bloqueada: 'Por descubrir' };
+export const STATE_LABEL = {
+  get activa() { return t('world.en_curso'); }, get disponible() { return t('world.disponible'); }, get completada() { return t('world.hecha'); },
+  get fallida() { return t('world.no_salio'); }, get bloqueada() { return t('world.por_descubrir'); }
+};
 
 // Matriz completa: una fila por tarea (para la documentación y para las pruebas de cobertura).
 export function taskMatrix(challenges) {
