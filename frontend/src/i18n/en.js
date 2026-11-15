@@ -496,4 +496,7 @@ export default {
   "hud.more": "+{n} more",
   "hud.less": "Show less",
   "hud.more_label": "Show the other meters",
+  "read.aloud": "🔊 Read aloud",
+  "read.stop": "⏹ Stop",
+  "read.option": "Option {id}: {label}. {cons}",
 };
