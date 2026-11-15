@@ -289,20 +289,20 @@ export function weatherHTML(v) {
   const e = w.event;
   const url = safeUrl(e?.sourceUrl);
   return `<div class="sheet wide enter alertsheet">
-    <h2>🌞 Alerta de clima espacial</h2>
-    <p class="say small">${withTerms('Entrenamiento de refugio: el Sol tuvo actividad fuerte. ¿Qué hace tu tripulación con la caminata EVA de hoy?')}</p>
+    <h2>${t('screen.alerta_de_clima_espacial')}</h2>
+    <p class="say small">${withTerms(t('screen.entrenamiento_de_refugio_el_sol'))}</p>
     ${e ? `<div class="src">
-      <b>Registro real de NASA: ${esc(e.type)} · ${esc(fmtDate(e.observedAt))}</b>
-      <span>${withTerms(e.summary || e.title || '')}</span><br>
-      <small>${esc(e.source || 'NASA DONKI')}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">Ver registro</a>` : ''}</small>
-      ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ''}
-    </div>` : `<p class="muted">No hay un registro DONKI cargado: este es un ejercicio sin dato real.</p>`}
-    <p class="muted small">${esc(w.note || 'La fecha es histórica: no es un pronóstico para la Luna. Los efectos del juego son inventados.')}</p>
+      <b>${t('screen.registro_real_de_nasa')}: ${esc(e.type)} · ${esc(fmtDate(e.observedAt))}</b>
+      <span>${withTerms(trEvent(e.summary) || e.title || '')}</span><br>
+      <small>${esc(tr(e.source || 'NASA DONKI'))}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">${t('screen.ver_registro')}</a>` : ''}</small>
+      ${e.note ? `<p class="muted small">${esc(trEvent(e.note))}</p>` : ''}
+    </div>` : `<p class="muted">${t('screen.no_hay_un_registro_donki')}</p>`}
+    <p class="muted small">${esc(trEvent(w.note) || t('screen.la_fecha_es_historica_no'))}</p>
     <div class="opts">
-      <button class="opt" data-action="weather" data-choice="shelter"><span class="optid">🛡️</span><span class="label">Ir al refugio</span>
-        <span class="cons">Todos adentro hasta que pase. Se pausa la investigación.</span>${chips({ energy: -8, shield: 11, research: -5 })}</button>
-      <button class="opt" data-action="weather" data-choice="continue_eva"><span class="optid">🧑‍🚀</span><span class="label">Seguir la caminata</span>
-        <span class="cons">Más ciencia, pero el traje y la salud se exponen.</span>${chips({ research: 9, oxygen: -5, shield: -12, health: -7 })}</button>
+      <button class="opt" data-action="weather" data-choice="shelter"><span class="optid">🛡️</span><span class="label">${t('screen.ir_al_refugio')}</span>
+        <span class="cons">${t('screen.todos_adentro_hasta_que_pase')}</span>${chips({ energy: -8, shield: 11, research: -5 })}</button>
+      <button class="opt" data-action="weather" data-choice="continue_eva"><span class="optid">🧑‍🚀</span><span class="label">${t('screen.seguir_la_caminata')}</span>
+        <span class="cons">${t('screen.mas_ciencia_pero_el_traje')}</span>${chips({ research: 9, oxygen: -5, shield: -12, health: -7 })}</button>
     </div>
   </div>`;
 }
@@ -310,50 +310,50 @@ export function weatherHTML(v) {
 export function weatherResultHTML(res) {
   const shelter = res.result?.choice === 'shelter';
   return `<div class="sheet enter">
-    <h2>${shelter ? '🛡️ Todos a salvo en el refugio' : '🧑‍🚀 La caminata siguió'}</h2>
-    <p>${shelter ? 'La tripulación esperó adentro. Perdieron tiempo de investigación, pero se protegieron.' : 'Consiguieron más datos científicos, pero el traje quedó expuesto. Eso puede traer problemas.'}</p>
+    <h2>${shelter ? t('screen.todos_a_salvo_en_el') : t('screen.la_caminata_siguio')}</h2>
+    <p>${shelter ? t('screen.la_tripulacion_espero_adentro_perdie') : t('screen.consiguieron_mas_datos_cientificos_p')}</p>
     ${chips(res.result?.delta || {})}
     <p class="muted small">${esc(res.result?.note || '')}</p>
-    <div class="row sticky"><button class="btn go" data-action="afterResult" autofocus>Seguir</button></div>
+    <div class="row sticky"><button class="btn go" data-action="afterResult" autofocus>${t('next')}</button></div>
   </div>`;
 }
 
 // ── Final ──
 export function endingHTML(v) {
   const rep = v.ending;
-  if (!rep) return `<div class="sheet enter"><h2>Misión terminada</h2><div class="row"><button class="btn go" data-action="new">Nueva misión</button></div></div>`;
+  if (!rep) return `<div class="sheet enter"><h2>${t('missionDone')}</h2><div class="row"><button class="btn go" data-action="new">${t('screen.nueva_mision')}</button></div></div>`;
   const id = rep.endingId;
   const tragic = id === 9 || id === 10;
   const icon = { 1: '🌕', 2: '🌿', 3: '🔬', 4: '📡', 5: '🤝', 6: '🛰️', 7: '🌑', 8: '🚨', 9: '🕯️', 10: '🌘' }[id] || '🌙';
   const p = rep.performance || {};
   const low = METRICS.filter((m) => m.key !== 'research' && (rep.metrics?.[m.key] ?? 100) < 30);
   return `<div class="sheet wide final enter">
-    <p class="muted">Final ${id} de 10</p>
-    <h2>${icon} ${esc(rep.ending?.title || 'Fin de la misión')}</h2>
+    <p class="muted">${t('finalN', { n: id, m: 10 })}</p>
+    <h2>${icon} ${esc(rep.ending?.title || t('screen.fin_de_la_mision'))}</h2>
     <p class="say small">${esc(rep.ending?.description || '')}</p>
-    ${tragic ? `<p class="note">Este final es triste. Podés repetir un día y probar otras decisiones: así se aprende en un entrenamiento.</p>` : ''}
-    <h3>Por qué llegaste a este final</h3>
+    ${tragic ? `<p class="note">${t('screen.este_final_es_triste_podes')}</p>` : ''}
+    <h3>${t('screen.por_que_llegaste_a_este')}</h3>
     <ul>${(rep.why?.criteria || []).map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
-    ${low.length ? `<p>Indicadores muy bajos: ${low.map((m) => `${m.icon} ${esc(m.label)} (${rep.metrics[m.key]})`).join(', ')}.</p>` : ''}
+    ${low.length ? `<p>${t('screen.indicadores_muy_bajos')}: ${low.map((m) => `${m.icon} ${esc(m.label)} (${rep.metrics[m.key]})`).join(', ')}.</p>` : ''}
     ${rep.statuses?.length ? `<div class="fx">${statusChips(rep.statuses, 'warn')}</div>` : ''}
     <div class="facts-grid">
-      <div class="stat"><span>Retos superados</span><b>✅ ${p.completed ?? 0}</b></div>
-      <div class="stat"><span>A medias / fallidos</span><b>🟡 ${p.partial ?? 0} · ❌ ${p.failed ?? 0}</b></div>
-      <div class="stat"><span>Omitidos</span><b>⏭️ ${p.skipped ?? 0}</b></div>
-      <div class="stat"><span>Monedas ganadas</span><b>🪙 ${rep.earned ?? 0}</b></div>
+      <div class="stat"><span>${t('screen.retos_superados')}</span><b>✅ ${p.completed ?? 0}</b></div>
+      <div class="stat"><span>${t('screen.a_medias_fallidos')}</span><b>🟡 ${p.partial ?? 0} · ❌ ${p.failed ?? 0}</b></div>
+      <div class="stat"><span>${t('screen.omitidos')}</span><b>⏭️ ${p.skipped ?? 0}</b></div>
+      <div class="stat"><span>${t('screen.monedas_ganadas')}</span><b>🪙 ${rep.earned ?? 0}</b></div>
     </div>
     <p class="muted small">${esc(rep.why?.priorityNote || '')}</p>
-    <p class="muted">Código de misión: <b>${esc(v.seed)}</b></p>
-    <div class="row"><button class="btn go" data-action="repeatMenu">↺ Repetir un día</button><button class="btn" data-action="new">🚀 Nueva misión</button><button class="btn" data-action="album">📒 Álbum</button><button class="btn" data-action="menu">Menú principal</button></div>
+    <p class="muted">${t('screen.codigo_de_mision')}: <b>${esc(v.seed)}</b></p>
+    <div class="row"><button class="btn go" data-action="repeatMenu">${t('repeatDay')}</button><button class="btn" data-action="new">${t('newMission')}</button><button class="btn" data-action="album">${t('album')}</button><button class="btn" data-action="menu">${t('mainMenu')}</button></div>
   </div>`;
 }
 
 export function repeatHTML(v) {
   const days = Array.from({ length: v.day }, (_, i) => i + 1);
-  return `<div class="sheet enter">${close}
-    <h2>↺ Repetir un día</h2>
-    <p>Volvés al inicio de ese día con los recursos, compras y suerte de ese momento. Lo que pasó después se borra.</p>
-    <div class="row days">${days.map((d) => `<button class="btn ${d === v.day ? 'go' : ''}" data-action="repeat" data-day="${d}">Día ${d}</button>`).join('')}</div>
+  return `<div class="sheet enter">${close()}
+    <h2>${t('repeatDay')}</h2>
+    <p>${t('screen.volves_al_inicio_de_ese')}</p>
+    <div class="row days">${days.map((d) => `<button class="btn ${d === v.day ? 'go' : ''}" data-action="repeat" data-day="${d}">${t('dayN', { d })}</button>`).join('')}</div>
   </div>`;
 }
 
