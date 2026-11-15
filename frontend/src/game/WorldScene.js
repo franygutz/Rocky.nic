@@ -9,7 +9,8 @@ import { SCENES, U, OUTSIDE, step, safeSpot, doorAt, zoneState, dist, nextHop, d
 import { findPath } from '../world/path.js';
 import { avatarUri, avatarKey, defaultAvatar, normalizeAvatar } from '../world/avatar.js';
 import { renderSheet, PXM } from '../world/lunar.js';
-import { buildWalkSheet, WALK_FRAMES, WALK_FPS, WALK_W, WALK_H, WALK_OX, WALK_OY, WALK_V, STAND_FRAME } from '../world/walk.js';
+import { buildWalkSheet, WALK_FRAMES, WALK_FPS, WALK_W, WALK_H, WALK_OX, WALK_OY, WALK_V, STAND_FRAME, choosePose } from '../world/walk.js';
+import { cliffCanvas, mapSampler, CLIFF_COLORS } from '../world/cliff.js';
 import { sfx } from './sfx.js';
 import { C } from '../theme.js';
 
@@ -35,6 +36,7 @@ const SHIP_COLORS = { o: 0x27234c, c: 0xfff3dc, w: 0xc5d2ff, t: 0x44d9e6, y: 0xf
 const LUN_CACHE = new Map(); // hojas de cuadros ya generadas (avatar + casco + animación)
 const SPECIAL = new Set(['salto', 'caida', 'muestra']); // animaciones de una vez: bloquean el movimiento
 
+
 export class WorldScene extends Phaser.Scene {
   constructor() { super('World'); }
 
@@ -43,6 +45,7 @@ export class WorldScene extends Phaser.Scene {
     this.startAt = data?.x != null ? { x: data.x, y: data.y } : null;
     this.cfg = SCENES[this.sid];
     this.ready = false;
+    this.surroundBox = null;
   }
 
   preload() {
@@ -86,10 +89,26 @@ export class WorldScene extends Phaser.Scene {
     return Promise.all(jobs);
   }
 
+  // ── Borde del exterior: la meseta termina en un barranco (en lugar del fondo negro) ──
+  buildSurround(W, H) {
+    if (!this.textures.exists('barranco')) {
+      const s = this.cfg, src = this.textures.get(s.map).getSourceImage();
+      const c = cliffCanvas(document, s.w, s.h, { ground: mapSampler(document, src, s.w, s.h) });
+      this.textures.addCanvas('barranco', c.canvas);
+      this.textures.get('barranco').customData.offset = [c.ox, c.oy];
+    }
+    const [ox, oy] = this.textures.get('barranco').customData.offset;
+    const img = this.add.image(-ox, -oy, 'barranco').setOrigin(0).setDepth(0.5); // encima del mapa, debajo de todo lo demás
+    // La cámara puede asomarse al barranco, pero no más allá del dibujo.
+    this.surroundBox = { x: -ox, y: -oy, w: img.width, h: img.height };
+    void W; void H;
+  }
+
   // ── Construcción del escenario ───────────────────────────────────────────────
   build() {
     const s = this.cfg, W = s.w * U, H = s.h * U;
     this.bg = this.add.image(0, 0, s.map).setOrigin(0, 0).setDepth(0);
+    if (s.surround) this.buildSurround(W, H);
     if (s.front) this.add.image(0, s.front.y * U, s.front.tex).setOrigin(0, 0).setDepth(1e6);
     this.statusLayer = this.add.graphics().setDepth(5);
     this.decor = [];
@@ -111,8 +130,7 @@ export class WorldScene extends Phaser.Scene {
     // Si empiezas dentro de una zona (al continuar o al reaparecer), no se abre sola: hay que entrar de nuevo.
     for (const [id, z] of Object.entries(s.zones || {})) this.insideZones[id] = zoneState(z, this.pos.x, this.pos.y, false);
 
-    this.cameras.main.setBackgroundColor('#171426');
-    this.fitCamera();
+    this.cameras.main.setBackgroundColor(s.surround ? CLIFF_COLORS.abyssDeep : '#171426');
     this.cameras.main.startFollow(this.hero, true, 0.14, 0.14);
     this.cameras.main.fadeIn(session.settings.reducedMotion ? 1 : 220, 23, 20, 38);
 
@@ -138,6 +156,7 @@ export class WorldScene extends Phaser.Scene {
     this.cleanups.push(() => this.scale.off('resize', this.fitCamera, this));
 
     this.ready = true;
+    this.fitCamera(); // antes de 'ready' no hacía nada: zoom y límites no se aplicaban al entrar
     session.world = { scene: this.sid, x: this.pos.x, y: this.pos.y };
     session.worldScene = this;
     if (session.nextAnim) { const a = session.nextAnim; session.nextAnim = null; this.playSpecial({ name: a }); }
@@ -253,7 +272,9 @@ export class WorldScene extends Phaser.Scene {
     const across = portrait ? s.view * 0.62 : s.view;
     const zoom = Math.max(0.2, Math.min(W / (across * U), H / (Math.min(s.h, across * 0.75) * U)));
     cam.setZoom(Math.min(zoom, Math.max(W / (s.w * U), H / (s.h * U)) * 4));
-    cam.setBounds(0, 0, s.w * U, s.h * U, true);
+    const b = this.surroundBox;
+    if (b) cam.setBounds(b.x, b.y, b.w, b.h, true);
+    else cam.setBounds(0, 0, s.w * U, s.h * U, true);
   }
 
   // ── Movimiento ──────────────────────────────────────────────────────────────
@@ -277,6 +298,7 @@ export class WorldScene extends Phaser.Scene {
     const free = canWalk() && time >= this.lockUntil && !this.special;
     this.running = !!(free && ((this.keys.SHIFT && this.keys.SHIFT.isDown) || this.route.length > 6));
     let [vx, vy] = free ? this.inputVector() : [0, 0];
+    this.keyDir = [vx, vy];
     if (free && (vx || vy)) this.route = [];
     if (free && !vx && !vy && this.route.length) {
       const n = this.route[0], d = dist(this.pos, n);
@@ -285,13 +307,19 @@ export class WorldScene extends Phaser.Scene {
     }
     this.moving = free && (vx !== 0 || vy !== 0);
     if (this.moving) {
+      // Hacia dónde mira: con teclas, la dirección pulsada; siguiendo una ruta, un punto un poco más adelante
+      // (la ruta va en zigzag por la grilla y mirar solo al próximo nodo hacía girar al personaje de espaldas).
+      let dx = vx, dy = vy;
+      if (this.route.length && !(this.keyDir && (this.keyDir[0] || this.keyDir[1]))) {
+        const la = this.route[Math.min(3, this.route.length - 1)];
+        dx = la.x - this.pos.x; dy = la.y - this.pos.y;
+      }
       const sp = (this.effSpeed || this.speed()) * dt;
       const p = step(this.sid, this.pos.x, this.pos.y, vx * sp, vy * sp);
       this.moving = Math.abs(p.x - this.pos.x) + Math.abs(p.y - this.pos.y) > 0.001;
       this.pos = p;
-      if (!this.helmet) this.pose = vy < 0 ? 'back' : 'front'; // dentro de Zora solo hay arte de frente y de espaldas (kit oficial)
-      else if (Math.abs(vy) > Math.abs(vx) * 0.9) this.pose = vy > 0 ? 'front' : 'back'; // subir y bajar: de espaldas y de frente, con pasos
-      else { this.pose = 'side'; this.facing = vx > 0 ? 1 : -1; }
+      this.pose = choosePose(this.pose, dx, dy);
+      if (this.pose === 'side' && Math.abs(dx) > 0.05) this.facing = dx > 0 ? 1 : -1;
       if (!this.moving) this.route = [];
     }
     this.animate(dt);
@@ -348,12 +376,14 @@ export class WorldScene extends Phaser.Scene {
   }
 
   animate(dt) {
+    if (this.avatarLoading || !this.cur) return;
     const sc = this.cfg.avatarScale;
     if (!this.special) {
       let want;
-      if (this.moving) want = this.pose === 'side' && this.helmet ? (this.running ? 'esqui' : 'trote') : 'walk-' + (this.pose === 'side' ? 'front' : this.pose);
-      else want = this.pose === 'side' && this.helmet ? 'quieto' : 'stand-' + (this.pose === 'side' ? 'front' : this.pose);
-      if (this.cur.name !== want) { this.ensureAnim(want); this.play(want, { loop: true }); }
+      // De costado se usa el perfil lunar (con casco afuera y con su peinado adentro de Zora); de frente y de espaldas, el sprite del kit.
+      if (this.moving) want = this.pose === 'side' ? (this.running ? 'esqui' : 'trote') : 'walk-' + this.pose;
+      else want = this.pose === 'side' ? 'quieto' : 'stand-' + this.pose;
+      if (this.cur.name !== want || !this.sheets[want]) { this.ensureAnim(want); this.play(want, { loop: true }); }
       if (this.moving) {
         // Física de verdad: la velocidad sale de m/s reales (≈ 2,2 al trote y 3,4 al esquí, como los astronautas del Apolo) y de la escala del
         // sprite (1 m = 22 px lógicos); el ritmo de los pasos = velocidad / velocidad de la animación, así los pies no patinan.
@@ -362,7 +392,7 @@ export class WorldScene extends Phaser.Scene {
         this.effSpeed = this.cur.rate * sh.v * PXM * sc;
       }
     }
-    const c = this.cur, sh = this.sheets[c.name];
+    const c = this.cur, sh = this.sheets[c.name] || this.ensureAnim(c.name);
     c.t += dt * c.rate;
     if (c.loop) c.t %= sh.T;
     else if (c.t >= sh.T) { c.t = sh.T - 1e-6; const d = c.onDone; c.onDone = null; this.applyFrame(); d?.(); }
@@ -471,7 +501,8 @@ export class WorldScene extends Phaser.Scene {
     if (!a) return;
     this.avatar = a;
     this.sheets = {};
-    this.loadAvatar(a).then(() => { if (!this.alive || !this.hero) return; this.ensureAnim('quieto'); this.ensureAnim('trote'); this.play('quieto', { loop: true }); });
+    this.avatarLoading = true; // mientras cargan las texturas del avatar nuevo no se arman animaciones
+    this.loadAvatar(a).then(() => { this.avatarLoading = false; if (!this.alive || !this.hero) return; this.ensureAnim('quieto'); this.ensureAnim('trote'); this.play('quieto', { loop: true }); });
   }
 
   dispose() {

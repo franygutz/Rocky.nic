@@ -8,6 +8,15 @@ export const WALK_W = 36, WALK_H = 54;   // margen de 2 px a los lados y 8 arrib
 export const WALK_OX = 18, WALK_OY = 54; // ancla: centro del cuerpo, suela en la última fila
 export const WALK_V = 1.05;              // m/s del trote de referencia (el mismo del perfil)
 
+// Elige la vista según la dirección, con margen para no parpadear entre perfil y frente en las diagonales.
+export function choosePose(prev, dx, dy) {
+  const ax = Math.abs(dx), ay = Math.abs(dy);
+  if (ax < 1e-6 && ay < 1e-6) return prev;
+  const vertical = prev === 'front' || prev === 'back';
+  if (vertical ? ay * 1.35 >= ax : ay > ax * 1.35) return dy > 0 ? 'front' : 'back';
+  return 'side';
+}
+
 // dy positivo = hacia arriba. b = cuerpo, L/R = pierna izquierda/derecha levantada, aL/aR = brazos, sx = balanceo lateral
 const POSES = [
   { b: -1, L: 0, R: 3, aL: 2, aR: -2, sx: -1 },  // apoyo pie izquierdo

@@ -15,8 +15,10 @@ export const SCENES = {
     name: 'Exterior de la estación',
     map: 'mapa-exterior',
     w: 568, h: 336, avatarScale: 0.5, view: 200, music: 'sky',
-    // zona general (todo el terreno) menos obstáculos
-    walk: [[2, 6, 566, 334]],
+    surround: true, // la base está en una hondonada rodeada de paredes de roca (src/world/cliff.js)
+    // zona general (todo el terreno) menos obstáculos; deja libre la franja de montañas del borde.
+    // Arriba, el límite sigue la línea del cielo medida en el PNG (+20 unidades): el astronauta no queda parado sobre el cielo.
+    walk: [[14, 29, 142, 322], [142, 22, 189, 322], [189, 25, 236, 322], [236, 32, 284, 322], [284, 41, 331, 322], [331, 37, 378, 322], [378, 30, 473, 322], [473, 28, 520, 322], [520, 44, 554, 322]],
     block: [
       [46, 2, 133, 72], [0, 0, 48, 26], [8, 52, 52, 86], // antena y rocas
       [196, 106, 374, 195], // Zora
@@ -48,21 +50,41 @@ export const SCENES = {
     name: 'Nave Zora',
     map: 'mapa-zora',
     w: 480, h: 320, avatarScale: 0.5, view: 170, music: 'inside',
-    walk: px(ZK, [
-      [22, 44, 212, 126], [85, 124, 120, 152], // energía
-      [253, 62, 415, 128], [305, 126, 337, 152], // comunicaciones
-      [498, 72, 735, 138], [612, 136, 652, 172], // cabina
-      [48, 150, 470, 192], [48, 150, 86, 236], // pasillo superior e izquierdo
-      [22, 252, 130, 318], [52, 188, 86, 254], // esclusa
-      [392, 190, 700, 238], [620, 150, 652, 270], // pasillo derecho y vertical
-      [222, 190, 258, 264], [165, 262, 318, 336], // taller
-      [392, 222, 432, 264], [346, 286, 486, 360], // atención médica
-      [620, 258, 652, 292], [535, 286, 732, 374], // soporte vital
-      [222, 336, 260, 398], [222, 336, 556, 398], // pasillo inferior
-      [222, 392, 254, 422], [155, 418, 332, 486], // dormitorios
-      [520, 392, 556, 432], [460, 420, 695, 486], // almacén
-      [258, 332, 346, 340],
-    ]),
+    // Habitaciones (medidas en la vista de 760 px) + pasillos medidos sobre el PNG (1440 × 960 px, 3 px por unidad)
+    // siguiendo el borde exacto de las baldosas: así el astronauta no puede pisar el vacío entre pasillos.
+    walk: [
+      ...px(ZK, [
+        [22, 44, 212, 126], // energía
+        [253, 62, 415, 128], // comunicaciones
+        [498, 72, 735, 138], // cabina
+        [22, 252, 130, 318], // esclusa
+        [165, 262, 318, 336], // taller
+        [346, 286, 486, 360], // atención médica
+        [535, 286, 732, 374], // soporte vital
+        [155, 418, 332, 486], // dormitorios
+        [460, 420, 695, 486], // almacén
+      ]),
+      // Pasillos y puertas medidos sobre el PNG (1440 × 960 px, 3 px por unidad) desde el borde del vacío:
+      // a los costados quedan 15 px para el pie (la pared + medio pie), arriba 18 px (el cuerpo no flota sobre el vacío)
+      // y abajo 12 px. Así el astronauta camina solo sobre las baldosas.
+      ...px(3, [
+        [176, 230, 204, 310], // puerta de energía
+        [592, 238, 637, 310], // puerta de comunicaciones
+        [110, 305, 873, 357], // pasillo superior
+        [104, 350, 150, 432], [116, 428, 144, 482], // bajada a la esclusa
+        [425, 350, 474, 470], [438, 466, 455, 502], // bajada al taller
+        [821, 350, 873, 440], // cruce del pasillo superior con el derecho
+        [821, 380, 1311, 432], // pasillo derecho
+        [752, 431, 840, 490], // codo hacia la atención médica
+        [764, 485, 792, 546], // puerta de la atención médica
+        [1175, 256, 1224, 438], // puerta de la cabina
+        [1187, 432, 1236, 485], [1199, 480, 1227, 546], // bajada y puerta de soporte vital
+        [443, 630, 471, 800], // salida inferior del taller y puerta de los dormitorios
+        [431, 698, 990, 732], // pasillo inferior
+        [985, 722, 1029, 735], // extremo del pasillo inferior
+        [1001, 722, 1029, 800], // puerta del almacén
+      ]),
+    ],
     block: px(ZK, [
       [30, 52, 62, 80], // consola de energía
       [172, 262, 232, 284], [262, 262, 320, 284], // equipos del taller

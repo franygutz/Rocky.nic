@@ -17,7 +17,7 @@ const _rgb=new Map(),_mix=new Map();
 function rgb(h){let v=_rgb.get(h);if(!v){const n=parseInt(h.slice(1),16);v=[(n>>16)&255,(n>>8)&255,n&255];_rgb.set(h,v)}return v}
 function mix(a,b,t){const k=a+b+t;let v=_mix.get(k);if(!v){const A=rgb(a),B=rgb(b);v='#'+A.map((x,i)=>Math.round(x+(B[i]-x)*t).toString(16).padStart(2,'0')).join('');_mix.set(k,v)}return v}
 const dk=c=>mix(c,P.ink,.3);
-function lookOf(a){const acc=P[SUIT_KEY[SUITS[a.suit][1]]];return{acc,accSh:acc===P.main?P.shade:mix(acc,P.ink,.28),skin:SKINS[a.skin][1],skinSh:SKINS[a.skin][2],hair:HAIRS[a.hair][1],eye:EYES[a.eyes][1],accessory:a.accessory,bare:!!a.bare,top:[10,12].includes(a.style)?-2.4:[11,3,13].includes(a.style)?-.2:-.9,back:[1,2,3,5,7,4].includes(a.style)?2.6:[10,12].includes(a.style)?.4:1.4,longH:[1,2,3,5,7].includes(a.style)}}
+function lookOf(a){const acc=P[SUIT_KEY[SUITS[a.suit][1]]];return{acc,accSh:acc===P.main?P.shade:mix(acc,P.ink,.28),skin:SKINS[a.skin][1],skinSh:SKINS[a.skin][2],hair:HAIRS[a.hair][1],hairHi:HAIRS[a.hair][2],style:a.style|0,eye:EYES[a.eyes][1],accessory:a.accessory,bare:!!a.bare,top:[10,12].includes(a.style)?-2.4:[11,3,13].includes(a.style)?-.2:-.9,back:[1,2,3,5,7,4].includes(a.style)?2.6:[10,12].includes(a.style)?.4:1.4,longH:[1,2,3,5,7].includes(a.style)}}
 
 /* ===== Lienzo de píxeles y formas con contorno ===== */
 class Buf{constructor(w,h){this.w=w;this.h=h;this.d=new Uint8ClampedArray(w*h*4);this.m=new Int32Array(w*h);this.stamp=0}
@@ -199,13 +199,49 @@ const ANIMS=[
 
 
 // Adentro de Zora no hay casco: cabeza al descubierto con el mismo peinado, ojos y detalle del avatar.
-function drawBare(B,C,hd,hf,L){const r=7.6;
- new Shape(B).circ(C[0],C[1],r).paint(L.skin,{shade:L.skinSh,fn:(x,y)=>{const dx=x+.5-C[0],dy=y+.5-C[1],lf=dx*hf[0]+dy*hf[1],ld=-(dx*hd[0]+dy*hd[1]);
-  if(ld<-3.2||(lf<-1.2&&ld<1.8))return L.hair;
-  if(lf>3&&lf<4.6&&ld>-1.4&&ld<.8)return P.ink;
-  if(L.accessory==='glasses'&&ld>-1.8&&ld<-.2&&lf>1.2&&lf<6.4)return P.ink;
-  if(L.accessory==='beard'&&ld>3&&lf>-.5)return L.hair;
-  if(L.accessory==='freckles'&&lf>4&&lf<5.2&&ld>1.4&&ld<2.4)return L.skinSh;
+// Cabello de perfil (sin casco), uno por cada peinado del Kit: así el avatar conserva su peinado en todas las animaciones.
+// vol: volumen sobre la cabeza · cap: hasta dónde cubre la coronilla · back/down: nuca · fringe: flequillo · extra: forma propia.
+const HAIR_PROFILE=[
+ {vol:1.4,cap:3.2,back:-1.2,down:6.5,len:-6.5,w:3.6},            // 0 Bob
+ {vol:1.2,cap:3.2,back:-1.2,down:7,len:-13,w:3.4},                // 1 Largo liso
+ {vol:.8,cap:3.4,back:-1.6,down:2,extra:'pony'},                  // 2 Coleta
+ {vol:2.4,cap:3,back:-.8,down:7,len:-12,w:4.4,curl:true},         // 3 Rizos largos
+ {vol:.6,cap:3.6,back:-1.8,down:1.6,extra:'bun'},                 // 4 Moño
+ {vol:.8,cap:3.4,back:-1.4,down:3,extra:'braid'},                 // 5 Trenzas
+ {vol:1,cap:2.8,back:-1.6,down:1.6,fringe:2.2},                   // 6 Pixie
+ {vol:1.8,cap:3,back:-1,down:6,len:-9,w:3.8,curl:true},           // 7 Ondulado
+ {vol:1,cap:3.4,back:-1.8,down:1.4},                              // 8 Corto clásico
+ {vol:1.2,cap:3,back:-1.6,down:1.6,fringe:1.6},                   // 9 Flequillo
+ {vol:.3,cap:4.6,back:-3.2,down:-.5},                             // 10 Rapado
+ {vol:4,cap:2.6,back:-.6,down:4.5,curl:true,extra:'afro'},        // 11 Afro
+ {vol:1.2,cap:3.6,back:-2.6,down:0},                              // 12 Degradado
+ {vol:.8,cap:3.4,back:-1.8,down:1.2,extra:'spike'},               // 13 Puntiagudo
+ {vol:2,cap:3,back:-1.4,down:2.4,curl:true},                      // 14 Rizos cortos
+ {vol:1.2,cap:3.2,back:-1.6,down:1.6,fringe:2.8}                  // 15 Raya lateral
+];
+function drawBare(B,C,hd,hf,L){const r=7.6,H=HAIR_PROFILE[L.style]||HAIR_PROFILE[8];
+ const W=(f,u)=>[C[0]+hf[0]*f+hd[0]*u,C[1]+hf[1]*f+hd[1]*u];
+ // 1) Volumen y largo, por detrás de la cara
+ const back=new Shape(B);
+ if(H.extra==='afro'){const c=W(-2.4,1.8);back.circ(c[0],c[1],r+H.vol-.8)}
+ else{const c=W(-2.2,1.4);back.circ(c[0],c[1],r+H.vol-.5)}
+ if(H.curl){for(let k=0;k<6;k++){const a=Math.PI*(.08+k*.12),c=W(-1.4+Math.cos(a)*-(r+H.vol-1.2),1.4+Math.sin(a)*(r+H.vol-1.2));back.circ(c[0],c[1],1.9)}}
+ if(H.len){const a=W(-3.6,0),b=W(-4.4,H.len);back.cap(a[0],a[1],b[0],b[1],H.w);if(H.curl){const c=W(-5.6,H.len+1.5);back.circ(c[0],c[1],H.w*.8)}}
+ if(H.extra==='pony'){const a=W(-7.6,3.6),b=W(-10,-4.5);back.cap(a[0],a[1],b[0],b[1],2.3)}
+ if(H.extra==='bun'){const c=W(-3.4,8.6);back.circ(c[0],c[1],3.3)}
+ if(H.extra==='braid'){const a=W(-5.4,-1),b=W(-5.8,-13);back.cap(a[0],a[1],b[0],b[1],1.8)}
+ if(H.extra==='spike')for(const k of[-4.5,-1.5,1.5]){back.poly([W(k-1.8,r-1),W(k+1.8,r-1),W(k+.4,r+4.6)])}
+ const bands=H.extra==='braid'?(x,y)=>{const dx=x+.5-C[0],dy=y+.5-C[1],u=dx*hd[0]+dy*hd[1];return u<-1&&Math.round(u)%3===0?mix(L.hair,P.ink,.35):null}:null;
+ back.paint(L.hair,{shade:mix(L.hair,P.ink,.25),hi:L.hairHi,fn:bands});
+ if(H.extra==='pony'){const t=W(-7.4,3.2);new Shape(B).circ(t[0],t[1],1.3).paint(L.acc,{ink:null})}
+ // 2) Cara de perfil con la coronilla, la nuca y el flequillo de ese peinado
+ new Shape(B).circ(C[0],C[1],r).paint(L.skin,{shade:L.skinSh,fn:(x,y)=>{const dx=x+.5-C[0],dy=y+.5-C[1],lf=dx*hf[0]+dy*hf[1],u=dx*hd[0]+dy*hd[1];
+  if(u>H.cap||(lf<H.back&&u>-H.down)||(H.fringe&&lf>0&&u>H.fringe))return u>r-1.6&&lf>-2?L.hairHi:L.hair;
+  if(lf>3&&lf<4.6&&u>-.8&&u<1.4)return P.ink;
+  if(L.accessory==='glasses'&&u>.2&&u<1.8&&lf>1.2&&lf<6.4)return P.ink;
+  if(L.accessory==='beard'&&u<-3&&lf>-.5)return L.hair;
+  if(L.accessory==='freckles'&&lf>4&&lf<5.2&&u<-1.4&&u>-2.4)return L.skinSh;
+  if(lf>-1.4&&lf<.6&&u>-1.2&&u<1.2)return L.skinSh; // oreja
   return null}})}
 function frameBuf(A,t,g,look,preset){const[x0,y0,x1,y1]=A.box,B=new Buf(x1-x0,y1-y0),ox=-x0,oy=-y0;
  const p=A.pose(t,g),cam={x:A.moving?A.v*PXM*t:0,y:0};drawAstro(B,p,look,ox,oy,A,{t,g,cam,tau:t});return B}

@@ -7,6 +7,8 @@ import { baseClip, createKita, CLIPS } from '../src/game/kita.js';
 import { suitFactor, minigameSeconds, OUTDOOR_CATEGORIES } from '../src/rules.js';
 import { catalog, createBridge } from '../src/engine.js';
 import * as S from '../src/ui/screens.js';
+import { choosePose } from '../src/world/walk.js';
+import { cliffCells, CLIFF } from '../src/world/cliff.js';
 
 const mem = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v), removeItem: (k) => m.delete(k) }; };
 const bridge = () => createBridge({ storage: mem(), seed: 'mundo' });
@@ -234,5 +236,79 @@ describe('Reglas de salida y datos de la NASA', () => {
     const html = S.fichaHTML(catalog.facts.find((x) => x.id === 'radiation'), { label: 'Baliza de medición' }, bridge().getView());
     expect(html).toContain('13,22');
     expect(html).toContain('Dato verificado de la NASA');
+  });
+});
+
+describe('vista del astronauta al caminar', () => {
+  it('de costado se ve de perfil aunque la ruta suba o baje un poco (no camina de espaldas)', () => {
+    expect(choosePose('side', 10, -3)).toBe('side');
+    expect(choosePose('front', 10, -3)).toBe('side');
+    expect(choosePose('back', -10, 2)).toBe('side');
+  });
+  it('subiendo o bajando claro se ve de espaldas o de frente', () => {
+    expect(choosePose('side', 1, -10)).toBe('back');
+    expect(choosePose('side', 1, 10)).toBe('front');
+  });
+  it('en las diagonales no parpadea: conserva la vista que traía', () => {
+    expect(choosePose('side', 10, 11)).toBe('side');
+    expect(choosePose('front', 11, 10)).toBe('front');
+    expect(choosePose('back', 0, 0)).toBe('back');
+  });
+});
+
+describe('límites de los pasillos de Zora', () => {
+  // puntos medidos sobre el PNG de Zora (1440 × 960 px, 3 px por unidad)
+  const at = (x, y) => walkable('zora', x / 3, y / 3);
+  it('se camina sobre las baldosas de los pasillos', () => {
+    expect(at(300, 330)).toBe(true); // pasillo superior
+    expect(at(1000, 400)).toBe(true); // pasillo derecho
+    expect(at(700, 720)).toBe(true); // pasillo inferior
+  });
+  it('no se puede pisar el vacío entre pasillos', () => {
+    expect(at(780, 390)).toBe(false); // codo del pasillo superior (la captura del reporte)
+    expect(at(560, 660)).toBe(false); // entre el taller y la atención médica
+    expect(at(960, 660)).toBe(false); // entre la atención médica y soporte vital
+    expect(at(300, 400)).toBe(false); // debajo del pasillo superior
+  });
+});
+
+describe('hondonada del exterior', () => {
+  const { w: W, h: H } = SCENES.exterior;
+  const c = cliffCells(W, H);
+  const at = (x, y) => c.px[(y + c.oy) * c.w + (x + c.ox)]; // coordenadas del mapa
+  it('el fondo es el mapa (transparente) y todo lo de afuera tiene color', () => {
+    expect(at(288, 210)).toBeNull();
+    expect(at(100, 150)).toBeNull();
+    let empty = 0;
+    for (let y = 0; y < c.h; y++) for (let x = 0; x < c.w; x++) {
+      const inMap = x >= c.ox && x < c.ox + W && y >= c.oy && y < c.oy + H;
+      if (!inMap && !/^#[0-9a-f]{6}$/i.test(c.px[y * c.w + x] || '')) empty++;
+    }
+    expect(empty).toBe(0);
+  });
+  it('arriba sube una pared de roca y detrás sigue la meseta', () => {
+    const col = Array.from({ length: c.oy }, (_, k) => at(288, -1 - k)); // de abajo hacia arriba
+    expect(col.slice(0, 30).filter((p) => ['#a6869f', '#8f6f8d', '#775b7b', '#62496a', '#46334f'].includes(p) || /^#[4-9]/.test(p)).length).toBeGreaterThan(15);
+    expect(col).toContain('#dcc0b9'); // canto claro de la meseta
+  });
+  it('al frente, la meseta vuelve a caer en un barranco', () => {
+    const col = Array.from({ length: c.h - c.oy - H }, (_, k) => at(300, H + k));
+    expect(col.some((p) => ['#c6a29f', '#b394a6', '#c0a08f', '#d4b4ac'].includes(p))).toBe(true);
+    expect(col.slice(-20).every((p) => p === '#1e1629' || p === '#2a1f3b')).toBe(true);
+  });
+  it('el astronauta camina solo dentro del fondo', () => {
+    for (const [x0, y0, x1, y1] of SCENES.exterior.walk) {
+      for (const [x, y] of [[x0, y0], [x1 - 1, y0], [x0, y1 - 1], [x1 - 1, y1 - 1]]) {
+        if (walkable('exterior', x, y)) expect(at(x, y)).toBeNull();
+      }
+    }
+    expect(walkable('exterior', 4, 200)).toBe(false);
+    expect(walkable('exterior', 288, 210)).toBe(true);
+  });
+  it('si el mapa trae cielo arriba, la pared lo tapa', () => {
+    const g = cliffCells(W, H, { ground: (x, y) => (x > 200 && x < 400 && y < 15 ? '#261038' : '#c6a29f') });
+    const pick = (x, y) => g.px[(y + g.oy) * g.w + (x + g.ox)];
+    expect(pick(300, 5)).not.toBeNull(); // el cielo queda tapado
+    expect(pick(100, 5)).toBeNull(); // donde no hay cielo, se ve el mapa
   });
 });
