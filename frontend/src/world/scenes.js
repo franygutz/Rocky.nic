@@ -107,7 +107,7 @@ export const SCENES = {
         { id: 'zora-energia-consola', r: 20, kind: 'task', cat: 'energy', label: 'Consola de energía' },
         { id: 'zora-com-antena', r: 22, kind: 'task', cat: 'comms', label: 'Consola de la antena' },
         { id: 'zora-com-radio', r: 20, kind: 'comms', cat: 'comms', label: 'Radio con la Tierra' },
-        { id: 'zora-luni', r: 22, kind: 'luni', label: 'LUNI, el asistente de la base' },
+        { id: 'zora-luni', r: 22, kind: 'luni', label: 'Kita, la mascota de la base' },
         { id: 'zora-panel', r: 18, kind: 'statuses', label: 'Panel de alertas' },
         { id: 'zora-taller-1', r: 20, kind: 'task', cat: 'life', label: 'Estación de trabajo' },
         { id: 'zora-taller-2', r: 20, kind: 'task', cat: 'life', label: 'Monitor de aire' },
