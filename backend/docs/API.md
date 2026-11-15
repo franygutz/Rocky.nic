@@ -121,3 +121,10 @@ Los artículos tienen `limit`, `price`, `delta`, `remove` definidos en `data/sho
 - `400 INVALID_PERFORMANCE`: entrada de minijuego inválida.
 
 No usen jamás `http://127.0.0.1:3001` como URL remota desde el equipo de otra persona: `localhost` siempre apunta a la propia computadora. Para colaboración sin backend online, integren el **motor offline**.
+
+## Idiomas (v0.5.1)
+
+- Puente: `bridge.setLanguage('es'|'en')` y `bridge.getLanguages()`. La vista trae `lang`, `languages` (con `ready`) y `statusNames`. La preferencia se guarda aparte de la partida (`<storageKey>-lang`); la primera vez toma el idioma del navegador.
+- HTTP: `GET /api/v1/languages` y `?lang=en` (o cabecera `Accept-Language`) en catálogo, misiones, tienda, hechos científicos y rutas de partida.
+- Textos en `data/i18n/<código>.json` (shop, status, endings, facts, challenges). Lo que falte cae al español. Para agregar un idioma: crear su archivo, sumarlo a `LANGUAGES` en `engine.js` y cargarlo en `server.js`, `build-offline.js` y `frontend/src/engine.js`.
+- Kita (el chat) entiende preguntas y responde en ambos idiomas.
