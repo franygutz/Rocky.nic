@@ -21,3 +21,8 @@ export function pix(name, { size = 18, cls = 'pix' } = {}) {
   return `<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 9 9" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true" focusable="false">${r}</svg>`;
 }
 export const PIX_NAMES = Object.keys(G);
+
+// Kita de cuerpo entero recortada de su hoja «feliz» (150 × 186), para botones y títulos en lugar de emojis.
+export function kitaIcon({ size = 22, cls = 'kita-ico' } = {}) {
+  return `<span class="${cls}" aria-hidden="true" style="--s:${size}px;background-image:url(${import.meta.env.BASE_URL}assets/kita/kita-icono.png)"></span>`;
+}

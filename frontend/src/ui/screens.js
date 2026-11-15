@@ -1,3 +1,4 @@
+import { kitaIcon, pix } from './pix.js';
 // Pantallas en HTML. Todo texto que viene del motor pasa por esc() o withTerms().
 import { CATEGORY, METRIC, METRICS, RESULT_LABEL, MESSAGE_TYPES, hasMinigame, minigameSeconds, statusName, GOOD_STATUSES, deltaList, iconUrl, ICON } from '../rules.js';
 import { CATEGORIES, avatarUri, EMBLEM_FILES, EMBLEMS } from '../world/avatar.js';
@@ -109,11 +110,11 @@ export function missionHTML(v, { hint, factor = 1 } = {}) {
         </button>`;
       }).join('')}
     </div>
-    <p class="muted small">🎮 En un minijuego, si te sale bien recibís todo lo bueno. Si sale a medias, la mitad. Los costos se pagan igual.</p>
-    ${hint ? `<div class="bubble"><b>🤖 LUNI:</b> ${esc(hint)}</div>` : ''}
+    <p class="muted small">${t('screen.en_un_minijuego_si_te')}</p>
+    ${hint ? `<div class="bubble"><b>${kitaIcon({ size: 26 })} Kita:</b> ${esc(hint)}</div>` : ''}
     <div class="row">
-      <button class="btn small calm" data-action="hint">🤖 Pedir una pista a LUNI</button>
-      <button class="btn small" data-action="skip">⏭️ Omitir reto</button>
+      <button class="btn small calm" data-action="hint">${kitaIcon({ size: 30 })} ${t('screen.pedir_una_pista_a_kita')}</button>
+      <button class="btn small" data-action="skip">${t('screen.omitir_reto')}</button>
     </div>
   </div>`;
 }

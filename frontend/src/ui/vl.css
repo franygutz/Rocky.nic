@@ -201,3 +201,8 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 .card-k .buy { min-height: 52px; font-size: 17px; width: 100%; }
 .shop-tip { text-align: center; font-weight: 700; margin: 14px 0 0; }
 
+/* Cara de Kita como ícono */
+.kita-ico { display: inline-block; width: calc(var(--s, 22px) * .81); height: var(--s, 22px); background-repeat: no-repeat; background-size: contain; background-position: center; image-rendering: pixelated; vertical-align: middle; flex: none; }
+.kita-title { display: flex; align-items: center; gap: 8px; }
+.vl-act .kita-ico { margin-right: 2px; }
+

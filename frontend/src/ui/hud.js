@@ -3,7 +3,7 @@
 import { session } from '../bus.js';
 import { METRICS, CATEGORY, ICON, iconUrl } from '../rules.js';
 import { placeOf, SCENES, OUTSIDE } from '../world/scenes.js';
-import { pix } from './pix.js';
+import { pix, kitaIcon } from './pix.js';
 import { esc } from './text.js';
 
 const $ = (s) => document.querySelector(s);
@@ -103,7 +103,7 @@ export function setSuit(s) {
 }
 
 // ── Barra inferior: una línea con el reto actual y los accesos ──
-const btn = (action, ic, label, extra = '', cls = '') => `<button class="vl-act ${cls}" data-action="${action}" aria-label="${label}">${pix(ic, { size: 20 })}<span>${label}</span>${extra}</button>`;
+const btn = (action, ic, label, extra = '', cls = '') => `<button class="vl-act ${cls}" data-action="${action}" aria-label="${label}">${ic === 'kita' ? kitaIcon({ size: 28 }) : pix(ic, { size: 20 })}<span>${label}</span>${extra}</button>`;
 
 export function renderDock(v) {
   const dock = $('#dock');

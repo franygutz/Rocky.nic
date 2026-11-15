@@ -3,6 +3,8 @@
 import { session } from '../bus.js';
 import { safeUrl } from './text.js';
 import { sfx } from '../game/sfx.js';
+import { t } from '../i18n/index.js';
+import { kitaIcon } from './pix.js';
 
 const $ = (s) => document.querySelector(s);
 const log = []; // { q, r }
@@ -41,7 +43,8 @@ function render() {
   const d = $('#drawer');
   d.innerHTML = '';
   const head = el('div', 'dhead');
-  const title = el('h2', '', '🤖 LUNI');
+  const title = el('h2', 'kita-title');
+  title.innerHTML = `${kitaIcon({ size: 44 })} <span>Kita</span>`;
   const x = el('button', 'btn small', '✕');
   x.setAttribute('aria-label', 'Cerrar');
   x.dataset.action = 'closeLuni';
