@@ -256,3 +256,7 @@ body.reduced #place.show span { animation: none; opacity: 1; transform: none; }
 .mapplaces li.here { background: #FFC93C; box-shadow: 0 3px 0 var(--ink); }
 .mapplaces li em { font-style: normal; font-size: 12px; font-weight: 700; }
 body.reduced .mapimg .you i { animation: none; }
+
+/* Indicadores: 3 centrales grandes y el resto plegado (aparece solo si está en alerta) */
+.vl-m.core .vl-name { font-size: 15px; }
+.vl-m.core .vl-bar { height: 10px; }
