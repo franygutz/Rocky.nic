@@ -30,10 +30,11 @@ function build() {
       <button class="vl-btn" data-action="map" aria-label="${esc(t('map.open'))}" title="${esc(t('map.open'))}">${pix('map')}</button>
       <button class="vl-btn" data-action="pause" aria-label="${esc(t('hud.pausa'))}">${pix('pause')}</button>
     </div>
-    <div class="vl-rail" role="group" aria-label="${esc(t('hud.indicadores_de_la_base'))}">
+    <div class="vl-rail ${session.showAllMetrics ? '' : 'collapsed'}" role="group" aria-label="${esc(t('hud.indicadores_de_la_base'))}">
       ${[...METRICS.filter((m) => CORE.includes(m.key)).sort((a, b) => CORE.indexOf(a.key) - CORE.indexOf(b.key)), ...METRICS.filter((m) => !CORE.includes(m.key))].map((m) => `<div class="vl-m ${CORE.includes(m.key) ? 'core' : 'extra'}" data-m="${m.key}" role="meter" aria-label="${esc(m.label)}" aria-valuemin="0" aria-valuemax="100" title="${esc(m.label)}">
         ${icon(m.file)}<span class="vl-name">${esc(m.label)}</span>
         <span class="vl-bar"><i style="--c:${m.color}"></i></span><b class="vl-val"></b><em class="vl-flag" aria-hidden="true"></em></div>`).join('')}
+      <button class="vl-more" data-action="moreMetrics" aria-expanded="${!!session.showAllMetrics}" aria-label="${esc(t('hud.more_label'))}">${session.showAllMetrics ? t('hud.less') : t('hud.more', { n: METRICS.length - CORE.length })}</button>
       <div class="vl-tank" data-m="suit" role="meter" aria-label="${esc(t('hud.tanque_del_traje'))}" aria-valuemin="0" aria-valuemax="100">
         <span class="vl-tank-title">${pix('tank', { size: 16 })} ${t('hud.tanque_del_traje')}</span>
         <span class="vl-seg" aria-hidden="true">${Array.from({ length: SEGMENTS }, () => '<i></i>').join('')}</span>
