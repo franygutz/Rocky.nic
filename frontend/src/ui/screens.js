@@ -1,6 +1,7 @@
 import { kitaIcon, pix } from './pix.js';
 // Pantallas en HTML. Todo texto que viene del motor pasa por esc() o withTerms().
 import { t, tr, lang, trEvent } from '../i18n/index.js';
+import { isFull, isStandalone } from './fullscreen.js';
 import { CATEGORY, METRIC, METRICS, RESULT_LABEL, MESSAGE_TYPES, hasMinigame, minigameSeconds, statusName, GOOD_STATUSES, deltaList, iconUrl, ICON } from '../rules.js';
 import { CATEGORIES, avatarUri, EMBLEM_FILES, EMBLEMS } from '../world/avatar.js';
 import { placeOf, SCENES } from '../world/scenes.js';
@@ -26,6 +27,15 @@ export function langPicker(v) {
   return `<div class="langs" role="group" aria-label="${esc(t('language'))}">${list.map((l) => `<button class="btn small lang ${l.code === lang() ? 'go' : ''}" data-action="setLang" data-lang="${esc(l.code)}" aria-pressed="${l.code === lang()}" ${l.ready ? '' : 'disabled'}><span aria-hidden="true">${l.code === 'en' ? '🇬🇧' : '🇳🇮'}</span> ${esc(l.native)}</button>`).join('')}</div>`;
 }
 
+// Botón de pantalla completa (no aparece si el juego ya se abrió desde la pantalla de inicio).
+const fullBtn = () => (typeof window === 'undefined' || isStandalone() ? '' : `<button class="btn" data-action="fullscreen">${isFull() ? t('fs.exit') : t('fs.enter')}</button>`);
+
+export function fullHelpHTML() {
+  return `<div class="sheet enter">${close()}<h2>${t('fs.ios_title')}</h2><p>${t('fs.ios_body')}</p>
+    <ol class="steps"><li>${t('fs.ios_1')}</li><li>${t('fs.ios_2')}</li><li>${t('fs.ios_3')}</li></ol>
+    <div class="row"><button class="btn go" data-action="back">${t('fs.ok')}</button></div></div>`;
+}
+
 // ── Inicio ──
 export function menuHTML({ canContinue, finished, day, view }) {
   return `<div class="wrap enter">
@@ -44,6 +54,7 @@ export function menuHTML({ canContinue, finished, day, view }) {
         <button class="btn" data-action="sources">${t('sources')}</button>
         <button class="btn" data-action="glossary">${t('glossary')}</button>
         <button class="btn" data-action="teachers">${t('teachers')}</button>
+        ${fullBtn()}
       </div>
       ${langPicker(view)}
     </div>
@@ -488,6 +499,7 @@ export function pauseHTML(v) {
       <button class="btn" data-action="glossary">${t('glossary')}</button>
       <button class="btn" data-action="sources">${t('sources')}</button>
       <button class="btn" data-action="settings">${t('settings')}</button>
+      ${fullBtn()}
       <button class="btn" data-action="menu">${t('mainMenu')}</button>
     </div>
     ${langPicker(v)}
