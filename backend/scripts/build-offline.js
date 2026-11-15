@@ -3,7 +3,7 @@ import {resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const read=(f)=>readFileSync(resolve(root,f),'utf8');
 const data=(f)=>JSON.parse(read(`data/${f}.json`));
-const catalog={challenges:data('challenges'),items:data('shop'),endings:data('endings'),facts:data('science-facts'),events:data('nasa-events')};
+const catalog={challenges:data('challenges'),items:data('shop'),endings:data('endings'),facts:data('science-facts'),events:data('nasa-events'),statusNames:data('status-names'),i18n:{en:(()=>{try{return data('i18n/en')}catch{return null}})()}};
 const core=read('src/core/engine.js').replace('export function createEngine','function createEngine');
 const bridge=read('src/core/frontend-bridge.js').replace('export function createFrontendBridge','function createFrontendBridge');
 const literal=JSON.stringify(catalog).replace(/</g,'\\u003c');
