@@ -422,6 +422,15 @@ function onAction(a, el) {
     case 'luni': openLuni(); break;
     case 'closeLuni': closeLuni(); break;
     case 'luniAsk': ask(el.dataset.q); break;
+    case 'moreMetrics': {
+      session.showAllMetrics = !session.showAllMetrics;
+      const rail = document.querySelector('.vl-rail');
+      rail?.classList.toggle('collapsed', !session.showAllMetrics);
+      el.setAttribute('aria-expanded', String(!!session.showAllMetrics));
+      el.textContent = session.showAllMetrics ? t('hud.less') : t('hud.more', { n: METRICS.length - CORE.length });
+      measure();
+      break;
+    }
     case 'setLang':
       try { b.setLanguage(el.dataset.lang); } catch (e) { fail(e); break; }
       if (!document.getElementById('drawer').hidden) clearLuni();
