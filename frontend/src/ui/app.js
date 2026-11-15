@@ -240,6 +240,23 @@ function recordEnding(v) {
 }
 
 // ── Reto ──
+// Leer el reto en voz alta (para quienes todavía leen despacio): voz del navegador, en el idioma activo.
+function readAloud(btn) {
+  const syn = window.speechSynthesis;
+  if (!syn) return;
+  if (syn.speaking) { syn.cancel(); btn.textContent = t('read.aloud'); btn.setAttribute('aria-pressed', 'false'); return; }
+  const m = view().mission;
+  if (!m) return;
+  const text = [m.name + '.', m.intro, ...m.options.map((o) => t('read.option', { id: o.id, label: o.label, cons: o.consequence }))].join(' ');
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang() === 'en' ? 'en-US' : 'es-MX';
+  u.rate = 0.92;
+  u.onend = () => { btn.textContent = t('read.aloud'); btn.setAttribute('aria-pressed', 'false'); };
+  btn.textContent = t('read.stop'); btn.setAttribute('aria-pressed', 'true');
+  syn.speak(u);
+}
+const stopReading = () => { try { window.speechSynthesis?.cancel(); } catch { /* sin voz */ } };
+
 function openMission() {
   const v = view();
   if (v.phase !== 'active' || !v.mission || v.scene !== 'mission') return;
