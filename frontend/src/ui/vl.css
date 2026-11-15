@@ -171,6 +171,7 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 .ficha .say { font-size: 18px; line-height: 1.5; }
 
 @media (max-width: 560px) { .vl-pips { display: none; } .vl-plate { font-size: 19px; padding: 4px 8px; } .vl-top { gap: 5px; } }
+
 /* Kita es un botón: al tocarla se abre el chat */
 .kita .spr { display: block; padding: 0; border: 0; background-color: transparent; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .kita .spr:hover { filter: brightness(1.12); transform: translateY(-2px); }
@@ -201,7 +202,6 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 .card-k .buy { min-height: 52px; font-size: 17px; width: 100%; }
 .shop-tip { text-align: center; font-weight: 700; margin: 14px 0 0; }
 
-/* Cara de Kita como ícono */
 /* Cierre de misión */
 #finale { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 120%, #4A3F8F 0%, #27234C 55%, #14122E 100%); overflow: hidden; cursor: pointer; animation: f-in .35s ease-out both; }
 #finale.out { opacity: 0; transition: opacity .3s ease-in; }
@@ -225,11 +225,11 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 #finale.still *, body.reduced #finale * { animation: none !important; }
 #finale.still .f-kita { background-position: 0 0; }
 
+/* Cara de Kita como ícono */
 .kita-ico { display: inline-block; width: calc(var(--s, 22px) * .81); height: var(--s, 22px); background-repeat: no-repeat; background-size: contain; background-position: center; image-rendering: pixelated; vertical-align: middle; flex: none; }
 .kita-title { display: flex; align-items: center; gap: 8px; }
 .vl-act .kita-ico { margin-right: 2px; }
 
-/* Cortina circular entre lugares */
 /* Cartel del lugar al entrar */
 #place { position: fixed; left: 50%; top: 84px; transform: translateX(-50%); z-index: 30; pointer-events: none; }
 #place span { display: inline-block; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); box-shadow: var(--hard); border-radius: var(--r); padding: 6px 18px; font-family: var(--f-pix); font-size: 28px; line-height: 1.1; opacity: 0; transform: translateY(-14px); }
@@ -237,6 +237,7 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 @keyframes place-in { 0% { opacity: 0; transform: translateY(-14px); } 14% { opacity: 1; transform: none; } 80% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
 body.reduced #place.show span { animation: none; opacity: 1; transform: none; }
 
+/* Cortina circular entre lugares */
 @property --r { syntax: '<length>'; inherits: false; initial-value: 0px; }
 #iris { position: fixed; inset: 0; z-index: 25; pointer-events: none; opacity: 0; --x: 50%; --y: 50%; --r: 0px;
   background: radial-gradient(circle at var(--x) var(--y), transparent calc(var(--r) - 2px), #171426 var(--r)); }
