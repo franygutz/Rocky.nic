@@ -1,5 +1,5 @@
 {
-  "name":"moon-survival-backend","version":"0.4.1","private":true,"type":"module",
+  "name":"moon-survival-backend","version":"0.5.0","private":true,"type":"module",
   "description":"Motor lunar determinista, API Node/SQLite, datos NASA y versión offline",
   "engines":{"node":">=22.13.0"},
   "scripts":{

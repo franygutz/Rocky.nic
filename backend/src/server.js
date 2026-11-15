@@ -37,7 +37,7 @@ const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>16000)throw new Error('BODY_TOO_LARGE')}if(!text.trim())return{};try{const b=JSON.parse(text);if(!b||Array.isArray(b)||typeof b!=='object')throw Error();return b}catch{throw new Error('BAD_JSON')}}
 const errorCodes={BODY_TOO_LARGE:413,BAD_JSON:400,GAME_NOT_FOUND:404,OLD_SAVE_VERSION:409,GAME_FINISHED:409,MISSION_NOT_FOUND:404,NOT_CURRENT_MISSION:409,
 INVALID_CHOICE:400,INVALID_HINT:400,INVALID_PERFORMANCE:400,NO_CURRENT_MISSION:409,ITEM_NOT_FOUND:404,OUT_OF_STOCK:409,INSUFFICIENT_COINS:409,
-INVALID_MESSAGE_TYPE:400,WEATHER_RESPONSE_REQUIRED:409,NO_PENDING_WEATHER:409,INVALID_WEATHER_CHOICE:400,INSUFFICIENT_ENERGY:409,INVALID_REPLAY_DAY:409,INVALID_QUESTION:400,REPORT_NOT_READY:409,INVALID_REQUEST_ID:400};
+INVALID_MESSAGE_TYPE:400,WEATHER_RESPONSE_REQUIRED:409,NO_PENDING_WEATHER:409,INVALID_WEATHER_CHOICE:400,INSUFFICIENT_ENERGY:409,INVALID_REPLAY_DAY:409,INVALID_QUESTION:400,REPORT_NOT_READY:409,INVALID_REQUEST_ID:400,NO_ORDER_READY:409,BAG_FULL:409,ITEM_NOT_IN_BAG:409,INVALID_PERCENT:400,INVALID_AVATAR:400,INVALID_SCENE:400,INVALID_POSITION:400,TANK_NOT_LOADED:409,TANK_FILL_OUTSIDE:409,INSUFFICIENT_STATION_OXYGEN:409};
 function mutate(db,id,action,input,handler){
   return transaction(db,()=>{
     const g=getGame(db,id);const rid=input.requestId;
@@ -68,7 +68,7 @@ export function createApp({db=openDatabase(':memory:'),allowedOrigins=origins}={
     if(req.method==='OPTIONS'){res.writeHead(origin&&!allowedOrigins.includes(origin)?403:204);res.end();return}
     try{
       const url=new URL(req.url,'http://127.0.0.1');const path=url.pathname;
-      if(req.method==='GET'&&(path==='/'||path==='/health'))return send(res,200,{ok:true,service:'moon-survival-backend',version:'0.4.1',api:'/api/v1',offline:'public/offline-demo.html'});
+      if(req.method==='GET'&&(path==='/'||path==='/health'))return send(res,200,{ok:true,service:'moon-survival-backend',version:'0.5.0',api:'/api/v1',offline:'public/offline-demo.html'});
       if(req.method==='GET'&&path==='/api/v1/catalog')return send(res,200,{missions:catalog.challenges.length,shop:catalog.items.length,endings:Object.keys(catalog.endings).length,scienceEvents:scienceEvents(db).length});
       if(req.method==='GET'&&path==='/api/v1/missions'){
         const difficulty=url.searchParams.get('difficulty');const category=url.searchParams.get('category');
@@ -98,6 +98,15 @@ export function createApp({db=openDatabase(':memory:'),allowedOrigins=origins}={
         if(req.method==='POST'&&act==='shop/purchase'){const b=await body(req);return send(res,200,mutate(db,id,'BUY',b,g=>engine.purchase(g,b.itemId)))}
         if(req.method==='POST'&&act==='weather/respond'){const b=await body(req);return send(res,200,mutate(db,id,'WEATHER',b,g=>engine.respondWeather(g,b.choice)))}
         if(req.method==='POST'&&act==='communications/send'){const b=await body(req);return send(res,200,mutate(db,id,'SEND_MESSAGE',b,g=>engine.sendMessage(g,b.type)))}
+        if(req.method==='POST'&&act==='shop/order'){const b=await body(req);return send(res,200,mutate(db,id,'ORDER',b,g=>engine.orderItem(g,b.itemId,{requestId:b.requestId})))}
+        if(req.method==='POST'&&act==='orders/collect'){const b=await body(req);return send(res,200,mutate(db,id,'COLLECT',b,g=>engine.collectOrders(g,{requestId:b.requestId})))}
+        if(req.method==='POST'&&act==='inventory/use'){const b=await body(req);return send(res,200,mutate(db,id,'USE_ITEM',b,g=>engine.useItem(g,b.itemId,{requestId:b.requestId})))}
+        if(req.method==='POST'&&act==='world/tick'){const b=await body(req);return send(res,200,mutate(db,id,'WORLD_TICK',b,g=>engine.tickWorld(g,{seconds:b.seconds,outside:!!b.outside})))}
+        if(req.method==='POST'&&act==='world/tank'){const b=await body(req);return send(res,200,mutate(db,id,'TANK_FILL',b,g=>engine.tankFill(g,b.percent,{requestId:b.requestId})))}
+        if(req.method==='POST'&&act==='world/leave'){const b=await body(req);return send(res,200,mutate(db,id,'LEAVE_BASE',b,g=>engine.leaveBase(g,{requestId:b.requestId})))}
+        if(req.method==='POST'&&act==='world/enter'){const b=await body(req);return send(res,200,mutate(db,id,'ENTER_BASE',b,g=>engine.enterBase(g)))}
+        if(req.method==='POST'&&act==='world/avatar'){const b=await body(req);return send(res,200,mutate(db,id,'AVATAR',b,g=>engine.setAvatar(g,b.avatar)))}
+        if(req.method==='POST'&&act==='world/state'){const b=await body(req);return send(res,200,mutate(db,id,'WORLD_STATE',b,g=>engine.setWorldState(g,{scene:b.scene,pos:b.pos})))}
         if(req.method==='POST'&&act==='npc/ask'){const b=await body(req);const out=mutate(db,id,'NPC_ASK',b,g=>{const events=scienceEvents(db);const known=new Map((g.scienceEventPool||[]).map(e=>[e.id,e]));for(const e of events)known.set(e.id,e);g.scienceEventPool=[...known.values()];return engine.npcAsk(g,b.question,{hint:b.hint===true})});return send(res,200,{npc:out.response,game:out.game,alreadyProcessed:out.alreadyProcessed||false})}
         const r=act.match(/^missions\/(\d+)\/resolve$/);
         if(req.method==='POST'&&r){const b=await body(req);return send(res,200,mutate(db,id,'RESOLVE',b,g=>engine.resolveMission(g,Number(r[1]),b.choiceId,{performance:b.performance,hintUsed:b.hintUsed??false})))}
@@ -110,5 +119,5 @@ export function createApp({db=openDatabase(':memory:'),allowedOrigins=origins}={
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
   const db=openDatabase();const {server}=createApp({db,allowedOrigins:(process.env.FRONTEND_ORIGINS||origins.join(',')).split(',').map(s=>s.trim())});
   const host=process.env.HOST||'127.0.0.1',port=Number(process.env.PORT||3001);
-  server.listen(port,host,()=>console.log(`Moon Survival v0.4.1 disponible en http://${host}:${port}/health · SQLite ${process.env.DATABASE_PATH||'./data/moon-v03.sqlite'}`));
+  server.listen(port,host,()=>console.log(`Vita Lunae v0.5.0 disponible en http://${host}:${port}/health · SQLite ${process.env.DATABASE_PATH||'./data/moon-v03.sqlite'}`));
 }

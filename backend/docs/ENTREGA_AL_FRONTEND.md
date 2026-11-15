@@ -1,6 +1,6 @@
-# Moon Survival — Contrato de integración para frontend (Luna)
+# Vita Lunae — Contrato de integración para frontend (Luna)
 
-**Versión de integración: v0.4.1** (puente v0.4 + LUNI con glosario, sugerencias y datos verificados de la Luna).
+**Versión de integración: v0.5.0** (puente v0.4 + LUNI con glosario, sugerencias y datos verificados de la Luna).
 
 ## Decisiones definitivas del juego
 
@@ -120,4 +120,4 @@ if (vista.scene === 'weather') {
 
 ## Nota para backend
 
-Este parche agrega una **capa de presentación**; no cambia los 50 retos ni las reglas del motor. En v0.4.1 hay **58 pruebas** (45 del backend y 13 del puente) y todas pasan. Las partidas y registros NASA del usuario no se incluyen en el ZIP por privacidad y para evitar sobrescritura.
+Este parche agrega una **capa de presentación**; no cambia los 50 retos ni las reglas del motor. En v0.5.0 hay **58 pruebas** (45 del backend y 13 del puente) y todas pasan. Las partidas y registros NASA del usuario no se incluyen en el ZIP por privacidad y para evitar sobrescritura.
