@@ -196,7 +196,7 @@ test('API compra y repetir día limpia historial activo de compras',async()=>wit
 test('API NPC y envíos de mensajes sin almacenar texto de preguntas',async()=>withServer(async (api,db)=>{
  const id=(await api('POST','/api/v1/games')).json.game.id;
  const n=await api('POST',`/api/v1/games/${id}/npc/ask`,{question:'¿Qué pasó en DONKI?',hint:true});
- assert.equal(n.status,200);assert.equal(n.json.npc.npc,'LUNI');assert.equal(n.json.game.npcHelpCount,1);
+ assert.equal(n.status,200);assert.equal(n.json.npc.npc,'Kita');assert.equal(n.json.game.npcHelpCount,1);
  const m=await api('POST',`/api/v1/games/${id}/communications/send`,{type:'status_report'});assert.equal(m.status,200);
  const stored=db.prepare('SELECT state_json FROM games WHERE id=?').get(id).state_json;
  assert.ok(!stored.includes('¿Qué pasó en DONKI?'));
