@@ -29,5 +29,14 @@
   "hipoxia_grave": "Hipoxia grave",
   "eva_sin_rescate": "EVA sin rescate inmediato",
   "tanque_incompleto": "Tanque incompleto",
-  "oxigeno_agotado": "Oxígeno del traje agotado"
+  "oxigeno_agotado": "Oxígeno del traje agotado",
+  "plan_rescate": "Plan de rescate",
+  "rescate_sin_datos": "Rescate sin datos",
+  "evacuacion_solicitada": "Evacuación solicitada",
+  "protocolo_emergencia": "Protocolo de emergencia",
+  "refugio_exitoso": "Refugio exitoso",
+  "prioridad_vital": "Prioridad vital",
+  "semillas_conservadas": "Semillas conservadas",
+  "informe_final": "Informe final",
+  "informe_incompleto": "Informe incompleto"
 }

@@ -1,0 +1,1052 @@
+{
+  "shop": {
+    "agua": {
+      "name": "💧 Water reserve",
+      "desc": "+18 water; helps refill a tank."
+    },
+    "bateria": {
+      "name": "🔋 Portable battery",
+      "desc": "+20 energy for essential systems."
+    },
+    "oxigeno": {
+      "name": "🫁 Oxygen cartridge",
+      "desc": "+20 oxygen; helps when levels are low."
+    },
+    "botiquin": {
+      "name": "🧰 Medical kit",
+      "desc": "+18 health; eases tiredness and dizziness."
+    },
+    "escudo": {
+      "name": "🛡️ Shelter kit",
+      "desc": "+22 protection; fixes preventive faults."
+    },
+    "comms": {
+      "name": "📡 Antenna module",
+      "desc": "+20 communications; clears signal overload."
+    },
+    "huerto": {
+      "name": "🌿 Hydroponic kit",
+      "desc": "+17 food and +3 research."
+    }
+  },
+  "status": {
+    "aire_sin_revisar": "Air not checked",
+    "exposicion_sin_control": "Exposure not assessed",
+    "red_sobrecargada": "Overloaded grid",
+    "cultivo_retrasado": "Delayed crop",
+    "reporte_pendiente": "Pending report",
+    "tos": "Breathing discomfort",
+    "eva_riesgosa": "Risky spacewalk",
+    "energia_comprometida": "Power at risk",
+    "riego_excesivo": "Too much watering",
+    "enlace_saturado": "Link overloaded",
+    "fatiga": "Fatigue",
+    "mareos": "Dizziness",
+    "traje_comprometido": "Suit compromised",
+    "sin_respuesta": "No answer from Earth",
+    "fuga_activa": "Active leak",
+    "contaminacion": "Possible contamination",
+    "orden_erronea": "Wrong order",
+    "refugio_incompleto": "Shelter not enough",
+    "fallo_red": "Grid failure",
+    "consumo_excesivo": "Too much use",
+    "deshidratacion": "Signs of dehydration",
+    "aislamiento": "Isolation",
+    "malestar_digestivo": "Stomach upset",
+    "apagones": "Repeated blackouts",
+    "crisis_sin_resolver": "Unresolved crisis",
+    "rescate_retrasado": "Help delayed",
+    "sin_semillas": "No backup seeds",
+    "hipoxia_grave": "Severe hypoxia",
+    "eva_sin_rescate": "Spacewalk with no quick rescue",
+    "tanque_incompleto": "Incomplete tank",
+    "oxigeno_agotado": "Suit oxygen used up",
+    "plan_rescate": "Rescue plan",
+    "rescate_sin_datos": "Rescue without data",
+    "evacuacion_solicitada": "Evacuation requested",
+    "protocolo_emergencia": "Emergency protocol",
+    "refugio_exitoso": "Shelter success",
+    "prioridad_vital": "Life first",
+    "semillas_conservadas": "Seeds saved",
+    "informe_final": "Final report",
+    "informe_incompleto": "Incomplete report"
+  },
+  "endings": {
+    "1": {
+      "title": "Aurora of Luna-7",
+      "description": "The crew ends safe and with important science results."
+    },
+    "2": {
+      "title": "Star garden",
+      "description": "The greenhouse and supplies are ready for the next crew."
+    },
+    "3": {
+      "title": "Knowledge for Earth",
+      "description": "The mission brings valuable research despite the difficulties."
+    },
+    "4": {
+      "title": "The bridge restored",
+      "description": "Communication lets the team plan the next phase of the mission."
+    },
+    "5": {
+      "title": "A united crew",
+      "description": "Teamwork and care for each other held the base together."
+    },
+    "6": {
+      "title": "Imperfect rescue",
+      "description": "The mission ends with difficulties and a support plan."
+    },
+    "7": {
+      "title": "Controlled silence",
+      "description": "The team stays safe, but the link with Earth is still at risk."
+    },
+    "8": {
+      "title": "Emergency retreat",
+      "description": "The crew stops the science mission and starts emergency procedures."
+    },
+    "9": {
+      "title": "Silence in the habitat",
+      "description": "A serious life-support crisis ends with the loss of an astronaut and the end of the mission."
+    },
+    "10": {
+      "title": "The last walk",
+      "description": "A spacewalk with a compromised suit ends with the loss of an astronaut."
+    }
+  },
+  "facts": {
+    "donki": {
+      "keywords": [
+        "storm",
+        "solar",
+        "radiation",
+        "donki",
+        "particles",
+        "sun"
+      ],
+      "answer": "DONKI keeps records and analysis of solar events, such as solar energetic particles (SEP) and coronal mass ejections (CME). An alert is a reason to check the shelter plan and outdoor tasks. The exact Moon risk needs more calculations."
+    },
+    "oxygen": {
+      "keywords": [
+        "oxygen",
+        "air",
+        "breathe",
+        "co2",
+        "leak",
+        "tank"
+      ],
+      "answer": "Life support does more than add oxygen. It also controls the air and helps remove carbon dioxide. If there is a leak, adding oxygen does not replace fixing the source of the loss.",
+      "source": "NASA Open Science / educational material for the task"
+    },
+    "plant": {
+      "keywords": [
+        "plant",
+        "seed",
+        "watering",
+        "water",
+        "food",
+        "crop",
+        "harvest"
+      ],
+      "answer": "A crop needs water, light, nutrients and a controlled environment. Using more water does not guarantee better growth. Base food includes reserves, because a newly planted seed is not harvested right away."
+    },
+    "comms": {
+      "keywords": [
+        "communication",
+        "message",
+        "antenna",
+        "latency",
+        "earth",
+        "delay",
+        "signal"
+      ],
+      "answer": "A radio message takes a little over one second to travel between Earth and the Moon: 1.35 s on November 14, 2026, with the Moon at 405,616 km (NASA/JPL Horizons). Between November and December 2026 it goes from 1.19 to 1.36 s. So if contact is lost for minutes or hours, the cause is something else: antennas, pointing, power or procedures. In the game, turn delays are a simplification.",
+      "source": "NASA/JPL Horizons · Earth–Moon distance and light time"
+    },
+    "power": {
+      "keywords": [
+        "energy",
+        "battery",
+        "solar panel",
+        "electricity",
+        "blackout",
+        "circuit"
+      ],
+      "answer": "A battery stores energy; it does not make it. If several systems use power at the same time, you must decide which load comes first. To protect the crew, life-support functions usually come first.",
+      "source": "NASA · power challenges of a Moon base"
+    },
+    "radiation": {
+      "keywords": [
+        "radiation",
+        "dose",
+        "dosimeter",
+        "crater",
+        "lro"
+      ],
+      "answer": "The CRaTER instrument, on board the LRO orbiter that circles the Moon, measures radiation. On a normal day (January 2020) it read 13.22 microgray per hour. During the solar storm of September 11, 2017 it reached 19,481.6 microgray per hour: about 1,732 times normal, because the Moon has no atmosphere and no global magnetic field to protect it. These are measurements in lunar orbit, not inside a habitat; that is why a base needs a shelter.",
+      "source": "NASA OSDR RadLab · LRO CRaTER (lunar orbit)"
+    },
+    "sources": {
+      "keywords": [
+        "source",
+        "real data",
+        "nasa",
+        "record",
+        "measurement",
+        "research"
+      ],
+      "answer": "In Vita Lunae, we tell apart NASA historical records, science explanations and numbers made up for the game. A DONKI solar event is not a dose measured directly inside a lunar habitat."
+    }
+  },
+  "challenges": {
+    "1": {
+      "name": "Air check",
+      "categoryLabel": "Life support",
+      "intro": "The ventilation system shows an odd reading. Should you check before going outside to explore?",
+      "cause": "Start of the mission: first check of the habitat.",
+      "science": "Air quality depends on several systems. One reading is not enough to find the cause.",
+      "choices": [
+        {
+          "label": "Calibrate sensors and filters",
+          "consequence": "Air becomes stable, but maintenance uses energy."
+        },
+        {
+          "label": "Trust the indicator",
+          "consequence": "You save energy today, but CO₂ can build up tomorrow and cause headaches."
+        }
+      ]
+    },
+    "2": {
+      "name": "A dosimeter blinks",
+      "categoryLabel": "Radiation",
+      "intro": "One astronaut's meter shows an odd reading before a spacewalk.",
+      "cause": "As she gets close to the suit area.",
+      "science": "Dosimeters record exposure. An odd value must be checked against context and the instrument.",
+      "choices": [
+        {
+          "label": "Check the instrument",
+          "consequence": "The spacewalk is delayed, and the team learns how to check a measurement."
+        },
+        {
+          "label": "Go out without checking",
+          "consequence": "The mission saves time, but uncertainty about exposure grows."
+        }
+      ]
+    },
+    "3": {
+      "name": "Dust on the panels",
+      "categoryLabel": "Energy",
+      "intro": "Some solar panels give less energy than expected.",
+      "cause": "While checking outside systems.",
+      "science": "Light, angle and wear all affect solar power. Dust is a maintenance problem.",
+      "choices": [
+        {
+          "label": "Clean with the robot",
+          "consequence": "Production recovers, at the cost of a small battery reserve."
+        },
+        {
+          "label": "Overload the system",
+          "consequence": "Energy rises for a moment, but one piece of equipment is strained."
+        }
+      ]
+    },
+    "4": {
+      "name": "First seeds",
+      "categoryLabel": "Food",
+      "intro": "The greenhouse has limited water and trays ready for a first experiment.",
+      "cause": "On your first visit to the greenhouse.",
+      "science": "Real food production takes time: the 'food' meter includes reserves and production capacity.",
+      "choices": [
+        {
+          "label": "Plant with controlled watering",
+          "consequence": "The farming experiment moves ahead, but the water goes down."
+        },
+        {
+          "label": "Save all the water",
+          "consequence": "Reserves are kept, but crop research is delayed."
+        }
+      ]
+    },
+    "5": {
+      "name": "First message from Earth",
+      "categoryLabel": "Communications",
+      "intro": "The crew receives instructions and photos; the antenna battery is needed for other things too.",
+      "cause": "After settling into Luna-7.",
+      "science": "The normal Earth–Moon signal delay is about 1.3 seconds one way. Longer interruptions need another cause.",
+      "choices": [
+        {
+          "label": "Send a short transmission",
+          "consequence": "Earth learns the base status, at a cost in energy."
+        },
+        {
+          "label": "Postpone the transmission",
+          "consequence": "Power is saved, but pending reports pile up."
+        }
+      ]
+    },
+    "6": {
+      "name": "Clogged filter",
+      "categoryLabel": "Life support",
+      "intro": "The life-support module warns that the filter needs attention.",
+      "cause": "After variable air readings.",
+      "science": "Ventilation and CO₂ removal are part of life support, not just the oxygen supply.",
+      "choices": [
+        {
+          "label": "Replace the cartridge",
+          "consequence": "The air improves and the risk of symptoms drops."
+        },
+        {
+          "label": "Reduce ventilation",
+          "consequence": "Energy is saved, but breathing discomfort can appear."
+        }
+      ]
+    },
+    "7": {
+      "name": "Outing under watch",
+      "categoryLabel": "Radiation",
+      "intro": "Researchers report more solar activity. A trip outside is about to start.",
+      "cause": "As she gets ready to leave the habitat.",
+      "science": "The risk depends on the solar event, the location and the shielding. The game simplifies these variables.",
+      "choices": [
+        {
+          "label": "Reschedule the trip",
+          "consequence": "The crew stays protected, but a work window is lost."
+        },
+        {
+          "label": "Make the trip short",
+          "consequence": "A sample is collected, but exposure risks go up."
+        }
+      ]
+    },
+    "8": {
+      "name": "Backup battery",
+      "categoryLabel": "Energy",
+      "intro": "A freshly checked battery can power the water recycler or the lab.",
+      "cause": "When the first electrical reserve is assigned.",
+      "science": "A battery stores energy; it does not create it.",
+      "choices": [
+        {
+          "label": "Prioritize the recycler",
+          "consequence": "Water is recovered; research is delayed."
+        },
+        {
+          "label": "Turn on the lab",
+          "consequence": "Science data is gathered, but there is less electrical margin."
+        }
+      ]
+    },
+    "9": {
+      "name": "Uneven sprouts",
+      "categoryLabel": "Food",
+      "intro": "Some seedlings grow worse than others in the greenhouse.",
+      "cause": "After the crop has started.",
+      "science": "Plant growth depends together on light, water, nutrients and the environment.",
+      "choices": [
+        {
+          "label": "Check light and nutrients",
+          "consequence": "The setup is fixed, though it takes time and energy."
+        },
+        {
+          "label": "Increase watering without measuring",
+          "consequence": "Some plants improve, but water is wasted and contamination may appear."
+        }
+      ]
+    },
+    "10": {
+      "name": "The reply is late",
+      "categoryLabel": "Communications",
+      "intro": "Earth's confirmation has not arrived. Is it normal delay or a link failure?",
+      "cause": "When a confirmation fails.",
+      "science": "A delay of about 1.3 s each way does not explain a loss of communication lasting minutes or hours.",
+      "choices": [
+        {
+          "label": "Check the signal log",
+          "consequence": "An antenna needs adjusting, and rushed decisions are avoided."
+        },
+        {
+          "label": "Repeat messages nonstop",
+          "consequence": "Congestion grows and energy is used up without fixing the fault."
+        }
+      ]
+    },
+    "11": {
+      "name": "Headache",
+      "categoryLabel": "Life support",
+      "intro": "An astronaut has a headache and tiredness. The crew suspects an air or rest problem.",
+      "cause": "If air quality or workload is ignored.",
+      "science": "Symptoms are not specific. In the game, the team looks for the cause instead of making a diagnosis.",
+      "choices": [
+        {
+          "label": "Check the air and rest",
+          "consequence": "Well-being improves, at a cost in energy and time."
+        },
+        {
+          "label": "Ask her to keep going",
+          "consequence": "Productivity holds for now, but a crisis may appear."
+        }
+      ]
+    },
+    "12": {
+      "name": "Suit with damaged protection",
+      "categoryLabel": "Radiation",
+      "intro": "A warning says the exploration suit's protection may be compromised.",
+      "cause": "While preparing for a spacewalk.",
+      "science": "A spacesuit protects against several dangers; radiation is only one of them.",
+      "choices": [
+        {
+          "label": "Inspect and replace parts",
+          "consequence": "Safety improves, using materials and energy."
+        },
+        {
+          "label": "Use it for one last mission",
+          "consequence": "A sample is collected, but the risk to the person going out rises."
+        }
+      ]
+    },
+    "13": {
+      "name": "Power spike",
+      "categoryLabel": "Energy",
+      "intro": "The recycler, greenhouse and fans all need electricity at the same time.",
+      "cause": "When three systems run at once.",
+      "science": "A microgrid design must balance generation, storage and demand.",
+      "choices": [
+        {
+          "label": "Schedule use in turns",
+          "consequence": "Total load drops and energy is saved, though research moves more slowly."
+        },
+        {
+          "label": "Keep everything on",
+          "consequence": "Production continues, but the electrical margin gets worse."
+        }
+      ]
+    },
+    "14": {
+      "name": "Water for whom?",
+      "categoryLabel": "Food",
+      "intro": "The lab asks for watering water while life support needs reserves to run.",
+      "cause": "When the stored water is shared out.",
+      "science": "On a lunar base, water must be counted for drinking, hygiene, recycling and technical processes.",
+      "choices": [
+        {
+          "label": "Assign measured watering",
+          "consequence": "The crop is protected, with a moderate drop in water."
+        },
+        {
+          "label": "Save water for the crew",
+          "consequence": "The immediate risk drops, but the crop is at risk."
+        }
+      ]
+    },
+    "15": {
+      "name": "Misaligned antenna",
+      "categoryLabel": "Communications",
+      "intro": "Module movement or a pointing fault reduces link quality.",
+      "cause": "After losing signal quality.",
+      "science": "Link geometry and pointing affect communications. Not every delay is normal latency.",
+      "choices": [
+        {
+          "label": "Recalibrate from inside",
+          "consequence": "Communication returns and the fault is recorded."
+        },
+        {
+          "label": "Wait for another window",
+          "consequence": "Electricity is saved, but a critical order may arrive late."
+        }
+      ]
+    },
+    "16": {
+      "name": "Pressure microleak",
+      "categoryLabel": "Life support",
+      "intro": "A sensor detects a slow loss in one compartment of the habitat.",
+      "cause": "After pressure alerts.",
+      "science": "In a pressurized habitat, a leak must be found: making more oxygen does not fix the cause.",
+      "choices": [
+        {
+          "label": "Isolate and repair the section",
+          "consequence": "The air is kept; the team gives up energy and time."
+        },
+        {
+          "label": "Make up the loss with more supply",
+          "consequence": "The problem stays open and uses up reserves every shift."
+        }
+      ]
+    },
+    "17": {
+      "name": "Historic solar alert",
+      "categoryLabel": "Radiation",
+      "intro": "The observatory reports a solar event recorded by NASA DONKI as a training scenario.",
+      "cause": "When the observatory alert arrives.",
+      "science": "DONKI reports historic solar events. It does not turn an event into an exact dose on the Moon by itself.",
+      "choices": [
+        {
+          "label": "Activate shelter protocol",
+          "consequence": "Risk drops, and the protection system uses energy."
+        },
+        {
+          "label": "Continue outdoor tasks",
+          "consequence": "Field science is gained, but a higher simulated exposure is accepted."
+        }
+      ]
+    },
+    "18": {
+      "name": "The crater's shadow",
+      "categoryLabel": "Energy",
+      "intro": "The Sun's position leaves a set of panels in shadow during a work window.",
+      "cause": "As the base nears a poorly lit area.",
+      "science": "On the Moon, shadows and light cycles directly affect solar power.",
+      "choices": [
+        {
+          "label": "Move robots and share out the load",
+          "consequence": "Power is rebalanced, though oxygen and electricity are used in operations."
+        },
+        {
+          "label": "Keep every load on",
+          "consequence": "The battery runs down faster and the blackout risk rises."
+        }
+      ]
+    },
+    "19": {
+      "name": "Crop contamination",
+      "categoryLabel": "Food",
+      "intro": "Signs that may mean contamination are seen in a hydroponic tray.",
+      "cause": "If sanitary control is not enough.",
+      "science": "Food hygiene and monitoring of closed systems are crucial in space environments.",
+      "choices": [
+        {
+          "label": "Isolate the suspect trays",
+          "consequence": "Part of the crop is lost, but the rest and health are protected."
+        },
+        {
+          "label": "Mix the whole harvest",
+          "consequence": "The immediate loss is avoided, but the stored food could be at risk."
+        }
+      ]
+    },
+    "20": {
+      "name": "Contradictory orders",
+      "categoryLabel": "Communications",
+      "intro": "Two messages arrive out of order and suggest different priorities.",
+      "cause": "When the link is restored.",
+      "science": "Space communication needs checkable messages and autonomous procedures for failures.",
+      "choices": [
+        {
+          "label": "Check the time stamps",
+          "consequence": "The crew clears up the order of events and coordinates better."
+        },
+        {
+          "label": "Run the newest message on screen",
+          "consequence": "Delay is avoided, but a team may shut down a needed system."
+        }
+      ]
+    },
+    "21": {
+      "name": "Water recycler",
+      "categoryLabel": "Life support",
+      "intro": "The system recovers less water than planned and the tanks are going down.",
+      "cause": "When the water reserve falls or a fault appears.",
+      "science": "Recycling saves resources, but it needs maintenance and energy.",
+      "choices": [
+        {
+          "label": "Change the recovery circuit",
+          "consequence": "Water is recovered and safety improves, using electricity."
+        },
+        {
+          "label": "Ration without repairing",
+          "consequence": "Energy is saved, but fatigue rises and output falls."
+        }
+      ]
+    },
+    "22": {
+      "name": "Design a shelter",
+      "categoryLabel": "Radiation",
+      "intro": "The base must choose which compartment to use as a shelter during a solar event.",
+      "cause": "When preparing the radiation protocol.",
+      "science": "How much shielding material there is, and where it sits, affects protection. The simulator uses an abstract scale.",
+      "choices": [
+        {
+          "label": "Protect a small space",
+          "consequence": "Crew protection improves, but activities are limited."
+        },
+        {
+          "label": "Spread materials across the whole base",
+          "consequence": "Mobility is kept, but effective protection is not enough."
+        }
+      ]
+    },
+    "23": {
+      "name": "Partial blackout",
+      "categoryLabel": "Energy",
+      "intro": "One circuit shuts off, leaving part of the greenhouse and one fan without power.",
+      "cause": "After an overload or low battery levels.",
+      "science": "Restoring in stages helps keep critical loads under control.",
+      "choices": [
+        {
+          "label": "Restart by sectors",
+          "consequence": "Life support is stabilized, at a cost in food and productivity."
+        },
+        {
+          "label": "Force a full restart",
+          "consequence": "It is faster, but the fault can spread to other systems."
+        }
+      ]
+    },
+    "24": {
+      "name": "Wilting plants",
+      "categoryLabel": "Food",
+      "intro": "Water, light or temperature in the greenhouse are not well balanced.",
+      "cause": "When projected output drops.",
+      "science": "Visible plant symptoms have many causes: observing before acting avoids waste.",
+      "choices": [
+        {
+          "label": "Diagnose the cause",
+          "consequence": "Conditions are fixed before using more resources."
+        },
+        {
+          "label": "Increase all supplies",
+          "consequence": "The crop improves in the short term, but reserves run out faster."
+        }
+      ]
+    },
+    "25": {
+      "name": "Unstable link",
+      "categoryLabel": "Communications",
+      "intro": "The base loses contact at times, and an outdoor activity depends on an order.",
+      "cause": "When the link with Earth fails on and off.",
+      "science": "Operational independence matters because immediate control from Earth is not always possible.",
+      "choices": [
+        {
+          "label": "Activate autonomous protocol",
+          "consequence": "The crew can keep going with safety rules and send fewer messages."
+        },
+        {
+          "label": "Wait with no backup plan",
+          "consequence": "The team loses time, stress rises and a repair is delayed."
+        }
+      ]
+    },
+    "26": {
+      "name": "Hard breathing",
+      "categoryLabel": "Life support",
+      "intro": "Two crew members feel dizzy and have breathing discomfort during a task.",
+      "cause": "If air quality gets worse or symptoms are not treated.",
+      "science": "Signs of discomfort call for checking life support and safety, not an automatic diagnosis of a specific illness.",
+      "choices": [
+        {
+          "label": "Stop work and check the air",
+          "consequence": "An air problem is found and safety is restored."
+        },
+        {
+          "label": "Keep going until done",
+          "consequence": "Time is saved, but the team's physical state gets worse."
+        }
+      ]
+    },
+    "27": {
+      "name": "Built-up exposure",
+      "categoryLabel": "Radiation",
+      "intro": "A dosimeter summary shows that spacewalk planning must be reviewed.",
+      "cause": "After several spacewalks or a solar event.",
+      "science": "Accumulated exposure must be compared with limits and conditions. The game does not calculate clinical doses.",
+      "choices": [
+        {
+          "label": "Cut spacewalks and check protection",
+          "consequence": "The team protects its health, though a science mission is lost."
+        },
+        {
+          "label": "Prioritize the findings",
+          "consequence": "More data is collected, at a cost to safety."
+        }
+      ]
+    },
+    "28": {
+      "name": "Power sharing",
+      "categoryLabel": "Energy",
+      "intro": "Scientists want to turn on a new instrument just as the batteries are running low.",
+      "cause": "When several tasks compete for the same supply.",
+      "science": "Energy management is an optimization problem with limits and goals that pull in different directions.",
+      "choices": [
+        {
+          "label": "Assign quotas per system",
+          "consequence": "Water and air get priority without fully canceling the science."
+        },
+        {
+          "label": "Give the instrument full priority",
+          "consequence": "Research moves ahead, but electrical reserves are stretched thin."
+        }
+      ]
+    },
+    "29": {
+      "name": "Biofilm in the pipes",
+      "categoryLabel": "Food",
+      "intro": "A biofilm may be in part of the watering line, and the food system must be protected.",
+      "cause": "If there are hygiene or watering failures.",
+      "science": "Water and food systems in closed environments need microbiological monitoring.",
+      "choices": [
+        {
+          "label": "Isolate and disinfect the circuit",
+          "consequence": "Production is lost, but health is protected and the team learns from the incident."
+        },
+        {
+          "label": "Use the circuit to the end",
+          "consequence": "Temporary production is kept, but the health risk goes up."
+        }
+      ]
+    },
+    "30": {
+      "name": "Critical transmission",
+      "categoryLabel": "Communications",
+      "intro": "Earth asks for a report to plan possible help. The link needs power priority.",
+      "cause": "When an emergency balance must be sent.",
+      "science": "Sending reliable information matters as much as sending it fast.",
+      "choices": [
+        {
+          "label": "Send a compressed report",
+          "consequence": "The base's situation becomes clear and coordination becomes more likely."
+        },
+        {
+          "label": "Save battery for life support",
+          "consequence": "Air is protected, but Earth gets incomplete information."
+        }
+      ]
+    },
+    "31": {
+      "name": "Crew fatigue",
+      "categoryLabel": "Life support",
+      "intro": "One astronaut is exhausted and makes procedure mistakes.",
+      "cause": "After several days of too many tasks.",
+      "science": "Rest, teamwork and behavioral health are part of space planning.",
+      "choices": [
+        {
+          "label": "Cut shifts and look after the team",
+          "consequence": "Health improves and mistakes become less likely, but output is delayed."
+        },
+        {
+          "label": "Extend the shifts",
+          "consequence": "Short-term productivity rises, but fatigue grows and morale drops."
+        }
+      ]
+    },
+    "32": {
+      "name": "Spacewalk during alert",
+      "categoryLabel": "Radiation",
+      "intro": "A team is outside when a warning arrives that needs a coordinated response.",
+      "cause": "During outdoor trips with higher risk.",
+      "science": "During a space weather alert, protection and the return procedure are key.",
+      "choices": [
+        {
+          "label": "Return now and shelter",
+          "consequence": "The task is left unfinished, but safety improves."
+        },
+        {
+          "label": "Finish the task first",
+          "consequence": "Information is gathered, but the crew faces a bigger danger."
+        }
+      ]
+    },
+    "33": {
+      "name": "Central grid failure",
+      "categoryLabel": "Energy",
+      "intro": "A distribution fault threatens to cut off water, communications and ventilation.",
+      "cause": "If an overload is not fixed in time.",
+      "science": "Redundancy stops a single failure from halting the whole mission.",
+      "choices": [
+        {
+          "label": "Build an emergency microgrid",
+          "consequence": "Critical systems stay on, though research is paused."
+        },
+        {
+          "label": "Keep running on a single circuit",
+          "consequence": "The restart seems fast, but if it fails again, several systems are hit."
+        }
+      ]
+    },
+    "34": {
+      "name": "The last harvest",
+      "categoryLabel": "Food",
+      "intro": "Trays grown before the mission began can add food, but they must be inspected.",
+      "cause": "When reserves run out and some crops are already ripe.",
+      "science": "A harvest in seven days is only plausible for plants that were already growing; a crop started on day 1 does not ripen all at once.",
+      "choices": [
+        {
+          "label": "Harvest only what is safe",
+          "consequence": "A modest reserve is gained and health is protected."
+        },
+        {
+          "label": "Harvest everything without inspection",
+          "consequence": "The reserve grows, but there is a risk of stomach upset from compromised food."
+        }
+      ]
+    },
+    "35": {
+      "name": "Ask for evacuation?",
+      "categoryLabel": "Communications",
+      "intro": "The team must decide whether to ask for an early return or keep waiting for supplies.",
+      "cause": "Under uncertainty about reserves and the connection.",
+      "science": "The decision to end a mission must consider safety, logistics and checkable communications.",
+      "choices": [
+        {
+          "label": "Ask for help with full data",
+          "consequence": "Earth can plan a response; the communications reserve is used up."
+        },
+        {
+          "label": "Keep the mission without reporting",
+          "consequence": "Energy and autonomy are kept, but possible help is delayed."
+        }
+      ]
+    },
+    "36": {
+      "name": "Life-support crisis",
+      "categoryLabel": "Life support",
+      "intro": "Two essential systems fail at the same time and the operating margin is minimal.",
+      "cause": "If air and water problems pile up.",
+      "science": "In emergency operations, the priority is keeping critical systems running, not maximizing research.",
+      "choices": [
+        {
+          "label": "Apply the emergency protocol",
+          "consequence": "Air and water come first, at the cost of energy and experiments."
+        },
+        {
+          "label": "Improvise to save the experiments",
+          "consequence": "Scientific data is kept, but the base's safety is compromised."
+        }
+      ]
+    },
+    "37": {
+      "name": "Severe solar event",
+      "categoryLabel": "Radiation",
+      "intro": "The team faces an extreme scenario based on space weather science records.",
+      "cause": "During a serious alert in an advanced stage.",
+      "science": "Radiation scenarios are educational: they do not replace specific lunar dose calculations.",
+      "choices": [
+        {
+          "label": "Stay in the protected shelter",
+          "consequence": "The crew lowers the risk, though power output drops and activities are lost."
+        },
+        {
+          "label": "Go out and repair right now",
+          "consequence": "Part of the energy is recovered, at the cost of greater simulated exposure."
+        }
+      ]
+    },
+    "38": {
+      "name": "Extreme rationing",
+      "categoryLabel": "Energy",
+      "intro": "Few electrical reserves are left and three important systems need power.",
+      "cause": "When solar output no longer covers demand.",
+      "science": "With limited resources, you must decide which loads are critical and which can wait.",
+      "choices": [
+        {
+          "label": "Keep air and water first",
+          "consequence": "Life support is saved and secondary tasks are suspended."
+        },
+        {
+          "label": "Feed all tasks equally",
+          "consequence": "No system gets enough and the risk of total blackout rises."
+        }
+      ]
+    },
+    "39": {
+      "name": "Seeds or food",
+      "categoryLabel": "Food",
+      "intro": "Reserves are limited: the crew must decide what to keep for the base's future.",
+      "cause": "When you must choose between short and long term.",
+      "science": "Food security combines immediate availability and the resilience of the production system.",
+      "choices": [
+        {
+          "label": "Save seeds and ration",
+          "consequence": "Long-term sustainability is protected, but immediate food drops."
+        },
+        {
+          "label": "Eat all available reserves",
+          "consequence": "Immediate food improves, but the ability to keep growing is sacrificed."
+        }
+      ]
+    },
+    "40": {
+      "name": "The last contact window",
+      "categoryLabel": "Communications",
+      "intro": "At the end of the mission, Earth needs a final report to plan the next step.",
+      "cause": "As the campaign nears its end.",
+      "science": "The quality of a mission also depends on recording and communicating what was learned.",
+      "choices": [
+        {
+          "label": "Send telemetry and decisions",
+          "consequence": "Learning is documented and coordination improves, at a cost in electricity."
+        },
+        {
+          "label": "Save the remaining energy",
+          "consequence": "The last energy reserve is protected, but Earth gets less information."
+        }
+      ]
+    },
+    "41": {
+      "name": "Water to make oxygen",
+      "categoryLabel": "Life support",
+      "intro": "The electrolysis oxygen generator needs water while the consumption tanks go down.",
+      "cause": "The oxygen tank enters high-demand mode.",
+      "science": "Electrolysis needs water and electricity. The simulation simplifies the real flows.",
+      "choices": [
+        {
+          "label": "Adjust output and recover water",
+          "consequence": "The system keeps the air with controlled use of the tanks."
+        },
+        {
+          "label": "Demand maximum output",
+          "consequence": "Oxygen rises, but water reserves run out and a crisis begins."
+        }
+      ]
+    },
+    "42": {
+      "name": "Lost dosimeter report",
+      "categoryLabel": "Radiation",
+      "intro": "A scientist lost the dose history before planning a new trip outside.",
+      "cause": "A radiation alert coincides with spacewalk planning.",
+      "science": "Dose readings let teams make informed decisions; by themselves they do not predict an outcome.",
+      "choices": [
+        {
+          "label": "Rebuild the readings and stop the spacewalk",
+          "consequence": "The team is protected and the report is documented."
+        },
+        {
+          "label": "Approve it without history",
+          "consequence": "The expedition moves up, but the unassessed risk remains."
+        }
+      ]
+    },
+    "43": {
+      "name": "The module dilemma",
+      "categoryLabel": "Energy",
+      "intro": "Only enough power is left to keep two of three modules on: recycler, crop and antenna.",
+      "cause": "Demand is higher than the power available.",
+      "science": "Electrical management must put critical loads first, not just comfort.",
+      "choices": [
+        {
+          "label": "Prioritize recycler and antenna",
+          "consequence": "The crew keeps water and contact; the crops are delayed."
+        },
+        {
+          "label": "Prioritize crop and lab",
+          "consequence": "Science moves ahead and food reserves grow, but distribution fails."
+        }
+      ]
+    },
+    "44": {
+      "name": "Missing nutrients",
+      "categoryLabel": "Food",
+      "intro": "The plants are alive, but the hydroponic system has the wrong nutrient mix.",
+      "cause": "Greenhouse output goes down.",
+      "science": "Hydroponics depends on water, nutrients and microbial control.",
+      "choices": [
+        {
+          "label": "Analyze the solution and correct the doses",
+          "consequence": "The crop is stabilized, using energy and materials."
+        },
+        {
+          "label": "Use an unchecked mix",
+          "consequence": "It seems to save time, but it puts the trays at risk and adds uncertainty."
+        }
+      ]
+    },
+    "45": {
+      "name": "Duplicate message: a real order?",
+      "categoryLabel": "Communications",
+      "intro": "A repeated instruction arrives and the team does not know if it fits the current situation.",
+      "cause": "Two communication packets seem to contradict each other.",
+      "science": "The physical Earth–Moon delay is not the same as a fault or a duplicate message.",
+      "choices": [
+        {
+          "label": "Check the time stamp and version",
+          "consequence": "They avoid running an order twice and keep a backup."
+        },
+        {
+          "label": "Run it without checking",
+          "consequence": "Priorities get mixed up and the network gets even more congested."
+        }
+      ]
+    },
+    "46": {
+      "name": "Medical module decompression",
+      "categoryLabel": "Life support",
+      "intro": "A seal fails. The pressure drops and an astronaut needs immediate help.",
+      "cause": "After a leak is ignored or a compromised seal is detected.",
+      "science": "Depressurization can quickly harm life support; its numbers are simplified.",
+      "choices": [
+        {
+          "label": "Seal, isolate and assist",
+          "consequence": "The losses are contained; health needs watching."
+        },
+        {
+          "label": "Delay the isolation",
+          "consequence": "The leak gets worse, confusion appears and the crew is at risk."
+        }
+      ]
+    },
+    "47": {
+      "name": "Return from the crater",
+      "categoryLabel": "Radiation",
+      "intro": "An astronaut is far from the base when a danger warning arrives and a seal problem is found in her suit.",
+      "cause": "Radiation warnings and suit faults pile up.",
+      "science": "A badly sealed suit brings immediate risks of pressure and oxygen loss. The solar event gives context to the decision, but no lethal dose is inferred.",
+      "choices": [
+        {
+          "label": "Return with rover help",
+          "consequence": "The astronaut gets back to a safe area; the expedition is cut short."
+        },
+        {
+          "label": "Finish collecting",
+          "consequence": "The spacewalk drags on with a compromised suit and the risk becomes extreme."
+        }
+      ]
+    },
+    "48": {
+      "name": "Cascading blackout",
+      "categoryLabel": "Energy",
+      "intro": "The grid is overloaded. The fan, recycler and communications are about to stop.",
+      "cause": "Poor load balance and earlier faults combine.",
+      "science": "Without stable power distribution, life-support equipment can be affected.",
+      "choices": [
+        {
+          "label": "Isolate circuits and restart",
+          "consequence": "Basic functions come back, and research is limited."
+        },
+        {
+          "label": "Restart everything at once",
+          "consequence": "The overload hits three systems and the effects on the crew speed up."
+        }
+      ]
+    },
+    "49": {
+      "name": "Suspicious ration",
+      "categoryLabel": "Food",
+      "intro": "Two crew members have stomach upset after sharing food that may be contaminated.",
+      "cause": "The greenhouse had cleaning and storage problems.",
+      "science": "When food contamination is suspected, the product is identified and isolated; you do not diagnose from symptoms alone.",
+      "choices": [
+        {
+          "label": "Isolate the food and give help",
+          "consequence": "More exposure is avoided, though some food is lost."
+        },
+        {
+          "label": "Keep handing out rations",
+          "consequence": "More symptoms appear and work capacity drops."
+        }
+      ]
+    },
+    "50": {
+      "name": "The last order with no reply",
+      "categoryLabel": "Communications",
+      "intro": "The base must coordinate an evacuation; the link is intermittent and a new instruction may not arrive in time.",
+      "cause": "The team built up delays or electrical and antenna problems.",
+      "science": "Crew independence is essential because communication can be lost.",
+      "choices": [
+        {
+          "label": "Apply the local plan and send a signal",
+          "consequence": "Operational independence is kept and the best available report is sent."
+        },
+        {
+          "label": "Wait without acting",
+          "consequence": "Critical reserves run out and rescue is delayed."
+        }
+      ]
+    }
+  }
+}
