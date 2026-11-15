@@ -97,8 +97,7 @@ export function missionHTML(v, { hint, factor = 1 } = {}) {
     <h2>${esc(m.name)}</h2>
     ${place ? `<p class="muted small">📍 ${esc(tr(place.label))} · ${esc(tr(SCENES[place.scene].name))}</p>` : ''}
     <p class="say">${withTerms(m.intro)}</p>
-    <p class="muted">${withTerms(m.cause)}</p>
-    <details class="science"><summary>🔬 ${t('screen.lo_que_dice_la_ciencia')}</summary><p>${withTerms(m.science)}</p></details>
+    <details class="science"><summary>🔬 ${t('screen.lo_que_dice_la_ciencia')}</summary><p class="muted">${withTerms(m.cause)}</p><p>${withTerms(m.science)}</p></details>
     ${reasons.length ? `<p class="note">⏱ ${esc(reasons.join(' · '))}</p>` : ''}
     ${factor < 1 ? `<p class="note">🧑‍🚀 ${t('screen.el_tanque_del_traje_quedo')}</p>` : ''}
     <div class="opts">
