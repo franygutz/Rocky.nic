@@ -10,6 +10,8 @@ import { createKita } from '../game/kita.js';
 import { catalog } from '../engine.js';
 import { setupTouch } from './touch.js';
 import * as S from './screens.js';
+import { t, tr, lang } from '../i18n/index.js';
+import { playFinale } from './finale.js';
 import { openLuni, closeLuni, luniOpen, ask, clearLuni } from './luni.js';
 import { TERM, esc } from './text.js';
 import { sfx } from '../game/sfx.js';
@@ -142,7 +144,19 @@ function route() {
   hintText = '';
   if (v.phase === 'not_started') { toMenu(); return; }
   if (!normalizeAvatar(v.world?.avatar) && v.phase !== 'completed') { openCreator(false); return; }
-  if (v.phase === 'completed') { recordEnding(v); session.mode = 'ending'; replace(scr.ending()); return; }
+  if (v.phase === 'completed') {
+    recordEnding(v);
+    session.mode = 'ending';
+    if (session.finaleFor !== v.gameId && session.finaleNext) { // solo al terminar la partida, no al reabrir el final desde el menú
+      session.finaleFor = v.gameId;
+      closeAll(); kita?.react('trophy', '');
+      session.finaleNext = false;
+      playFinale(v).then(() => { if (session.mode === 'ending') replace(scr.ending()); });
+      return;
+    }
+    replace(scr.ending());
+    return;
+  }
   if (v.scene === 'weather') { session.mode = 'weather'; sfx.alert(); replace(scr.weather()); return; }
   if (v.pendingChoice) { startMinigame(v.pendingChoice); return; } // se cerró a mitad de un minijuego
   session.mode = 'map';
@@ -284,6 +298,7 @@ const ERR = {
   INSUFFICIENT_STATION_OXYGEN: 'La base casi no tiene oxígeno para llenar un tanque.'
 };
 function fail(e) {
+  session.finaleNext = v.phase === 'completed'; // el cierre solo sale al terminar jugando, no al reabrir el final
   const code = String(e?.message || '').split(':')[0];
   toast(ERR[code] || 'Algo no salió. Probá otra vez.');
   sfx.bad();
@@ -661,5 +676,5 @@ export function boot() {
   window.addEventListener('resize', measure);
   toMenu();
 
-  if (/[?&]debug\b/.test(location.search)) window.__moon = { session, bus, route, view, onAction, onInteract, saveWorld, POINTS, placeOf, nextHop, SCENES, kitaLog: () => kita?.log };
+  if (/[?&]debug\b/.test(location.search)) window.__moon = { scr, open, playFinale, session, bus, route, view, onAction, onInteract, saveWorld, POINTS, placeOf, nextHop, SCENES, kitaLog: () => kita?.log };
 }

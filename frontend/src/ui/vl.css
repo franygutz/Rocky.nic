@@ -202,6 +202,29 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 .shop-tip { text-align: center; font-weight: 700; margin: 14px 0 0; }
 
 /* Cara de Kita como ícono */
+/* Cierre de misión */
+#finale { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 120%, #4A3F8F 0%, #27234C 55%, #14122E 100%); overflow: hidden; cursor: pointer; animation: f-in .35s ease-out both; }
+#finale.out { opacity: 0; transition: opacity .3s ease-in; }
+.f-sky i { position: absolute; width: 4px; height: 4px; background: var(--paper); animation: f-tw 2.4s ease-in-out infinite; }
+.f-sky i:nth-child(3n) { width: 6px; height: 6px; background: #FFC93C; }
+.f-moon { position: absolute; left: 50%; bottom: -112vmin; width: 140vmin; height: 140vmin; margin-left: -70vmin; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #E7ECFF, #C5D2FF 55%, #8E9BD6); box-shadow: 0 0 0 6px var(--ink), 0 -10px 60px rgba(197, 210, 255, .45); animation: f-rise 1.2s ease-out both; opacity: .95; }
+.f-stage { position: relative; margin-top: -12vmin; display: grid; justify-items: center; gap: 10px; text-align: center; padding: 16px; z-index: 2; }
+.f-mark { animation: f-pop .7s cubic-bezier(.2, 1.4, .4, 1) .15s both; filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .35)); }
+.f-title { margin: 0; font-family: var(--f-pix); font-size: clamp(44px, 9vw, 84px); line-height: 1; color: var(--paper); text-shadow: 0 5px 0 var(--ink), 0 0 24px rgba(255, 201, 60, .55); animation: f-pop .6s cubic-bezier(.2, 1.4, .4, 1) .5s both; }
+.f-sub { margin: 0; font-size: clamp(17px, 3vw, 24px); font-weight: 700; color: var(--moon); animation: f-up .5s ease-out .9s both; }
+.f-kita { width: 129px; height: 105px; background-size: 774px 105px; background-repeat: no-repeat; image-rendering: pixelated; animation: f-kita .9s steps(6) infinite, f-up .5s ease-out 1.1s both; transform: scale(1.4); transform-origin: bottom center; margin-top: 10px; }
+.f-go { margin-top: 14px; animation: f-up .5s ease-out 1.8s both; min-width: 200px; }
+.f-confetti b { position: absolute; top: -20px; width: 10px; height: 16px; border: 2px solid var(--ink); animation: f-fall linear infinite; }
+@keyframes f-in { from { opacity: 0; } }
+@keyframes f-tw { 50% { opacity: .25; transform: scale(.7); } }
+@keyframes f-rise { from { transform: translateY(30vmin); } }
+@keyframes f-pop { from { transform: scale(0); opacity: 0; } }
+@keyframes f-up { from { transform: translateY(14px); opacity: 0; } }
+@keyframes f-kita { to { background-position-x: -774px; } }
+@keyframes f-fall { to { transform: translateY(112vh) rotate(540deg); } }
+#finale.still *, body.reduced #finale * { animation: none !important; }
+#finale.still .f-kita { background-position: 0 0; }
+
 .kita-ico { display: inline-block; width: calc(var(--s, 22px) * .81); height: var(--s, 22px); background-repeat: no-repeat; background-size: contain; background-position: center; image-rendering: pixelated; vertical-align: middle; flex: none; }
 .kita-title { display: flex; align-items: center; gap: 8px; }
 .vl-act .kita-ico { margin-right: 2px; }
