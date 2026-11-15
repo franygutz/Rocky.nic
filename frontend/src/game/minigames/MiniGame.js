@@ -63,7 +63,7 @@ export class MiniGame extends Phaser.Scene {
     const bw = narrow ? 104 : 124, bx = px + pw - bw / 2 - 16, by = py + 28;
     const btn = this.add.container(bx, by);
     const bg = this.add.graphics();
-    bg.fillStyle(C.white, 1).fillRoundedRect(-62, -20, 124, 40, 6).lineStyle(3, C.outline, 1).strokeRoundedRect(-62, -20, 124, 40, 6);
+    bg.fillStyle(C.white, 1).fillRoundedRect(-bw / 2, -20, bw, 40, 6).lineStyle(3, C.outline, 1).strokeRoundedRect(-bw / 2, -20, bw, 40, 6);
     btn.add([bg, this.add.text(0, 0, t('game.rendirme'), { fontFamily: FONT, fontSize: '17px', fontStyle: '700', color: '#27234C' }).setOrigin(0.5)]);
     btn.on('pointerover', () => btn.setScale(1.04)).on('pointerout', () => btn.setScale(1));
     btn.setSize(124, 40).setInteractive({ useHandCursor: true }).on('pointerdown', () => { sfx.tap(); this.end(false); });
