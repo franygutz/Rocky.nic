@@ -339,7 +339,7 @@ export function createEngine(catalog) {
     restored.receipts={};restored.world={...(restored.world||{}),avatar:original.world?.avatar??null,scene:original.world?.scene??'exterior',pos:original.world?.pos??null};restored.events.push({type:'DAY_REPEATED',day:n,previousTurn:original.turn});
     return {state:restored,result:{replayedDay:n,turn:restored.turn,day:restored.day,warning:'La repetición restaura recursos, decisiones, compras y aleatoriedad de ese día y elimina cambios posteriores del estado activo.'}};
   }
-  // Glosario de clima espacial de LUNI (v0.4). Definiciones generales, sin cifras inventadas.
+  // Glosario de clima espacial de Kita (v0.4). Definiciones generales, sin cifras inventadas.
   const GLOSSARY={
     CME:'Una CME (eyección de masa coronal) es una nube enorme de gas con carga eléctrica y campo magnético que el Sol lanza al espacio. DONKI registra cuándo sale y a qué velocidad viaja.',
     SEP:'Las SEP (partículas energéticas solares) son protones y otras partículas que el Sol acelera a gran velocidad. Fuera de la protección magnética de la Tierra pueden aumentar la radiación; por eso una base lunar necesita un refugio.',
@@ -347,7 +347,23 @@ export function createEngine(catalog) {
     KP:'El índice Kp va de 0 a 9 y mide cuánto se agita el campo magnético de la Tierra. Desde Kp 5 se considera tormenta geomagnética. Es una medida de la Tierra, no de la Luna.',
     DONKI:'DONKI (Space Weather Database Of Notifications, Knowledge, Information) es la base de datos de clima espacial de NASA, del Community Coordinated Modeling Center (CCMC). Guarda eventos como CME, SEP y tormentas geomagnéticas.'
   };
-  // Preguntas que LUNI sugiere después de cada respuesta, según el tema.
+  const GLOSSARY_EN={
+    CME:'A CME (coronal mass ejection) is a huge cloud of charged gas and magnetic field that the Sun throws into space. DONKI records when it leaves and how fast it travels.',
+    SEP:'SEPs (solar energetic particles) are protons and other particles that the Sun speeds up to very high speeds. Outside the Earth\'s magnetic shield they can raise radiation, so a Moon base needs a shelter.',
+    GST:'A GST is a geomagnetic storm: the Earth\'s magnetic field shakes when a CME or fast solar wind arrives. It happens around the Earth, so it does not measure radiation on the Moon.',
+    KP:'The Kp index goes from 0 to 9 and shows how much the Earth\'s magnetic field is shaking. From Kp 5 it counts as a geomagnetic storm. It is a measure for Earth, not the Moon.',
+    DONKI:'DONKI (Space Weather Database Of Notifications, Knowledge, Information) is NASA\'s space weather database at the Community Coordinated Modeling Center (CCMC). It stores events like CMEs, SEPs and geomagnetic storms.'
+  };
+  const SUGGESTIONS_EN={
+    storm:['What does SEP mean?','What is the latest DONKI event saved?','What is the Kp index?'],
+    life:['What happens if there is a leak?','How is my base?','What does CME mean?'],
+    food:['How much water do plants need?','How is my base?','What do I do in this challenge?'],
+    energy:['What are batteries for?','How is my base?','What do I do in this challenge?'],
+    comms:['How long does a message to Earth take?','What does CME mean?','How is my base?'],
+    radiation:['What does SEP mean?','What is the latest DONKI event saved?','What do I do in this challenge?'],
+    default:['What does CME mean?','How is my base?','What do I do in this challenge?']
+  };
+  // Preguntas que Kita sugiere después de cada respuesta, según el tema.
   const SUGGESTIONS={
     storm:['¿Qué significa SEP?','¿Cuál es el último evento DONKI guardado?','¿Qué es el índice Kp?'],
     life:['¿Qué pasa si hay una fuga?','¿Cómo va mi base?','¿Qué significa CME?'],
@@ -357,10 +373,10 @@ export function createEngine(catalog) {
     radiation:['¿Qué significa SEP?','¿Cuál es el último evento DONKI guardado?','¿Qué hago en este reto?'],
     default:['¿Qué significa CME?','¿Cómo va mi base?','¿Qué hago en este reto?']
   };
-  // LUNI funciona sin Internet y solo utiliza el catálogo y eventos ya descargados.
+  // Kita funciona sin Internet y solo utiliza el catálogo y eventos ya descargados.
   function npcAsk(original,question,{hint=false}={}){
     if(typeof question!=='string'||question.length>350||question.trim().length<2)throw Error('INVALID_QUESTION');
-    const g=clone(original);
+    const g=clone(original);const EN=lang==='en';const T=(es,en)=>EN?en:es;
     const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
     const q=norm(question);
     const hasWord=word=>(' '+q+' ').includes(' '+norm(word)+' ');
@@ -393,18 +409,18 @@ export function createEngine(catalog) {
     const source=(name,url,kind)=>{if(url?.startsWith('https://')&&!sources.some(s=>s.url===url))sources.push({title:name,url,kind})};
     let answer='',observation=null,matchedTopic=null;
     if(askHello&&!nasaAsk){
-      answer='¡Hola! Soy LUNI, el robot de Luna-7. Podés preguntarme por oxígeno, energía, agua, cultivos, comunicaciones y tormentas solares. También puedo ofrecer pistas sobre el reto actual o mostrar datos archivados de NASA.';
+      answer=T('¡Hola! Soy Kita, la mascota de Luna-7. Podés preguntarme por oxígeno, energía, agua, cultivos, comunicaciones y tormentas solares. También puedo ofrecer pistas sobre el reto actual o mostrar datos archivados de NASA.','Hi! I am Kita, the mascot of Luna-7. You can ask me about oxygen, energy, water, crops, communications and solar storms. I can also give hints about your current challenge or show archived NASA data.');
     }else if(askStatus&&!nasaAsk){
-      answer=`Día ${g.day}: oxígeno ${g.metrics.oxygen}/100, agua ${g.metrics.water}/100, energía ${g.metrics.energy}/100, comida ${g.metrics.food}/100, salud ${g.metrics.health}/100 y comunicaciones ${g.metrics.comms}/100. Estas escalas son inventadas para el videojuego, no medidas de NASA.`;
-      if(g.statuses.length)answer+=' Alertas pendientes: '+g.statuses.slice(0,3).join(', ')+'.';
+      answer=EN?`Day ${g.day}: oxygen ${g.metrics.oxygen}/100, water ${g.metrics.water}/100, energy ${g.metrics.energy}/100, food ${g.metrics.food}/100, health ${g.metrics.health}/100 and communications ${g.metrics.comms}/100. These scales are made up for the game, not NASA measurements.`:`Día ${g.day}: oxígeno ${g.metrics.oxygen}/100, agua ${g.metrics.water}/100, energía ${g.metrics.energy}/100, comida ${g.metrics.food}/100, salud ${g.metrics.health}/100 y comunicaciones ${g.metrics.comms}/100. Estas escalas son inventadas para el videojuego, no medidas de NASA.`;
+      if(g.statuses.length)answer+=T(' Alertas pendientes: ',' Pending alerts: ')+g.statuses.slice(0,3).map(k=>statusNames[k]||k).join(', ')+'.';
     }else if(askMission&&!nasaAsk&&(!topic||topic[1]===0)&&current){
-      answer=`Tu reto #${current.id} es «${current.name}». ${current.intro} ${current.science} Para decidir, compará las consecuencias para las personas y los recursos: una solución rápida puede ocasionar problemas después.`;
+      answer=EN?`Your challenge #${current.id} is "${current.name}". ${current.intro} ${current.science} To decide, compare the effects on people and resources: a quick fix can cause problems later.`:`Tu reto #${current.id} es «${current.name}». ${current.intro} ${current.science} Para decidir, compará las consecuencias para las personas y los recursos: una solución rápida puede ocasionar problemas después.`;
       const f=facts.find(f=>f.topic===current.category);if(f)source(f.source,f.sourceUrl,f.kind);
       matchedTopic=current.category;
     }else if(askDefinition&&term&&!askMission){
       // Glosario de clima espacial (v0.4): definiciones cortas para niños, con fuente NASA.
       matchedTopic='storm';
-      answer=GLOSSARY[term];
+      answer=(EN?GLOSSARY_EN:GLOSSARY)[term];
       source('NASA CCMC DONKI','https://ccmc.gsfc.nasa.gov/tools/DONKI/','glosario');
       const ofType=term==='DONKI'?archived:archived.filter(e=>e.type===(term==='KP'?'GST':term));
       if(ofType.length){
@@ -435,16 +451,16 @@ export function createEngine(catalog) {
       if(f){
         answer=f.answer;matchedTopic=f.topic;source(f.source,f.sourceUrl,f.kind);
         const metric={donki:'shield',oxygen:'oxygen',plant:'food',power:'energy',comms:'comms'}[topic[0]];
-        if(metric)answer+=`\n\nEn esta partida, el indicador de ${metric} está en ${g.metrics[metric]}/100. Es una escala didáctica.`;
+        if(metric)answer+=EN?`\n\nIn this game, the ${metric} meter is at ${g.metrics[metric]}/100. It is a teaching scale.`:`\n\nEn esta partida, el indicador de ${metric} está en ${g.metrics[metric]}/100. Es una escala didáctica.`;
       }
     }
     if(!answer)answer='No tengo una ficha científica verificable para esa pregunta todavía. Probá preguntarme por oxígeno, agua, cultivos, baterías, comunicaciones, radiación, DONKI o por el reto actual. Prefiero reconocer mis límites a inventar datos.';
     if(hint){g.npcHelpCount++;g.performance.hints++}
     const asked=norm(question);
-    const suggestions=(SUGGESTIONS[matchedTopic]||SUGGESTIONS.default).filter(s=>norm(s)!==asked).slice(0,3);
-    const response={npc:'LUNI',mode:'asistente_educativo_por_reglas_sin_IA_generativa',answer,observation,matchedTopic,
-      hint:hint&&current?`Pista del reto #${current.id}: ${current.science} Pensá qué recursos y qué riesgos cambian.`:null,
-      sources,suggestions,disclaimer:'LUNI no utiliza IA generativa y no consulta DONKI en vivo. Los datos NASA son registros históricos; los indicadores de la base son simulaciones ficticias.'};
+    const SG=EN?SUGGESTIONS_EN:SUGGESTIONS;const suggestions=(SG[matchedTopic]||SG.default).filter(s=>norm(s)!==asked).slice(0,3);
+    const response={npc:'Kita',mode:'asistente_educativo_por_reglas_sin_IA_generativa',answer,observation,matchedTopic,
+      hint:hint&&current?T(`Pista del reto #${current.id}: ${current.science} Pensá qué recursos y qué riesgos cambian.`,`Hint for challenge #${current.id}: ${current.science} Think about which resources and risks change.`):null,
+      sources,suggestions,disclaimer:T('Kita no utiliza IA generativa y no consulta DONKI en vivo. Los datos NASA son registros históricos; los indicadores de la base son simulaciones ficticias.','Kita does not use generative AI and does not query DONKI live. NASA data are historical records; the base meters are made-up simulations.')};
     return {state:g,response};
   }
   function report(g){
