@@ -30,53 +30,53 @@ export function langPicker(v) {
     <p class="tagline">Dirigí la nave <b>Zora</b> y su base lunar durante 7 días. Cada decisión cambia el aire, la energía, la comida y a tu tripulación.</p>
     <div class="menu">
       <div class="main">
-        ${canContinue ? `<button class="btn go continue" data-action="continue"><span>▶ ${finished ? 'Ver el final' : 'Continuar misión'}<small>${finished ? 'Misión terminada' : `Día ${day} de 7`}</small></span></button>` : ''}
-        <button class="btn ${canContinue ? '' : 'go'}" data-action="new">🚀 Nueva misión</button>
+        ${canContinue ? `<button class="btn go continue" data-action="continue"><span>▶ ${finished ? t('seeEnd') : t('continue')}<small>${finished ? t('missionDone') : t('dayOf', { d: day })}</small></span></button>` : ''}
+        <button class="btn ${canContinue ? '' : 'go'}" data-action="new">${t('newMission')}</button>
       </div>
       <div class="more">
-        ${canContinue ? '<button class="btn" data-action="editAvatar">🧑‍🚀 Mi astronauta</button>' : ''}
-        <button class="btn" data-action="code">🔤 Código de misión</button>
-        <button class="btn" data-action="album">📒 Álbum</button>
-        <button class="btn" data-action="settings">⚙️ Ajustes</button>
-        <button class="btn" data-action="sources">📚 Datos y fuentes</button>
-        <button class="btn" data-action="glossary">🔎 Glosario</button>
-        <button class="btn" data-action="teachers">🍎 Para docentes</button>
+        ${canContinue ? `<button class="btn" data-action="editAvatar">${t('myAstro')}</button>` : ''}
+        <button class="btn" data-action="code">${t('code')}</button>
+        <button class="btn" data-action="album">${t('album')}</button>
+        <button class="btn" data-action="settings">${t('settings')}</button>
+        <button class="btn" data-action="sources">${t('sources')}</button>
+        <button class="btn" data-action="glossary">${t('glossary')}</button>
+        <button class="btn" data-action="teachers">${t('teachers')}</button>
       </div>
     </div>
   </div>`;
 }
-
       ${langPicker(view)}
+
 export function codeHTML(error = '') {
-  return `<div class="sheet enter">${close}
-    <h2>Jugar con un código</h2>
-    <p>Con el mismo código, toda la clase juega la misma misión.</p>
+  return `<div class="sheet enter">${close()}
+    <h2>${t('screen.jugar_con_un_codigo')}</h2>
+    <p>${t('screen.con_el_mismo_codigo_toda')}</p>
     <form data-form="code" autocomplete="off">
-      <input class="codein" name="code" maxlength="20" autocapitalize="characters" aria-label="Código de misión" placeholder="AULA-1">
+      <input class="codein" name="code" maxlength="20" autocapitalize="characters" aria-label="${esc(t('screen.codigo_de_mision'))}" placeholder="AULA-1">
       ${error ? `<p class="err" role="alert">${esc(error)}</p>` : ''}
-      <div class="row" style="margin-top:14px"><button class="btn go" type="submit">Empezar esta misión</button></div>
+      <div class="row" style="margin-top:14px"><button class="btn go" type="submit">${t('screen.empezar_esta_mision')}</button></div>
     </form></div>`;
 }
 
 export function briefingHTML(v) {
   return `<div class="sheet enter">
-    <h2>🧑‍🚀 Bienvenida a Zora, ${esc(v.world?.avatar?.name || 'astronauta')}</h2>
-    <p>${withTerms('Estás a cargo de Zora, la nave de operaciones, y de su base. Durante 7 días vas a resolver 2 retos por día: 14 en total.')}</p>
+    <h2>🧑‍🚀 ${t('welcome', { n: esc(v.world?.avatar?.name || t('screen.astronauta')) })}</h2>
+    <p>${withTerms(t('screen.estas_a_cargo_de_zora'))}</p>
     <div class="facts-grid">
-      <div class="stat"><span>Duración</span><b>7 días · 14 retos</b></div>
-      <div class="stat"><span>Monedas para empezar</span><b>🪙 ${v.coins}</b></div>
-      <div class="stat code"><span>Código de misión</span><b>${esc(v.seed)}</b></div>
+      <div class="stat"><span>${t('screen.duracion')}</span><b>${t('screen.7_dias_14_retos')}</b></div>
+      <div class="stat"><span>${t('screen.monedas_para_empezar')}</span><b>🪙 ${v.coins}</b></div>
+      <div class="stat code"><span>${t('screen.codigo_de_mision')}</span><b>${esc(v.seed)}</b></div>
     </div>
     <ol class="how">
-      <li>Caminá con <b>WASD</b> o las flechas (o tocá el mapa). <b>E</b>, <b>Espacio</b> o <b>Enter</b> usan lo que tengas cerca; <b>Esc</b> pausa.</li>
-      <li>Seguí la <b>!</b> hasta el equipo de tu reto. Afuera de la nave se gasta el aire del traje: mirá la barra <b>Traje</b>.</li>
-      <li><b>Cada salida de Zora gasta un tanque.</b> Llénalo en los depósitos de soporte vital (cuesta oxígeno de la base): sin tanque lleno la esclusa no abre, y al volver queda vacío.</li>
-      <li>Las compras se piden en la plataforma y llegan en una nave de carga.</li>
-      <li>Elegí A o B. Cada opción tiene un costo.</li>
-      <li>Las opciones cuidadosas se hacen con un <b>minijuego</b>: si sale bien, rinde más.</li>
-      <li>¿Dudas? Preguntale a <b>LUNI</b>, el asistente de la cabina de Zora.</li>
+      <li>${t('screen.camina_con_wasd_o_las')}</li>
+      <li>${t('screen.segui_la_hasta_el_equipo')}</li>
+      <li>${t('screen.cada_salida_de_zora_gasta')}</li>
+      <li>${t('screen.las_compras_se_piden_en')}</li>
+      <li>${t('screen.elegi_a_o_b_cada')}</li>
+      <li>${t('screen.las_opciones_cuidadosas_se_hacen')}</li>
+      <li>${t('screen.dudas_preguntale_a_kita_el')}</li>
     </ol>
-    <div class="row" style="margin-top:14px"><button class="btn go" data-action="toMap" autofocus>Empezar el día 1</button></div>
+    <div class="row" style="margin-top:14px"><button class="btn go" data-action="toMap" autofocus>${t('screen.empezar_el_dia_1')}</button></div>
   </div>`;
 }
 
