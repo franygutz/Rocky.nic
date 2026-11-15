@@ -264,4 +264,5 @@ body.reduced .mapimg .you i { animation: none; }
 .vl-more { pointer-events: auto; justify-self: start; margin: 2px 0 4px; background: transparent; color: var(--moon); border: 2px solid var(--glass-line); border-radius: 8px; padding: 2px 10px; font: 700 13px var(--f-body); cursor: pointer; min-height: 30px; }
 .vl-more:hover { color: var(--paper); border-color: var(--paper); }
 .vl-more:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
-  .card-k .buy { min-height: 46px; font-size: 15px; }
+  .wallet-pill { font-size: 20px; padding: 3px 12px; }
+  .shop-lead { font-size: 16px; }
