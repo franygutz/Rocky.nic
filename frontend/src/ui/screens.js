@@ -17,10 +17,6 @@ export function chips(delta, { factorNote = false } = {}) {
 }
 const statusChips = (keys, cls) => keys.map((k) => { const c = GOOD_STATUSES.includes(k) ? 'ok' : cls; return `<span class="${c}">${c === 'ok' ? '✅' : '⚠️'} ${esc(statusName(k))}</span>`; }).join('');
 
-// ── Inicio ──
-export function menuHTML({ canContinue, finished, day }) {
-  return `<div class="wrap enter">
-    <h1 class="title" aria-label="Vita Lunae"><span>Vita</span><span>Lunae</span></h1>
 // ── Idioma: dos botones grandes (los idiomas salen del backend) ──
 export function langPicker(v) {
   const list = v?.languages?.length ? v.languages : [{ code: 'es', native: 'Español', ready: true }];
@@ -86,18 +82,18 @@ export function missionHTML(v, { hint, factor = 1 } = {}) {
   const place = placeOf(m);
   const c = CATEGORY[m.category] || { label: m.category, icon: '❔', color: 'var(--moon)' };
   const reasons = m.modifiers?.reasons || [];
-  return `<div class="sheet card wide enter">${close}
+  return `<div class="sheet card wide enter">${close()}
     <div class="row tags">
       <span class="sys" style="background:${c.color}">${c.icon} ${esc(c.label)}</span>
-      <span class="sys lvl">Reto #${m.id}</span>
+      <span class="sys lvl">${t('taskNo', { n: m.id })}</span>
     </div>
     <h2>${esc(m.name)}</h2>
-    ${place ? `<p class="muted small">📍 ${esc(place.label)} · ${esc(SCENES[place.scene].name)}</p>` : ''}
+    ${place ? `<p class="muted small">📍 ${esc(tr(place.label))} · ${esc(tr(SCENES[place.scene].name))}</p>` : ''}
     <p class="say">${withTerms(m.intro)}</p>
     <p class="muted">${withTerms(m.cause)}</p>
-    <details class="science"><summary>🔬 Lo que dice la ciencia</summary><p>${withTerms(m.science)}</p></details>
+    <details class="science"><summary>🔬 ${t('screen.lo_que_dice_la_ciencia')}</summary><p>${withTerms(m.science)}</p></details>
     ${reasons.length ? `<p class="note">⏱ ${esc(reasons.join(' · '))}</p>` : ''}
-    ${factor < 1 ? `<p class="note">🧑‍🚀 El tanque del traje quedó incompleto: este reto de afuera da menos tiempo.</p>` : ''}
+    ${factor < 1 ? `<p class="note">🧑‍🚀 ${t('screen.el_tanque_del_traje_quedo')}</p>` : ''}
     <div class="opts">
       ${m.options.map((o) => {
         const game = hasMinigame(o);
@@ -106,7 +102,7 @@ export function missionHTML(v, { hint, factor = 1 } = {}) {
           <span class="label">${esc(o.label)}</span>
           <span class="cons">${esc(o.consequence)}</span>
           ${chips(o.delta)}
-          <span class="mode ${game ? 'game' : ''}">${game ? `🎮 Minijuego · ${minigameSeconds(m.modifiers, factor)} s` : '⚡ Decisión rápida'}</span>
+          <span class="mode ${game ? 'game' : ''}">${game ? `🎮 ${t('minigameS', { s: minigameSeconds(m.modifiers, factor) })}` : `⚡ ${t('screen.decision_rapida')}`}</span>
         </button>`;
       }).join('')}
     </div>
@@ -122,34 +118,34 @@ export function missionHTML(v, { hint, factor = 1 } = {}) {
 export function skipConfirmHTML(v) {
   const penalty = { life: { oxygen: -8 }, radiation: { shield: -7 }, energy: { energy: -8 }, food: { food: -7 }, comms: { comms: -8 } }[v.mission.category];
   return `<div class="sheet enter">
-    <h2>⏭️ ¿Omitir este reto?</h2>
-    <p>Si lo omitís, no ganás monedas y la base lo sufre:</p>
+    <h2>${t('screen.omitir_este_reto')}</h2>
+    <p>${t('screen.si_lo_omitis_no_ganas')}</p>
     ${chips(penalty)}
-    <p class="muted">Además queda un problema pendiente para los próximos días.</p>
-    <div class="row"><button class="btn danger" data-action="skipYes">Sí, omitir</button><button class="btn" data-action="back">Volver al reto</button></div>
+    <p class="muted">${t('screen.ademas_queda_un_problema_pendiente')}</p>
+    <div class="row"><button class="btn danger" data-action="skipYes">${t('screen.si_omitir')}</button><button class="btn" data-action="back">${t('screen.volver_al_reto')}</button></div>
   </div>`;
 }
 
 // ── Resultado de un reto ──
 export function resultHTML(res, before, v) {
   const r = res.result || {};
-  const L = RESULT_LABEL[r.status] || { text: 'Decisión tomada', icon: '✅', cls: 'up' };
+  const L = RESULT_LABEL[r.status] || { text: t('screen.decision_tomada'), icon: '✅', cls: 'up' };
   const decision = r.assessmentMode === 'decision_only';
-  const title = decision ? 'Decisión tomada' : L.text;
+  const title = decision ? t('screen.decision_tomada') : L.text;
   const after = r.metricsAfter || v.metrics;
   const diff = {};
   for (const m of METRICS) { const d = Math.round((after[m.key] ?? 0) - (before.metrics[m.key] ?? 0)); if (d) diff[m.key] = d; }
   const opt = before.mission?.options?.find((o) => o.id === r.choiceId);
   return `<div class="sheet enter">
     <h2>${decision ? '🧭' : L.icon} ${esc(title)}</h2>
-    <p class="muted">Reto #${r.missionId} · ${esc(r.name || '')}${opt ? ` · Elegiste <b>${esc(opt.label)}</b>` : ''}</p>
-    ${r.consequence ? `<p class="say small">${r.status === 'partial' || r.status === 'failed' ? 'Si salía bien: ' : ''}${withTerms(r.consequence)}</p>` : ''}
-    ${r.qualityScore !== null && r.qualityScore !== undefined ? `<p>🎮 Puntaje del minijuego: <b>${r.qualityScore}/100</b>${r.status === 'partial' ? ' · lo bueno rindió la mitad' : r.status === 'failed' ? ' · lo bueno no llegó y queda un problema' : ''}</p>` : ''}
-    <h3>Cómo cambió la base</h3>
-    ${Object.keys(diff).length ? chips(diff) : '<p class="muted">Sin cambios en los indicadores.</p>'}
+    <p class="muted">${t('taskNo', { n: r.missionId })} · ${esc(r.name || '')}${opt ? ` · ${t('youChose', { l: esc(opt.label) })}` : ''}</p>
+    ${r.consequence ? `<p class="say small">${r.status === 'partial' || r.status === 'failed' ? t('screen.si_salia_bien') : ''}${withTerms(r.consequence)}</p>` : ''}
+    ${r.qualityScore !== null && r.qualityScore !== undefined ? `<p>🎮 ${t('screen.puntaje_del_minijuego')}: <b>${r.qualityScore}/100</b>${r.status === 'partial' ? t('screen.lo_bueno_rindio_la_mitad') : r.status === 'failed' ? t('screen.lo_bueno_no_llego_y') : ''}</p>` : ''}
+    <h3>${t('screen.como_cambio_la_base')}</h3>
+    ${Object.keys(diff).length ? chips(diff) : `<p class="muted">${t('screen.sin_cambios_en_los_indicadores')}</p>`}
     ${(r.addedStatuses?.length || r.removedStatuses?.length) ? `<div class="fx">${statusChips(r.addedStatuses || [], 'warn')}${statusChips(r.removedStatuses || [], 'ok')}</div>` : ''}
-    <p class="wallet">🪙 ${r.coinsAwarded ? `+${r.coinsAwarded} monedas` : 'Sin monedas esta vez'}</p>
-    <div class="row sticky"><button class="btn go" data-action="afterResult" autofocus>Seguir</button></div>
+    <p class="wallet">🪙 ${r.coinsAwarded ? t('plusCoins', { n: r.coinsAwarded }) : t('screen.sin_monedas_esta_vez')}</p>
+    <div class="row sticky"><button class="btn go" data-action="afterResult" autofocus>${t('next')}</button></div>
   </div>`;
 }
 
