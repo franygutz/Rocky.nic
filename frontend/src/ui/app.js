@@ -191,6 +191,26 @@ function openCreator(isEditing) {
 // Lleva el mundo a donde quedó la partida guardada (escenario y posición seguros).
 function placeWorld() {
   const w = view().world;
+// Cada día nuevo empieza en los dormitorios de Zora: si estaba afuera, vuelve a la base con el tanque vacío.
+// Cartel con el nombre del lugar al entrar: aparece, se queda un momento y se va.
+let placeTimer = null;
+function showPlace(sceneId) {
+  const el = $('#place'), sc = SCENES[sceneId];
+  if (!el || !sc) return;
+  el.innerHTML = `<span>${esc(tr(sc.name))}</span>`;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(placeTimer);
+  placeTimer = setTimeout(() => el.classList.remove('show'), 2100);
+}
+
+function wakeUp() {
+  session.newDay = false;
+  const bed = SCENES.zora.bed;
+  try { if (view().world?.suit?.outside) session.bridge.enterBase(); } catch { /* sin partida */ }
+  try { session.bridge.checkpoint('zora', { x: bed.x, y: bed.y }); } catch { /* sin almacenamiento */ }
+  bus.emit('teleport', { scene: 'zora', x: bed.x, y: bed.y });
+}
+
   const cur = session.world;
   let sc = w?.scene && SCENES[w.scene] ? w.scene : 'exterior';
   let pos = w?.pos || SCENES[sc].spawn;
@@ -673,6 +693,7 @@ export function boot() {
 
   new ResizeObserver(measure).observe($('#hud'));
   new ResizeObserver(measure).observe($('#dock'));
+    showPlace(d.to);
   window.addEventListener('resize', measure);
   toMenu();
 
