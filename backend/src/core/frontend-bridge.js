@@ -27,6 +27,26 @@ export function createFrontendBridge(engine, {
     catch { return null; }
   };
   const store = getStorage();
+  // Idioma: preferencia aparte de la partida (se puede cambiar desde el menú, antes de empezar).
+  const langKey = storageKey + '-lang';
+  const readLang = () => { try { return store?.getItem(langKey) || null; } catch { return null; } };
+  const browserLang = () => { try { return String(navigator.language || '').slice(0, 2).toLowerCase(); } catch { return ''; } };
+  if (typeof engine.setLanguage === 'function') {
+    const wanted = readLang() || browserLang();
+    try { engine.setLanguage(engine.languages().some(l => l.code === wanted && l.ready) ? wanted : 'es'); } catch { /* queda en español */ }
+  }
+  const langInfo = () => typeof engine.setLanguage === 'function'
+    ? {lang:engine.getLanguage(), languages:engine.languages(), statusNames:engine.statusNames()}
+    : {lang:'es', languages:[{code:'es',name:'Español',native:'Español',ready:true}], statusNames:{}};
+  function setLanguage(code) {
+    if (typeof engine.setLanguage !== 'function') throw new Error('INVALID_LANGUAGE');
+    const info = engine.languages().find(l => l.code === code);
+    if (!info || !info.ready) throw new Error('INVALID_LANGUAGE');
+    engine.setLanguage(code);
+    try { store?.setItem(langKey, code); } catch { /* sin almacenamiento: dura la sesión */ }
+    notify('LANGUAGE', {result:{lang:code}});
+    return getView();
+  }
   function notify(action, extra = {}) {
     const view = getView();
     for (const fn of listeners) fn(view, {action, ...extra});
@@ -80,7 +100,7 @@ export function createFrontendBridge(engine, {
   }
   function getState() { return game ? clone(game) : null; }
   function getView() {
-    if (!game) return {phase:'not_started', storage:{available:storageAvailable,error:storageError}};
+    if (!game) return {phase:'not_started', ...langInfo(), storage:{available:storageAvailable,error:storageError}};
     const next = engine.nextMission(game).next;
     let ending = null;
     if (game.phase === 'completed') {
@@ -105,7 +125,7 @@ export function createFrontendBridge(engine, {
       lastResult:lastResult?clone(lastResult):null,
       lastLuni:lastLuni?clone(lastLuni):null,
       orders:clone(game.orders||[]), bag:clone(game.bag||{}), world:clone(game.world||{avatar:null,scene:'exterior',pos:null,clock:0}),
-      ending,
+      ending, ...langInfo(),
       storage:{available:storageAvailable,error:storageError}
     };
   }
@@ -198,6 +218,6 @@ export function createFrontendBridge(engine, {
   }
   const restored=restore();
   if (!restored && autoStart) newGame();
-  return {newGame,getState,getView,subscribe,save,chooseCard,prepareMinigame,finishMinigame,skipCard,buy,
+  return {setLanguage,getLanguages:()=>langInfo().languages,newGame,getState,getView,subscribe,save,chooseCard,prepareMinigame,finishMinigame,skipCard,buy,
     respondWeather,sendMessage,repeatDay,askLuni,refreshNASA,clearProgress,order,collect,useItem,fillTank,leaveBase,enterBase,setAvatar,tick,checkpoint};
 }
