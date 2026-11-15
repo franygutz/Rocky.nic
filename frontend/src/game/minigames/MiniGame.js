@@ -70,7 +70,7 @@ export class MiniGame extends Phaser.Scene {
 
     this.timerBar = this.add.graphics();
     this.timeText = this.add.text(px + pw - 22, py + ph - 56, '', { fontFamily: FONT_PIX, fontSize: '28px', color: '#27234C' }).setOrigin(1, 0.5);
-    const areaTop = py + 126;
+    const areaTop = Math.max(py + 126, below + 6); // el área del juego empieza debajo de las instrucciones, aunque ocupen varias líneas
     this.area = { x: px + 22, y: areaTop, w: pw - 44, h: ph - (areaTop - py) - 70 };
     this.build();
   }
