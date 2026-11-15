@@ -264,9 +264,5 @@ body.reduced .mapimg .you i { animation: none; }
 .vl-more { pointer-events: auto; justify-self: start; margin: 2px 0 4px; background: transparent; color: var(--moon); border: 2px solid var(--glass-line); border-radius: 8px; padding: 2px 10px; font: 700 13px var(--f-body); cursor: pointer; min-height: 30px; }
 .vl-more:hover { color: var(--paper); border-color: var(--paper); }
 .vl-more:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
-  #dock { bottom: 6px; gap: 4px; }
-  .vl-bar-row { padding: 4px; }
-  .vl-act { min-height: 40px; padding: 0 9px; }
-  .vl-act span:not(.kita-ico) { display: none; }
-  .vl-act span.kita-ico { display: inline-block; }
-  .vl-hints { display: none; }
+  #touch { bottom: 8px !important; left: 8px; }
+  .pad { grid-template: repeat(3, 44px) / repeat(3, 44px); gap: 3px; }
