@@ -297,7 +297,7 @@ function afterResult() {
   const dayChanged = before && v.daysCompleted > before.daysCompleted && v.phase === 'active';
   before = null;
   if (lastRes?.result?.status === 'completed') setTimeout(() => bus.emit('playAnim', { name: 'salto', rate: 1.15 }), 250);
-  if (dayChanged) { session.mode = 'day'; kita?.react('trophy', '¡Día completo!'); replace(scr.day()); return; }
+  if (dayChanged) { session.newDay = true; session.mode = 'day'; kita?.react('trophy', t('rDay')); replace(scr.day()); return; }
   route();
 }
 
@@ -344,8 +344,8 @@ function onAction(a, el) {
       if (!stack.length && session.mode === 'menu') replace(scr.menu());
       if (!stack.length) refresh();
       break;
-    case 'toMap': route(); break;
-    case 'guide': session.settings.guide = true; bus.emit('walkToTarget'); toast('Te llevo hasta el equipo del reto.'); break;
+    case 'toMap': if (session.newDay) wakeUp(); route(); break;
+    case 'guide': session.settings.guide = true; bus.emit('walkToTarget'); toast(t('ui.te_llevo_hasta_el_equipo')); break;
     case 'act': bus.emit('act'); break;
     case 'guideClose': back(); bus.emit('walkToTarget'); break;
     case 'openMission': openMission(); break;

@@ -94,6 +94,7 @@ export const SCENES = {
       [462, 424, 516, 462], [562, 424, 622, 462], // estantes (paso libre desde el pasillo)
     ]),
     spawn: { x: 46, y: 186 },
+    bed: { x: +(240 / ZK).toFixed(1), y: +(468 / ZK).toFixed(1) }, // pasillo entre las literas: aquí despierta la tripulación cada día nuevo
     doors: [
       { id: 'salida', rect: px(ZK, [[28, 262, 124, 318]])[0], label: 'Salir al exterior', to: { scene: 'exterior', x: 288, y: 211 }, anchor: [46, 186], mode: 'point', needsTank: true },
     ],
