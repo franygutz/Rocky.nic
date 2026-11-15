@@ -240,47 +240,47 @@ export function createHTML({ draft, cat, editing }) {
   const preview = (key, value) => avatarUri({ ...draft, [key]: value }, false);
   const optionsHTML = active.list.map((item, i) => {
     const value = opt(active.key, i), on = draft[active.key] === value;
-    const label = item[0] === 'none' ? 'Sin detalle' : (active.key === 'accessory' || active.key === 'expression') ? item[1] : item[0];
+    const label = tr(item[0] === 'none' ? 'Sin detalle' : (active.key === 'accessory' || active.key === 'expression') ? item[1] : item[0]);
     const img = active.key === 'emblem' ? `<img src="${import.meta.env.BASE_URL}assets/simbolos/${EMBLEM_FILES[i]}.svg" alt="" width="44" height="44">`
       : `<img class="px" src="${preview(active.key, value)}" alt="" width="48" height="69">`;
-    return `<button class="chip-opt" data-action="pick" data-k="${active.key}" data-v="${value}" aria-pressed="${on}" aria-label="${esc(active.label)}: ${esc(label)}">${img}<span>${esc(label)}</span></button>`;
+    return `<button class="chip-opt" data-action="pick" data-k="${active.key}" data-v="${value}" aria-pressed="${on}" aria-label="${esc(tr(active.label))}: ${esc(label)}">${img}<span>${esc(label)}</span></button>`;
   }).join('');
   return `<div class="sheet creator enter" aria-labelledby="ctitle">
-    <h2 id="ctitle">🧑‍🚀 Crea tu astronauta</h2>
+    <h2 id="ctitle">${t('screen.crea_tu_astronauta')}</h2>
     <div class="cr-grid">
       <div class="cr-view" aria-live="polite">
-        <div class="cr-stage"><img class="px big" src="${avatarUri(draft, false)}" alt="Tu astronauta, sin casco" width="120" height="172">
-          <img class="px big" src="${avatarUri(draft, true)}" alt="Tu astronauta, con casco" width="120" height="172"></div>
-        <p class="muted small">Adentro de Zora y afuera con casco.</p>
-        <div class="cr-patch"><img src="${import.meta.env.BASE_URL}assets/simbolos/${EMBLEM_FILES[draft.emblem]}.svg" alt="" width="34" height="34"> Parche: ${esc(EMBLEMS[draft.emblem])}</div>
-        <label class="cr-name">Nombre <input data-field="name" maxlength="16" value="${esc(draft.name)}" autocomplete="off"></label>
+        <div class="cr-stage"><img class="px big" src="${avatarUri(draft, false)}" alt="${esc(t('screen.tu_astronauta_sin_casco'))}" width="120" height="172">
+          <img class="px big" src="${avatarUri(draft, true)}" alt="${esc(t('screen.tu_astronauta_con_casco'))}" width="120" height="172"></div>
+        <p class="muted small">${t('screen.adentro_de_zora_y_afuera')}</p>
+        <div class="cr-patch"><img src="${import.meta.env.BASE_URL}assets/simbolos/${EMBLEM_FILES[draft.emblem]}.svg" alt="" width="34" height="34"> ${t('screen.parche')}: ${esc(tr(EMBLEMS[draft.emblem]))}</div>
+        <label class="cr-name">${t('screen.nombre')} <input data-field="name" maxlength="16" value="${esc(draft.name)}" autocomplete="off"></label>
       </div>
       <div class="cr-pick">
-        <div class="cr-tabs" role="tablist" aria-label="Categorías">${CATEGORIES.map((c) => `<button role="tab" data-action="tab" data-k="${c.key}" aria-selected="${c.key === active.key}">${esc(c.label)}</button>`).join('')}</div>
-        <div class="cr-opts" role="group" aria-label="${esc(active.label)}">${optionsHTML}</div>
+        <div class="cr-tabs" role="tablist" aria-label="${esc(t('screen.categorias'))}">${CATEGORIES.map((c) => `<button role="tab" data-action="tab" data-k="${c.key}" aria-selected="${c.key === active.key}">${esc(tr(c.label))}</button>`).join('')}</div>
+        <div class="cr-opts" role="group" aria-label="${esc(tr(active.label))}">${optionsHTML}</div>
       </div>
     </div>
     <div class="row">
-      <button class="btn" data-action="randomAvatar">🎲 Al azar</button>
-      <button class="btn go" data-action="saveAvatar">${editing ? 'Guardar cambios' : 'Listo, empezar'}</button>
-      ${editing ? '<button class="btn" data-action="back">Cancelar</button>' : '<button class="btn" data-action="menu">Volver</button>'}
+      <button class="btn" data-action="randomAvatar">${t('screen.al_azar')}</button>
+      <button class="btn go" data-action="saveAvatar">${editing ? t('screen.guardar_cambios') : t('screen.listo_empezar')}</button>
+      ${editing ? `<button class="btn" data-action="back">${t('screen.cancelar')}</button>` : `<button class="btn" data-action="menu">${t('screen.volver')}</button>`}
     </div>
   </div>`;
 }
 
 // ── Aire del traje agotado ──
 export function evaHTML() {
-  return `<div class="sheet enter" style="text-align:center"><h2>🧑‍🚀 ¡Se acabó el aire del traje!</h2>
-    <p>Volviste a Zora con la reserva de emergencia. Perdiste un poco de salud y oxígeno.</p>
-    <p class="muted">Antes de salir otra vez, llena el tanque en los depósitos de soporte vital. Si lo llenas bien, tendrás más tiempo afuera.</p>
-    <div class="row"><button class="btn go" data-action="afterEva" autofocus>Entendido</button></div></div>`;
+  return `<div class="sheet enter" style="text-align:center"><h2>${t('screen.se_acabo_el_aire_del')}</h2>
+    <p>${t('screen.volviste_a_zora_con_la')}</p>
+    <p class="muted">${t('screen.antes_de_salir_otra_vez')}</p>
+    <div class="row"><button class="btn go" data-action="afterEva" autofocus>${t('screen.entendido')}</button></div></div>`;
 }
 export function tankHTML(fill, evaMax) {
   const ok = fill >= 60;
-  return `<div class="sheet enter" style="text-align:center"><h2>Tanque del traje</h2>
-    <div class="facts-grid"><div class="stat"><span>Llenado</span><b>${fill}%</b></div><div class="stat"><span>Aire para afuera</span><b>${evaMax} s</b></div><div class="stat"><span>Costo en la base</span><b>−3 oxígeno</b></div></div>
-    <p class="${ok ? '' : 'note'}">${ok ? 'El tanque quedó listo: ya puedes salir por la esclusa.' : 'El llenado quedó incompleto: tendrás menos aire y menos tiempo en los retos de paneles y cráter. Puedes volver a llenarlo (cuesta otros 3 de oxígeno).'}</p>
-    <div class="row" style="justify-content:center"><button class="btn go" data-action="back" autofocus>Seguir</button></div></div>`;
+  return `<div class="sheet enter" style="text-align:center"><h2>${t('hud.tanque_del_traje')}</h2>
+    <div class="facts-grid"><div class="stat"><span>${t('screen.llenado')}</span><b>${fill}%</b></div><div class="stat"><span>${t('ui.aire_para_afuera')}</span><b>${evaMax} s</b></div><div class="stat"><span>${t('screen.costo_en_la_base')}</span><b>${t('screen.3_oxigeno')}</b></div></div>
+    <p class="${ok ? '' : 'note'}">${ok ? t('screen.el_tanque_quedo_listo_ya') : t('screen.el_llenado_quedo_incompleto_tendras')}</p>
+    <div class="row" style="justify-content:center"><button class="btn go" data-action="back" autofocus>${t('next')}</button></div></div>`;
 }
 
 // ── Clima espacial (día 5) ──
