@@ -11,6 +11,7 @@ import { avatarUri, avatarKey, defaultAvatar, normalizeAvatar } from '../world/a
 import { renderSheet, PXM } from '../world/lunar.js';
 import { buildWalkSheet, WALK_FRAMES, WALK_FPS, WALK_W, WALK_H, WALK_OX, WALK_OY, WALK_V, STAND_FRAME, choosePose } from '../world/walk.js';
 import { cliffCanvas, mapSampler, CLIFF_COLORS } from '../world/cliff.js';
+import { irisClose, irisOpen } from '../ui/iris.js';
 import { sfx } from './sfx.js';
 import { C } from '../theme.js';
 
@@ -43,6 +44,8 @@ export class WorldScene extends Phaser.Scene {
   init(data) {
     this.sid = data?.id || 'exterior';
     this.startAt = data?.x != null ? { x: data.x, y: data.y } : null;
+    this.arrive = !!data?.arrive;
+    this.nudge = 0;
     this.cfg = SCENES[this.sid];
     this.ready = false;
     this.surroundBox = null;
@@ -132,7 +135,20 @@ export class WorldScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(s.surround ? CLIFF_COLORS.abyssDeep : '#171426');
     this.cameras.main.startFollow(this.hero, true, 0.14, 0.14);
-    this.cameras.main.fadeIn(session.settings.reducedMotion ? 1 : 220, 23, 20, 38);
+    const calm = !!session.settings.reducedMotion;
+    this.cameras.main.fadeIn(calm ? 1 : 200, 23, 20, 38);
+    { const [hx, hy] = this.heroScreen(); if (calm) irisOpen(hx, hy, 1); else this.time.delayedCall(60, () => { const [ax, ay] = this.heroScreen(); sfx.door(); irisOpen(ax, ay - 30, 520); }); }
+    // Entrada: el personaje aparece por la puerta con un pequeño paso hacia adentro.
+    if (this.arrive && !calm) {
+      const sx = this.hero.scaleX, sy = this.hero.scaleY;
+      this.nudge = 6;
+      this.hero.setAlpha(0).setScale(sx * 0.82, sy * 0.82);
+      this.shadow.setAlpha(0);
+      this.tweens.add({ targets: this.hero, alpha: 1, scaleX: sx, scaleY: sy, duration: 320, delay: 120, ease: 'Back.easeOut' });
+      this.tweens.addCounter({ from: 6, to: 0, duration: 320, delay: 120, ease: 'Sine.easeOut', onUpdate: (tw) => { this.nudge = tw.getValue(); } });
+      this.tweens.add({ targets: this.shadow, alpha: 0.35, duration: 320, delay: 120 });
+      this.arrivingUntil = this.time.now + 460;
+    }
 
     this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,E,SPACE,ENTER,SHIFT');
     this.input.keyboard.removeCapture('SPACE'); // el espacio sigue sirviendo en botones HTML
@@ -404,7 +420,7 @@ export class WorldScene extends Phaser.Scene {
   placeHero() {
     const x = this.pos.x * U, y = this.pos.y * U;
     const q = this.cfg.avatarScale * U; // un píxel del sprite en píxeles de mundo
-    this.hero.setPosition(Math.round(x / q) * q, Math.round(y / q) * q).setDepth(y);
+    this.hero.setPosition(Math.round(x / q) * q, Math.round(y / q) * q + (this.nudge || 0)).setDepth(y);
     this.shadow.setPosition(x, y - 1).setDepth(y - 1);
     this.nameTag.setPosition(x, y - 52 * this.cfg.avatarScale * U - 6);
   }
@@ -461,18 +477,27 @@ export class WorldScene extends Phaser.Scene {
 
   goTo(sceneId, x, y, instant = false) {
     if (!SCENES[sceneId] || this.time.now < this.lockUntil) return;
+  // Posición del personaje en la pantalla (para centrar la cortina circular).
+  heroScreen() {
+    const cam = this.cameras.main, v = cam.worldView;
+    return [(this.hero.x - v.x) * cam.zoom, (this.hero.y - v.y) * cam.zoom];
+  }
+
     this.lockUntil = this.time.now + 700; // bloqueo breve contra entradas repetidas
     this.route = [];
     const done = () => {
       bus.emit('prompt', null);
       session.world = { scene: sceneId, x, y };
       bus.emit('sceneChange', { from: this.sid, to: sceneId, x, y });
-      this.scene.restart({ id: sceneId, x, y });
+      this.scene.restart({ id: sceneId, x, y, arrive: !instant });
     };
     sfx.tap();
     if (instant || session.settings.reducedMotion) { done(); return; }
-    this.cameras.main.fadeOut(160, 23, 20, 38);
-    this.cameras.main.once('camerafadeoutcomplete', done);
+    // Salida: el personaje cruza la puerta (se achica y se desvanece) mientras la cámara se oscurece.
+    sfx.door();
+    this.tweens.add({ targets: [this.hero, this.shadow], alpha: 0, scaleX: '*=0.7', scaleY: '*=0.7', duration: 300, delay: 120, ease: 'Sine.easeIn' });
+    const [hx, hy] = this.heroScreen();
+    irisClose(hx, hy - 30, 460).then(done);
   }
 
   // ── Guía ────────────────────────────────────────────────────────────────────

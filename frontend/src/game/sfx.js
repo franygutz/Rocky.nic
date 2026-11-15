@@ -38,6 +38,7 @@ export const sfx = {
   win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, 'triangle', 0.14, i * 0.1)); },
   bad() { tone(220, 0.2, 'sawtooth', 0.06, 0, -80); },
   alert() { tone(880, 0.12, 'square', 0.05); tone(880, 0.12, 'square', 0.05, 0.2); },
+  door() { tone(320, 0.2, 'triangle', 0.07, 0, 180); tone(520, 0.22, 'triangle', 0.05, 0.14, -160); },
   rub() { tone(300 + Math.random() * 200, 0.04, 'triangle', 0.03); },
   light(i) { tone([392, 494, 587, 698][i % 4], 0.22, 'sine', 0.14); },
   charge(p) { tone(200 + p * 600, 0.05, 'sine', 0.05); },
