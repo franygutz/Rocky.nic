@@ -496,8 +496,11 @@ function measure() {
   document.documentElement.style.setProperty('--dock-h', (dock.hidden ? 16 : Math.max(60, dockH)) + 'px');
   $('#toast').style.bottom = (dock.hidden ? 40 : bottom + 12) + 'px';
   const ins = session.insets;
-  if (top !== ins.top || bottom !== ins.bottom || left !== (ins.left || 0)) {
-    session.insets = { top, bottom, left };
+  if (t0 !== ins.top || b0 !== ins.bottom || l0 !== (ins.left || 0)) {
+    session.insets = { top: t0, bottom: b0, left: l0 };
+  // El mapa ocupa toda la pantalla: la placa, el riel y la barra de abajo se dibujan encima.
+  void top; void bottom; void left;
+  const [t0, b0, l0] = [0, 0, 0];
     bus.emit('insets', session.insets);
   }
 }
