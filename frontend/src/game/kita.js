@@ -35,8 +35,9 @@ export function baseClip({ view, paused = false, working = false } = {}) {
   return 'idle';
 }
 
+import { t } from '../i18n/index.js';
 export function createKita(root, { reducedMotion = () => false } = {}) {
-  root.innerHTML = '<div class="spr" role="img" aria-label="Kita, la mascota"></div><span class="kita-tip" aria-live="polite"></span>';
+  root.innerHTML = `<button type="button" class="spr" data-action="luni" aria-label="${t('openKita')}"></button><span class="kita-tip" aria-live="polite"></span>`;
   const spr = root.querySelector('.spr'), tip = root.querySelector('.kita-tip');
   let base = 'idle', temp = null, timer = null, current = null, disposed = false;
   const log = []; // para pruebas y depuración

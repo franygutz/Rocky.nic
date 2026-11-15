@@ -119,6 +119,9 @@ function refresh() {
   if (touch) touch.hidden = !(session.mode === 'map' && !session.overlay);
   const root = $('#kita');
   if (root) {
+  document.documentElement.lang = lang();
+  $('#dock')?.setAttribute('aria-label', t('ui.acciones')); $('#drawer')?.setAttribute('aria-label', t('ui.panel'));
+  $('#kita .spr')?.setAttribute('aria-label', t('openKita'));
     const show = !!v && v.phase !== 'not_started' && !['menu', 'create', 'briefing', 'ending'].includes(session.mode);
     root.hidden = !show;
     kita?.setBase({ view: v, paused: topIs('pause'), working: session.mode === 'minigame' });
@@ -597,7 +600,7 @@ export function boot() {
     const b = e.target.closest('[data-action]');
     if (b && !b.disabled) onAction(b.dataset.action, b);
   });
-  ['#screen', '#hud', '#dock', '#drawer'].forEach((s) => delegate($(s)));
+  ['#screen', '#hud', '#dock', '#drawer', '#kita'].forEach((s) => delegate($(s)));
   document.addEventListener('input', (e) => {
     const f = e.target;
     if (f?.dataset?.field === 'name' && draft) draft = { ...draft, name: f.value.slice(0, 16) };
