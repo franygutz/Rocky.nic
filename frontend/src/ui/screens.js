@@ -153,22 +153,21 @@ export function resultHTML(res, before, v) {
 export function dayHTML(v, summary) {
   const done = v.daysCompleted;
   return `<div class="sheet wide enter">
-    <h2>🌙 Día ${done} terminado</h2>
-    <p>Por la noche la base consume oxígeno, agua y comida, y los paneles recargan algo de energía.
-       Los problemas pendientes también cobran su parte.</p>
+    <h2>🌙 ${t('dayDone', { d: done })}</h2>
+    <p>${t('screen.por_la_noche_la_base')}</p>
     <div class="summary">${METRICS.map((m) => meterRow(m, v.metrics[m.key])).join('')}</div>
-    ${v.statuses.length ? `<h3>⚠️ Problemas pendientes</h3><div class="fx">${statusChips(v.statuses, 'warn')}</div>` : '<p>✅ Sin problemas pendientes.</p>'}
+    ${v.statuses.length ? `<h3>${t('screen.problemas_pendientes')}</h3><div class="fx">${statusChips(v.statuses, 'warn')}</div>` : `<p>${t('screen.sin_problemas_pendientes')}</p>`}
     ${messagesArrived(v, summary)}
-    <h3>🛒 Tienda de la base</h3>
-    <p class="muted">¿Algo que comprar? La plataforma de entregas está afuera de Zora, abajo a la izquierda.</p>
-    <div class="row sticky"><button class="btn go" data-action="toMap">Empezar el día ${v.day}</button></div>
+    <h3>${t('screen.tienda_de_la_base')}</h3>
+    <p class="muted">${t('screen.algo_que_comprar_la_plataforma')}</p>
+    <div class="row sticky"><button class="btn go" data-action="toMap">${t('startDay', { d: v.day })}</button></div>
   </div>`;
 }
 
 function messagesArrived(v, summary) {
   const acks = (summary?.acks || []);
   if (!acks.length) return '';
-  return `<p class="note">📡 La Tierra confirmó: ${acks.map((m) => esc(MESSAGE_TYPES.find((t) => t.id === m.type)?.label || m.type)).join(', ')}.</p>`;
+  return `<p class="note">📡 ${t('screen.la_tierra_confirmo')}: ${acks.map((m) => esc(MESSAGE_TYPES.find((x) => x.id === m.type)?.label || m.type)).join(', ')}.</p>`;
 }
 
 function meterRow(m, val) {
@@ -212,11 +211,11 @@ export function bagHTML(v) {
   const entries = Object.entries(v.bag || {});
   const total = entries.reduce((a, [, n]) => a + n, 0);
   const byId = Object.fromEntries(v.shop.map((i) => [i.id, i]));
-  return `<div class="sheet wide enter">${close}<h2>🎒 Bolsa <small class="muted">${total} de 12</small></h2>
+  return `<div class="sheet wide enter">${close()}<h2>🎒 ${t('bag')} <small class="muted">${t('nOfM', { n: total, m: 12 })}</small></h2>
     ${entries.length ? `<div class="shop">${entries.map(([id, n]) => { const it = byId[id]; if (!it) return ''; const [icon, ...rest] = it.name.split(' ');
       return `<div class="item"><span class="ic">${icon}</span><b>${esc(rest.join(' '))} ×${n}</b><small>${esc(it.desc)}</small>${chips(it.delta)}
-        <button class="btn small go" data-action="use" data-id="${esc(id)}">Usar uno</button></div>`; }).join('')}</div>`
-      : '<p class="muted">Tu bolsa está vacía. Pide artículos en la plataforma de entregas (abajo a la izquierda, afuera de Zora).</p>'}
+        <button class="btn small go" data-action="use" data-id="${esc(id)}">${t('screen.usar_uno')}</button></div>`; }).join('')}</div>`
+      : `<p class="muted">${t('screen.tu_bolsa_esta_vacia_pide')}</p>`}
     ${ordersHTML(v)}
   </div>`;
 }
@@ -226,11 +225,11 @@ export function diaryHTML(v, game) {
   const rows = catalog.challenges.map((c) => ({ c, st: taskState(game, c.id) }));
   const done = rows.filter((r) => r.st === 'completada').length;
   const symbol = { activa: '▶', disponible: '•', completada: '✅', fallida: '✖', bloqueada: '🔒' };
-  return `<div class="sheet wide enter">${close}<h2>📒 Diario de tareas <small class="muted">${done} de 50 hechas</small></h2>
+  return `<div class="sheet wide enter">${close()}<h2>📒 ${t('screen.diario_de_tareas')} <small class="muted">${t('doneOfM', { n: done, m: 50 })}</small></h2>
     <div class="diary">${rows.map(({ c, st }) => { const pl = placeOf(c); const known = st !== 'bloqueada';
       return `<div class="drow ${st}"><span class="dsym" aria-hidden="true">${symbol[st]}</span>
-        <b>${known ? esc(c.name) : 'Tarea por descubrir'}</b>
-        <small>${known && pl ? esc(pl.label + ' · ' + SCENES[pl.scene].name) : esc(CATEGORY[c.category]?.label || '')}</small>
+        <b>${known ? esc(loc('challenges', c.id, 'name', c.name)) : t('screen.tarea_por_descubrir')}</b>
+        <small>${known && pl ? esc(tr(pl.label) + ' · ' + tr(SCENES[pl.scene].name)) : esc(CATEGORY[c.category]?.label || '')}</small>
         <em>${STATE_LABEL[st]}</em></div>`; }).join('')}</div></div>`;
 }
 
