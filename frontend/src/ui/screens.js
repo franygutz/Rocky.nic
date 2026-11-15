@@ -20,6 +20,12 @@ const statusChips = (keys, cls) => keys.map((k) => { const c = GOOD_STATUSES.inc
 export function menuHTML({ canContinue, finished, day }) {
   return `<div class="wrap enter">
     <h1 class="title" aria-label="Vita Lunae"><span>Vita</span><span>Lunae</span></h1>
+// ── Idioma: dos botones grandes (los idiomas salen del backend) ──
+export function langPicker(v) {
+  const list = v?.languages?.length ? v.languages : [{ code: 'es', native: 'Español', ready: true }];
+  return `<div class="langs" role="group" aria-label="${esc(t('language'))}">${list.map((l) => `<button class="btn small lang ${l.code === lang() ? 'go' : ''}" data-action="setLang" data-lang="${esc(l.code)}" aria-pressed="${l.code === lang()}" ${l.ready ? '' : 'disabled'}><span aria-hidden="true">${l.code === 'en' ? '🇬🇧' : '🇳🇮'}</span> ${esc(l.native)}</button>`).join('')}</div>`;
+}
+
     <p class="tagline">Dirigí la nave <b>Zora</b> y su base lunar durante 7 días. Cada decisión cambia el aire, la energía, la comida y a tu tripulación.</p>
     <div class="menu">
       <div class="main">
@@ -39,6 +45,7 @@ export function menuHTML({ canContinue, finished, day }) {
   </div>`;
 }
 
+      ${langPicker(view)}
 export function codeHTML(error = '') {
   return `<div class="sheet enter">${close}
     <h2>Jugar con un código</h2>
@@ -475,7 +482,8 @@ export function pauseHTML(v) {
       <button class="btn" data-action="settings">⚙️ Ajustes</button>
       <button class="btn" data-action="menu">Menú principal</button>
     </div>
-    <p class="muted small" style="margin-top:12px">✅ Partida guardada · Controles: WASD o flechas para moverte, E / Espacio / Enter para usar, Esc para pausar. También puedes tocar el mapa.</p></div>`;
+    ${langPicker(v)}
+    <p class="muted small" style="margin-top:12px">${t('pauseHelp')}</p></div>`;
 }
 
 export { METRIC };

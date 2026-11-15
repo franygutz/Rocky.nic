@@ -381,7 +381,12 @@ function onAction(a, el) {
     case 'luni': openLuni(); break;
     case 'closeLuni': closeLuni(); break;
     case 'luniAsk': ask(el.dataset.q); break;
-    case 'pause': if (!topIs('pause')) { saveWorld(); open(scr.pause()); kita?.react('saved', 'Partida guardada'); } break;
+    case 'setLang':
+      try { b.setLanguage(el.dataset.lang); } catch (e) { fail(e); break; }
+      if (!document.getElementById('drawer').hidden) clearLuni();
+      render(); refresh();
+      break;
+    case 'pause': if (!topIs('pause')) { saveWorld(); open(scr.pause()); kita?.react('saved', t('rSaved')); } break;
     case 'repeatMenu': open(scr.repeat()); break;
     case 'repeat':
       try { b.repeatDay(Number(el.dataset.day)); toast(`Volviste al inicio del día ${el.dataset.day}.`); } catch (e) { fail(e); break; }
