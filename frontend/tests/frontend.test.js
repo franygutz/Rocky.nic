@@ -119,8 +119,8 @@ describe('partida con el puente del backend', () => {
     expect(b.getView().turn).toBe(0);
   });
 
-  it('LUNI responde con sugerencias para mostrar como botones', () => {
-    const b = createBridge({ storage: memory() }); b.newGame({ seed: 'LUNI' });
+  it('Kita responde con sugerencias para mostrar como botones', () => {
+    const b = createBridge({ storage: memory() }); b.setLanguage('es'); b.newGame({ seed: 'LUNI' });
     const r = b.askLuni('¿Qué significa CME?');
     expect(r.answer).toMatch(/masa coronal/);
     expect(r.suggestions.length).toBeGreaterThanOrEqual(2);
@@ -140,5 +140,17 @@ describe('textos', () => {
   });
   it('no se usan enlaces que no sean http(s)', () => {
     expect(safeUrl('javascript:alert(1)')).toBeNull();
+  });
+});
+
+describe('idiomas', () => {
+  it('el puente cambia de idioma y el motor local trae el catálogo en inglés', () => {
+    const b = createBridge({ storage: memory() }); b.newGame({ seed: 'idioma' });
+    const es = b.setLanguage('es');
+    const en = b.setLanguage('en');
+    expect(en.lang).toBe('en');
+    expect(en.shop[0].name).not.toBe(es.shop[0].name);
+    expect(b.getLanguages().map((l) => l.code)).toEqual(['es', 'en']);
+    expect(() => b.setLanguage('fr')).toThrow('INVALID_LANGUAGE');
   });
 });
