@@ -362,42 +362,42 @@ export function commsHTML(v) {
   const fact = catalog.facts.find((f) => f.id === 'comms');
   const url = safeUrl(fact?.sourceUrl);
   const lowEnergy = v.metrics.energy < 5;
-  return `<div class="sheet wide enter">${close}
-    <h2>Mensajes a la Tierra</h2>
-    <p>Mandar un mensaje gasta <b>⚡ 5</b> de energía. La respuesta llega después de 1 reto, o de 3 si la antena anda mal.</p>
-    <div class="opts three">${MESSAGE_TYPES.map((t) => `<button class="opt" data-action="send" data-type="${t.id}" ${lowEnergy || v.phase !== 'active' ? 'disabled' : ''}>
-      <span class="optid">${t.icon}</span><span class="label">${esc(t.label)}</span><span class="cons">${esc(t.hint)}</span></button>`).join('')}</div>
-    <h3>Mensajes enviados</h3>
+  return `<div class="sheet wide enter">${close()}
+    <h2>${t('screen.mensajes_a_la_tierra')}</h2>
+    <p>${t('screen.mandar_un_mensaje_gasta_5')}</p>
+    <div class="opts three">${MESSAGE_TYPES.map((mt) => `<button class="opt" data-action="send" data-type="${mt.id}" ${lowEnergy || v.phase !== 'active' ? 'disabled' : ''}>
+      <span class="optid">${mt.icon}</span><span class="label">${esc(mt.label)}</span><span class="cons">${esc(mt.hint)}</span></button>`).join('')}</div>
+    <h3>${t('screen.mensajes_enviados')}</h3>
     ${v.messages.length ? `<div class="list">${v.messages.slice().reverse().map((m) => {
-      const t = MESSAGE_TYPES.find((x) => x.id === m.type);
+      const mt = MESSAGE_TYPES.find((x) => x.id === m.type);
       const ok = m.status === 'acknowledged';
-      return `<div class="src"><b>${t?.icon || '✉️'} ${esc(t?.label || m.type)}</b>
-        <span>${ok ? '✅ La Tierra confirmó' : `⏳ En camino · llega después del reto ${m.arrivalTurn}`}${m.delayCount ? ` · se atrasó ${m.delayCount} vez/veces` : ''}</span></div>`;
-    }).join('')}</div>` : '<p class="muted">Todavía no mandaste mensajes.</p>'}
-    ${fact ? `<div class="bubble"><b>📏 Dato real:</b> ${withTerms(fact.answer)}<br><small>${esc(fact.source)}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">Fuente</a>` : ''}</small></div>` : ''}
+      return `<div class="src"><b>${mt?.icon || '✉️'} ${esc(mt?.label || m.type)}</b>
+        <span>${ok ? `✅ ${t('screen.la_tierra_confirmo')}` : `⏳ ${t('inTransit', { n: m.arrivalTurn })}`}${m.delayCount ? t('delayedN', { n: m.delayCount }) : ''}</span></div>`;
+    }).join('')}</div>` : `<p class="muted">${t('screen.todavia_no_mandaste_mensajes')}</p>`}
+    ${fact ? `<div class="bubble"><b>📏 ${t('screen.dato_real')}:</b> ${withTerms(loc('facts', fact.id, 'answer', fact.answer))}<br><small>${esc(tr(fact.source))}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">${t('screen.fuente')}</a>` : ''}</small></div>` : ''}
   </div>`;
 }
 
 export function statusesHTML(v) {
-  return `<div class="sheet enter">${close}
-    <h2>⚠️ Alertas de la base</h2>
-    ${v.statuses.length ? `<p>Estos problemas siguen activos. Algunos retos y compras los resuelven.</p><div class="fx">${statusChips(v.statuses, 'warn')}</div>` : '<p>✅ No hay alertas. ¡Buen trabajo!</p>'}
-    <h3>Indicadores</h3>
+  return `<div class="sheet enter">${close()}
+    <h2>${t('screen.alertas_de_la_base')}</h2>
+    ${v.statuses.length ? `<p>${t('screen.estos_problemas_siguen_activos_algun')}</p><div class="fx">${statusChips(v.statuses, 'warn')}</div>` : `<p>${t('screen.no_hay_alertas_buen_trabajo')}</p>`}
+    <h3>${t('screen.indicadores')}</h3>
     <div class="summary">${METRICS.map((m) => meterRow(m, v.metrics[m.key])).join('')}</div>
-    <p class="muted small">Las escalas de 0 a 100 son inventadas para el juego, no son mediciones de la NASA.</p>
+    <p class="muted small">${t('screen.las_escalas_de_0_a')}</p>
   </div>`;
 }
 
 // ── Álbum ──
 export function albumHTML(album) {
   const got = new Set(album.endings || []);
-  return `<div class="sheet wide enter">${close}
-    <h2>📒 Álbum de finales</h2>
-    <p>Hay 10 finales posibles. Llegaste a <b>${got.size}</b>.</p>
+  return `<div class="sheet wide enter">${close()}
+    <h2>${t('screen.album_de_finales')}</h2>
+    <p>${t('albumLead', { n: `<b>${got.size}</b>` })}</p>
     <div class="list">${Object.entries(catalog.endings).map(([id, e]) => got.has(Number(id))
-      ? `<div class="fact"><span class="ic">✅</span><p>${esc(e.title)}</p><small>${esc(e.description)}</small></div>`
-      : `<div class="fact locked"><span class="ic">❔</span><p>Final ${id}</p><small>Todavía no llegaste a este final.</small></div>`).join('')}</div>
-    <p class="muted">Misiones terminadas en este dispositivo: ${album.missions || 0}</p>
+      ? `<div class="fact"><span class="ic">✅</span><p>${esc(loc('endings', id, 'title', e.title))}</p><small>${esc(loc('endings', id, 'description', e.description))}</small></div>`
+      : `<div class="fact locked"><span class="ic">❔</span><p>${t('screen.final')} ${id}</p><small>${t('screen.todavia_no_llegaste_a_este')}</small></div>`).join('')}</div>
+    <p class="muted">${t('screen.misiones_terminadas_en_este_disposit')}: ${album.missions || 0}</p>
   </div>`;
 }
 
