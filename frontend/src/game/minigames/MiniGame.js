@@ -55,7 +55,8 @@ export class MiniGame extends Phaser.Scene {
     const tt = this.add.text(px + 16, py + 27, title, { fontFamily: FONT_PIX, fontSize: '36px', color: '#FFF3DC', stroke: '#27234C', strokeThickness: 4 }).setOrigin(0, 0.5);
     for (let size = 36; tt.width > titleRoom && size > 18; size -= 2) tt.setFontSize(size);
     while (tt.width > titleRoom && title.length > 4) { title = title.slice(0, -2); tt.setText(title.trimEnd() + '…'); }
-    this.hint = this.add.text(px + 22, py + 64, this.instructions(), { fontFamily: FONT, fontSize: fs(19), fontStyle: '700', color: '#27234C', wordWrap: { width: pw - 44 } });
+    this.hint = this.add.text(px + 18, py + 62, this.instructions(), { fontFamily: FONT, fontSize: fs(19), fontStyle: '700', color: '#27234C', wordWrap: { width: pw - 36 } });
+    let below = this.hint.y + this.hint.height + 8;
     if (this.tired) this.add.text(px + 22, py + 96, t('game.cansancio_este_trabajo_pide_un'), { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700' });
 
     // Rendirse: cuenta como reto no terminado.
