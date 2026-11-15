@@ -499,4 +499,13 @@ export default {
   "read.aloud": "🔊 Leer en voz alta",
   "read.stop": "⏹ Parar",
   "read.option": "Opción {id}: {label}. {cons}",
+  "fs.enter": "⛶ Pantalla completa",
+  "fs.exit": "⛶ Salir de pantalla completa",
+  "fs.label": "Pantalla completa",
+  "fs.ios_title": "📱 Jugar en pantalla completa",
+  "fs.ios_body": "En iPhone, la pantalla completa se activa así:",
+  "fs.ios_1": "Toca el botón Compartir del navegador (el cuadrito con una flecha hacia arriba).",
+  "fs.ios_2": "Elige «Agregar a inicio».",
+  "fs.ios_3": "Abre Vita Lunae desde el ícono nuevo: se verá sin barras.",
+  "fs.ok": "Entendido",
 };

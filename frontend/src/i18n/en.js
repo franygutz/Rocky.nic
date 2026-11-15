@@ -499,4 +499,13 @@ export default {
   "read.aloud": "🔊 Read aloud",
   "read.stop": "⏹ Stop",
   "read.option": "Option {id}: {label}. {cons}",
+  "fs.enter": "⛶ Full screen",
+  "fs.exit": "⛶ Exit full screen",
+  "fs.label": "Full screen",
+  "fs.ios_title": "📱 Play in full screen",
+  "fs.ios_body": "On iPhone, full screen works like this:",
+  "fs.ios_1": "Tap the browser's Share button (the square with an arrow pointing up).",
+  "fs.ios_2": "Choose “Add to Home Screen”.",
+  "fs.ios_3": "Open Vita Lunae from the new icon: it will show with no bars.",
+  "fs.ok": "Got it",
 };
