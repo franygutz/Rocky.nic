@@ -260,3 +260,4 @@ body.reduced .mapimg .you i { animation: none; }
 /* Indicadores: 3 centrales grandes y el resto plegado (aparece solo si está en alerta) */
 .vl-m.core .vl-name { font-size: 15px; }
 .vl-m.core .vl-bar { height: 10px; }
+.vl-rail.collapsed .vl-m.extra:not([data-level="low"]):not([data-level="crit"]) { display: none; }
