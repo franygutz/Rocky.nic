@@ -88,7 +88,8 @@ export function createEngine(catalog) {
     if(c.category==='food'&&has(g,'cultivo_retrasado')){cost*=1.15;reasons.push('Cultivo retrasado: tareas consumen más recursos')}
     if(c.category==='energy'&&has(g,'energia_comprometida')){cost*=1.15;reasons.push('Red inestable: más gasto de recursos')}
     if(has(g,`reparacion_pendiente_${c.category}`)){time*=0.9;reasons.push('Reparación anterior incompleta')}
-    return {timeMultiplier:Math.round(time*100)/100,resourceCostMultiplier:Math.round(cost*100)/100,reasons,note:'Reglas simplificadas de jugabilidad, no parámetros físicos NASA.'};
+    const EN_R={'Fuga activa: menos margen operativo':'Active leak: less room to work','Traje comprometido: EVA requiere protocolo extra':'Suit damaged: the spacewalk needs extra steps','Retraso previo en comunicaciones':'Earlier delay in communications','Cultivo retrasado: tareas consumen más recursos':'Crop behind schedule: tasks use more resources','Red inestable: más gasto de recursos':'Unstable power grid: resources run out faster','Reparación anterior incompleta':'An earlier repair was not finished'};
+    return {timeMultiplier:Math.round(time*100)/100,resourceCostMultiplier:Math.round(cost*100)/100,reasons:lang==='en'?reasons.map(r=>EN_R[r]||r):reasons,note:lang==='en'?'Simplified game rules, not NASA physics values.':'Reglas simplificadas de jugabilidad, no parámetros físicos NASA.'};
   }
   function nextMission(g){const c=currentMission(g);return c?{next:{...c,status:'available',day:g.day,turn:g.turn+1,modifiers:missionModifiers(g,c),options:c.choices.map((o,i)=>({id:i?'B':'A',label:o.label,consequence:o.consequence}))},pendingCount:1}:{next:null,pendingCount:0}}
   function crisisTriggers(g) {
@@ -195,15 +196,28 @@ export function createEngine(catalog) {
     return 6;
   }
   function explanationFor(g,endingId) {
+    const T=(es,en)=>lang==='en'?en:es;const sn=k=>statusNames[k]||k;
     const m=g.metrics;const notes=[];
     const low=Object.entries(m).filter(([,n])=>n<30).map(([k,v])=>`${k} (${v}/100)`);
-    if(low.length)notes.push(`Recursos o indicadores comprometidos: ${low.join(', ')}.`);
-    if(g.statuses.length)notes.push(`Estados pendientes: ${g.statuses.join(', ')}.`);
-    if(g.performance.failed||g.performance.skipped)notes.push(`Hubo ${g.performance.failed} retos fallidos y ${g.performance.skipped} omitidos.`);
-    if(g.messages.some(x=>x.type==='rescue_request'&&x.status==='acknowledged'))notes.push('La solicitud de ayuda obtuvo confirmación de Tierra.');
-    if(g.messages.some(x=>x.status==='pending'))notes.push('Quedan mensajes pendientes de confirmación.');
-    if(!notes.length)notes.push('La tripulación terminó sin alertas persistentes y conservó el equilibrio de recursos.');
-    const reasons={
+    if(low.length)notes.push(T(`Recursos o indicadores comprometidos: ${low.join(', ')}.`,`Resources or meters in trouble: ${low.join(', ')}.`));
+    if(g.statuses.length)notes.push(T(`Estados pendientes: ${g.statuses.map(sn).join(', ')}.`,`Pending alerts: ${g.statuses.map(sn).join(', ')}.`));
+    if(g.performance.failed||g.performance.skipped)notes.push(T(`Hubo ${g.performance.failed} retos fallidos y ${g.performance.skipped} omitidos.`,`${g.performance.failed} tasks failed and ${g.performance.skipped} were skipped.`));
+    if(g.messages.some(x=>x.type==='rescue_request'&&x.status==='acknowledged'))notes.push(T('La solicitud de ayuda obtuvo confirmación de Tierra.','Earth confirmed your call for help.'));
+    if(g.messages.some(x=>x.status==='pending'))notes.push(T('Quedan mensajes pendientes de confirmación.','Some messages are still waiting for confirmation.'));
+    if(!notes.length)notes.push(T('La tripulación terminó sin alertas persistentes y conservó el equilibrio de recursos.','The crew finished with no lasting alerts and kept resources balanced.'));
+    const reasonsEn={
+      1:['Health ≥ 70','Five of six basic systems ≥ 45','Research ≥ 30'],
+      2:['Food ≥ 67','Water ≥ 48','Energy ≥ 15','Health ≥ 45'],
+      3:['Research ≥ 55','Health ≥ 42','Oxygen ≥ 35','Communication ≥ 40'],
+      4:['Communication ≥ 75','Energy ≥ 15','Health ≥ 45'],
+      5:['Health ≥ 45','Morale ≥ 62','Oxygen and water ≥ 30'],
+      6:['No other ending was reached','Enough health to finish without a critical retreat'],
+      7:['Communication < 25','Health ≥ 35'],
+      8:['Life support or health fell to a critical level; or health < 25 at the end'],
+      9:['Oxygen ≤ 14','Health ≤ 45','Leak, severe hypoxia or an unsolved crisis'],
+      10:['Protection ≤ 15','Oxygen ≤ 55','Spacewalk without quick rescue']
+    };
+    const reasonsEs={
       1:['Salud ≥ 70','Cinco de seis sistemas básicos ≥ 45','Investigación ≥ 30'],
       2:['Alimentos ≥ 67','Agua ≥ 48','Energía ≥ 15','Salud ≥ 45'],
       3:['Investigación ≥ 55','Salud ≥ 42','Oxígeno ≥ 35','Comunicaciones ≥ 40'],
@@ -215,7 +229,8 @@ export function createEngine(catalog) {
       9:['Oxígeno ≤ 14','Salud ≤ 45','Fuga, hipoxia grave o crisis pendiente'],
       10:['Protección ≤ 15','Oxígeno ≤ 55','EVA sin rescate inmediato']
     };
-    return {criteria:reasons[endingId]||[],evidence:notes,endingId,priorityNote:'Se evalúan primero las crisis graves y luego los criterios de final. Los umbrales son ficticios del videojuego.'};
+    const reasons=lang==='en'?reasonsEn:reasonsEs;
+    return {criteria:reasons[endingId]||[],evidence:notes,endingId,priorityNote:T('Se evalúan primero las crisis graves y luego los criterios de final. Los umbrales son ficticios del videojuego.','Serious crises are checked first, then the ending rules. The thresholds are made up for the game.')};
   }
   function endTurn(g) {
     g.turn++;
@@ -383,21 +398,21 @@ export function createEngine(catalog) {
     const any=(...words)=>words.some(hasWord);
     const current=currentMission(g);
     const groups={
-      donki:['donki','tormenta','tormentas','solar','solares','sol','sep','cme','gst','kp','radiacion','dosimetro','dosis','particula','particulas','refugio','crater'],
-      oxygen:['oxigeno','aire','respirar','co2','dioxido','fuga','fugas','tanque','tanques','presion','ventilacion'],
-      plant:['agua','riego','cultivo','cultivos','comida','alimento','alimentos','invernadero','semilla','semillas','planta','plantas','hidroponia'],
-      power:['energia','bateria','baterias','panel','paneles','electricidad','apagon','apagones','circuito'],
-      comms:['comunicacion','comunicaciones','mensaje','mensajes','antena','antenas','latencia','retraso','senal','transmitir'],
-      sources:['fuente','fuentes','referencias','bibliografia']
+      donki:['donki','tormenta','tormentas','solar','solares','sol','sep','cme','gst','kp','radiacion','dosimetro','dosis','particula','particulas','refugio','crater','storm','storms','radiation','dose','particles','shelter','sun','flare'],
+      oxygen:['oxigeno','aire','respirar','co2','dioxido','fuga','fugas','tanque','tanques','presion','ventilacion','oxygen','air','breathe','breathing','leak','leaks','tank','tanks','pressure'],
+      plant:['agua','riego','cultivo','cultivos','comida','alimento','alimentos','invernadero','semilla','semillas','planta','plantas','hidroponia','water','plants','plant','crops','crop','food','greenhouse','seeds','garden'],
+      power:['energia','bateria','baterias','panel','paneles','electricidad','apagon','apagones','circuito','energy','power','battery','batteries','solar panel','panels','electricity','blackout'],
+      comms:['comunicacion','comunicaciones','mensaje','mensajes','antena','antenas','latencia','retraso','senal','transmitir','communication','communications','message','messages','antenna','delay','signal','radio'],
+      sources:['fuente','fuentes','referencias','bibliografia','sources','references','source']
     };
     const scores=Object.fromEntries(Object.entries(groups).map(([id,terms])=>[id,terms.filter(hasWord).length]));
     const topic=Object.entries(scores).filter(([id])=>id!=='sources').sort((a,b)=>b[1]-a[1])[0];
-    const nasaAsk=any('nasa','donki','evento solar','eventos solares','tormenta','tormentas','cme','sep','gst','kp','actividad solar','clima espacial')||(any('evento','eventos','registro','registros')&&any('ultimo','ultima','reciente','hoy','ayer','2024','2025','2026'));
-    const askMission=any('que hago','que hago ahora','que debo hacer','que deberia hacer','pista','ayuda','ayudame','esta mision','este reto','mi reto','consejo');
-    const askStatus=any('como voy','como va mi base','como esta mi base','como esta la base','estado de la base','mi estado','mis recursos','cuanta energia','cuanto oxigeno','cuanta agua','cuanta comida','cuanto queda');
-    const askHello=any('hola','buenas','gracias','quien eres','como te llamas');
-    const type=any('sep','particulas energeticas')?'SEP':any('cme','eyeccion de masa')?'CME':any('gst','kp','geomagnetica')?'GST':null;
-    const askDefinition=any('que significa','que es','que son','que quiere decir','significado','definicion','define');
+    const nasaAsk=any('nasa','donki','space weather','solar storm','solar event','evento solar','eventos solares','tormenta','tormentas','cme','sep','gst','kp','actividad solar','clima espacial')||(any('evento','eventos','registro','registros')&&any('ultimo','ultima','reciente','hoy','ayer','2024','2025','2026'));
+    const askMission=any('que hago','que hago ahora','que debo hacer','que deberia hacer','pista','ayuda','ayudame','esta mision','este reto','mi reto','consejo','what do i do','what should i do','hint','help','this challenge','my challenge','advice','tip');
+    const askStatus=any('como voy','como va mi base','como esta mi base','como esta la base','estado de la base','mi estado','mis recursos','cuanta energia','cuanto oxigeno','cuanta agua','cuanta comida','cuanto queda','how am i doing','how is my base','how is the base','my base','status','my resources','how much');
+    const askHello=any('hola','buenas','gracias','quien eres','como te llamas','hello','hi','hey','thanks','thank you','who are you','your name');
+    const type=any('sep','particulas energeticas','solar energetic particles')?'SEP':any('cme','eyeccion de masa','coronal mass')?'CME':any('gst','kp','geomagnetica','geomagnetic')?'GST':null;
+    const askDefinition=any('que significa','que es','que son','que quiere decir','significado','definicion','define','what does','what is','what are','meaning','definition');
     const term=hasWord('kp')?'KP':type||(hasWord('donki')?'DONKI':null);
     const archived=(g.scienceEventPool||[]).slice();
     if(g.science?.registeredEvent&&!archived.some(x=>x.id===g.science.registeredEvent.id))archived.push(g.science.registeredEvent);
@@ -432,21 +447,21 @@ export function createEngine(catalog) {
     }else if(nasaAsk&&(any('nasa','donki','evento','eventos','solar','solares','tormenta','tormentas','sep','cme','gst','kp','clima espacial'))){
       const f=facts.find(f=>f.id==='donki');
       matchedTopic='storm';
-      answer=f?.answer||'DONKI es el registro de clima espacial de NASA.';
+      answer=f?.answer||T('DONKI es el registro de clima espacial de NASA.','DONKI is the NASA space weather record.');
       source(f?.source||'NASA DONKI',f?.sourceUrl||'https://ccmc.gsfc.nasa.gov/tools/DONKI/','hecho_cientifico');
       if(event){
         const date=String(event.observedAt||'fecha no disponible').slice(0,10);
         observation={id:event.id,type:event.type,title:event.title,observedAt:event.observedAt,source:event.source,sourceUrl:event.sourceUrl,disclaimer:evText(event.note||'No mide la dosis lunar.')};
         answer+=EN?`\n\nOf the ${archived.length} records saved in this game, I found: ${event.title} (${event.type}), dated ${date}. ${evText(event.summary)||''}`:`\n\nDe los ${archived.length} registros guardados en esta partida, encontré: ${event.title} (${event.type}), con fecha ${date}. ${event.summary||''}`;
         source(event.source,event.sourceUrl,'registro_nasa_descargado');
-      }else answer+=archived.length?'\n\nNo hay eventos guardados del tipo o año solicitado.':'\n\nNo hay eventos DONKI cargados en esta partida.';
-      answer+='\n\nLos registros son de archivo, no una consulta NASA en vivo ni mediciones de radiación en la base lunar.';
+      }else answer+=archived.length?T('\n\nNo hay eventos guardados del tipo o año solicitado.','\n\nThere are no saved events of that type or year.'):T('\n\nNo hay eventos DONKI cargados en esta partida.','\n\nNo DONKI events are loaded in this game.');
+      answer+=T('\n\nLos registros son de archivo, no una consulta NASA en vivo ni mediciones de radiación en la base lunar.','\n\nThese are archive records, not a live NASA query or radiation measurements at the Moon base.');
     }else if(scores.sources>0){
-      const f=facts.find(f=>f.id==='sources');answer=f?.answer||'Las referencias científicas acompañan a los retos.';
+      const f=facts.find(f=>f.id==='sources');answer=f?.answer||T('Las referencias científicas acompañan a los retos.','Scientific references come with the challenges.');
       if(f)source(f.source,f.sourceUrl,f.kind);
     }else if(topic&&topic[1]>0){
       // Preguntas por radiación o dosis usan la ficha medida cerca de la Luna (RadLab · LRO CRaTER).
-      const wantsDose=topic[0]==='donki'&&any('radiacion','dosis','dosimetro','crater');
+      const wantsDose=topic[0]==='donki'&&any('radiacion','dosis','dosimetro','crater','radiation','dose');
       const f=(wantsDose&&facts.find(f=>f.id==='radiation'))||facts.find(f=>f.id===topic[0]);
       if(f){
         answer=f.answer;matchedTopic=f.topic;source(f.source,f.sourceUrl,f.kind);
@@ -454,7 +469,7 @@ export function createEngine(catalog) {
         if(metric)answer+=EN?`\n\nIn this game, the ${metric} meter is at ${g.metrics[metric]}/100. It is a teaching scale.`:`\n\nEn esta partida, el indicador de ${metric} está en ${g.metrics[metric]}/100. Es una escala didáctica.`;
       }
     }
-    if(!answer)answer='No tengo una ficha científica verificable para esa pregunta todavía. Probá preguntarme por oxígeno, agua, cultivos, baterías, comunicaciones, radiación, DONKI o por el reto actual. Prefiero reconocer mis límites a inventar datos.';
+    if(!answer)answer=T('No tengo una ficha científica verificable para esa pregunta todavía. Probá preguntarme por oxígeno, agua, cultivos, baterías, comunicaciones, radiación, DONKI o por el reto actual. Prefiero reconocer mis límites a inventar datos.','I do not have a checked science card for that question yet. Try asking about oxygen, water, crops, batteries, communications, radiation, DONKI or your current challenge. I prefer to admit my limits than to make up facts.');
     if(hint){g.npcHelpCount++;g.performance.hints++}
     const asked=norm(question);
     const SG=EN?SUGGESTIONS_EN:SUGGESTIONS;const suggestions=(SG[matchedTopic]||SG.default).filter(s=>norm(s)!==asked).slice(0,3);
