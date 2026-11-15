@@ -114,6 +114,7 @@ function tankMenuHTML(gate = false) {
 
 function refresh() {
   const v = session.view;
+  document.body.classList.toggle('in-mini', session.mode === 'minigame');
   setStatusNames(v?.statusNames);
   renderHud(v);
   renderDock(v);
