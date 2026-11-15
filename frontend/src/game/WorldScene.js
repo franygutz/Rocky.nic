@@ -403,7 +403,7 @@ export class WorldScene extends Phaser.Scene {
       else want = this.pose === 'side' ? 'quieto' : 'stand-' + this.pose;
       if (this.cur.name !== want || !this.sheets[want]) { this.ensureAnim(want); this.play(want, { loop: true }); }
       if (this.moving) {
-        // Física de verdad: la velocidad sale de m/s reales (≈ 2,2 al trote y 3,4 al esquí, como los astronautas del Apolo) y de la escala del
+        // Física de verdad: la velocidad sale de m/s reales (afuera ≈ 1,2 al trote y 1,9 al esquí: lunar y con traje; dentro 2,2 y 3,4) y de la escala del
         // sprite (1 m = 22 px lógicos); el ritmo de los pasos = velocidad / velocidad de la animación, así los pies no patinan.
         const sh = this.sheets[want], mps = this.mps(this.running);
         this.cur.rate = Math.max(0.4, Math.min(2.4, mps / sh.v));
@@ -477,14 +477,14 @@ export class WorldScene extends Phaser.Scene {
     this.goTo(d.to.scene, d.to.x, d.to.y);
   }
 
-  goTo(sceneId, x, y, instant = false) {
-    if (!SCENES[sceneId] || this.time.now < this.lockUntil) return;
   // Posición del personaje en la pantalla (para centrar la cortina circular).
   heroScreen() {
     const cam = this.cameras.main, v = cam.worldView;
     return [(this.hero.x - v.x) * cam.zoom, (this.hero.y - v.y) * cam.zoom];
   }
 
+  goTo(sceneId, x, y, instant = false) {
+    if (!SCENES[sceneId] || this.time.now < this.lockUntil) return;
     this.lockUntil = this.time.now + 700; // bloqueo breve contra entradas repetidas
     this.route = [];
     const done = () => {
