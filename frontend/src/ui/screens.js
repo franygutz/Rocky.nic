@@ -117,6 +117,7 @@ export function missionHTML(v, { hint, factor = 1 } = {}) {
     ${hint ? `<div class="bubble"><b>${kitaIcon({ size: 26 })} Kita:</b> ${esc(hint)}</div>` : ''}
     <div class="row">
       <button class="btn small calm" data-action="hint">${kitaIcon({ size: 30 })} ${t('screen.pedir_una_pista_a_kita')}</button>
+      ${typeof window !== 'undefined' && 'speechSynthesis' in window ? `<button class="btn small" data-action="readAloud" aria-pressed="false">${t('read.aloud')}</button>` : ''}
       <button class="btn small" data-action="skip">${t('screen.omitir_reto')}</button>
     </div>
   </div>`;
