@@ -104,6 +104,7 @@ export function createFrontendBridge(engine, {
       performance:clone(game.performance),
       lastResult:lastResult?clone(lastResult):null,
       lastLuni:lastLuni?clone(lastLuni):null,
+      orders:clone(game.orders||[]), bag:clone(game.bag||{}), world:clone(game.world||{avatar:null,scene:'exterior',pos:null,clock:0}),
       ending,
       storage:{available:storageAvailable,error:storageError}
     };
@@ -163,6 +164,31 @@ export function createFrontendBridge(engine, {
     game=g;save();notify('NASA_REFRESH');
     return {count:g.scienceEventPool.length,view:getView()};
   }
+  // ── Mundo jugable (v0.5) ──
+  function worldOp(action, fn, name) {
+    const out = fn(engine.ensureWorld(requireGame()));
+    return commit(out, name || action);
+  }
+  const order = (itemId, {requestId} = {}) => worldOp('ORDER', g => engine.orderItem(g, itemId, {requestId}), 'ORDER');
+  const collect = ({requestId} = {}) => worldOp('COLLECT', g => engine.collectOrders(g, {requestId}), 'COLLECT');
+  const useItem = (itemId, {requestId} = {}) => worldOp('USE_ITEM', g => engine.useItem(g, itemId, {requestId}), 'USE_ITEM');
+  const fillTank = (percent, {requestId} = {}) => worldOp('TANK_FILL', g => engine.tankFill(g, percent, {requestId}), 'TANK_FILL');
+  const leaveBase = ({requestId} = {}) => worldOp('LEAVE_BASE', g => engine.leaveBase(g, {requestId}), 'LEAVE_BASE');
+  const enterBase = () => worldOp('ENTER_BASE', g => engine.enterBase(g), 'ENTER_BASE');
+  const setAvatar = avatar => worldOp('AVATAR', g => engine.setAvatar(g, avatar), 'AVATAR');
+  // Reloj del mundo: no guarda ni avisa en cada segundo, solo cuando cambia algo (pedido listo, oxígeno agotado).
+  function tick(seconds, {outside = false} = {}) {
+    const out = engine.tickWorld(engine.ensureWorld(requireGame()), {seconds, outside});
+    game = out.state;
+    if (out.result.ready.length || out.result.exhausted) { save(); notify('WORLD_TICK', {result: out.result}); }
+    return out.result;
+  }
+  // Punto de guardado del mundo (cambio de zona, tarea, compra, recogida, pausa, cierre).
+  function checkpoint(scene, pos) {
+    const out = engine.setWorldState(engine.ensureWorld(requireGame()), {scene, pos});
+    game = out.state; save();
+    return out.result;
+  }
   function clearProgress() {
     game=null;pendingChoice=null;lastLuni=null;lastResult=null;
     try {store?.removeItem(storageKey);if(storageKey==='moon-survival-partida-v03')store?.removeItem('moon-survival-v03-offline');storageAvailable=!!store;storageError=null;}
@@ -173,5 +199,5 @@ export function createFrontendBridge(engine, {
   const restored=restore();
   if (!restored && autoStart) newGame();
   return {newGame,getState,getView,subscribe,save,chooseCard,prepareMinigame,finishMinigame,skipCard,buy,
-    respondWeather,sendMessage,repeatDay,askLuni,refreshNASA,clearProgress};
+    respondWeather,sendMessage,repeatDay,askLuni,refreshNASA,clearProgress,order,collect,useItem,fillTank,leaveBase,enterBase,setAvatar,tick,checkpoint};
 }

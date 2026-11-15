@@ -27,5 +27,7 @@
   "rescate_retrasado": "Ayuda retrasada",
   "sin_semillas": "Sin semillas de respaldo",
   "hipoxia_grave": "Hipoxia grave",
-  "eva_sin_rescate": "EVA sin rescate inmediato"
+  "eva_sin_rescate": "EVA sin rescate inmediato",
+  "tanque_incompleto": "Tanque incompleto",
+  "oxigeno_agotado": "Oxígeno del traje agotado"
 }

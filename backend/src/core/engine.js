@@ -37,7 +37,8 @@ export function createEngine(catalog) {
       purchases:[],performance:{completed:0,partial:0,failed:0,skipped:0,hints:0,safeChoices:0,riskyChoices:0,scores:[],mastery:50},
       daySummaries:[],science:{sourceMode:scienceEvents.length?'archivo_real_nasa':'sin_datos',registeredEvent:null},
       events:[],messages:[],communicationSequence:0,npcHelpCount:0,endingId:null,
-      createdAt:new Date().toISOString(),snapshots:{},receipts:{},criticalAlert:null,weather:null};
+      createdAt:new Date().toISOString(),snapshots:{},receipts:{},criticalAlert:null,weather:null,
+      orders:[],bag:{},world:{avatar:null,scene:'exterior',pos:null,clock:0,suit:{fill:0,eva:0,evaMax:180,loaded:false,outside:false}}};
     g.scienceEventPool=scienceEvents.filter(x=>x&&typeof x.id==='string'&&['SEP','CME','GST'].includes(x.type)).map(e=>({id:e.id,type:e.type,observedAt:e.observedAt,title:e.title,source:e.source,sourceUrl:e.sourceUrl,summary:e.summary,datasetType:e.datasetType,location:e.location,note:e.note}));
     saveCheckpoint(g);
     return g;
@@ -303,7 +304,7 @@ export function createEngine(catalog) {
     if(!Number.isInteger(n)||n<1||n>original.day||!snap)throw Error('INVALID_REPLAY_DAY');
     const restored=clone(snap);restored.snapshots={};
     for(const[k,v]of Object.entries(original.snapshots)){if(Number(k)<=n)restored.snapshots[k]=clone(v)}
-    restored.receipts={};restored.events.push({type:'DAY_REPEATED',day:n,previousTurn:original.turn});
+    restored.receipts={};restored.world={...(restored.world||{}),avatar:original.world?.avatar??null,scene:original.world?.scene??'exterior',pos:original.world?.pos??null};restored.events.push({type:'DAY_REPEATED',day:n,previousTurn:original.turn});
     return {state:restored,result:{replayedDay:n,turn:restored.turn,day:restored.day,warning:'La repetición restaura recursos, decisiones, compras y aleatoriedad de ese día y elimina cambios posteriores del estado activo.'}};
   }
   // Glosario de clima espacial de LUNI (v0.4). Definiciones generales, sin cifras inventadas.
@@ -421,5 +422,157 @@ export function createEngine(catalog) {
       inventory:g.inventory,performance:g.performance,missions:g.history,daySummaries:g.daySummaries,science:g.science,messages:g.messages};
   }
   function shop(g){return items.map(i=>({...i,purchased:g.inventory[i.id]||0,remaining:i.limit-(g.inventory[i.id]||0),affordable:g.coins>=i.price,available:g.phase==='active'&&g.coins>=i.price&&(g.inventory[i.id]||0)<i.limit}))}
-  return {createGame,nextMission,resolveMission,skipMission,purchase,sendMessage,respondWeather,repeatDay,npcAsk,report,shop,endingFor,assess,currentMission,challengeMap};
+
+  // ── Mundo jugable (v0.5): pedidos físicos, bolsa, traje y guardado del mundo ──────────────────────────
+  // El frontend simula el movimiento; el motor decide saldo, pedidos, bolsa y efectos. Cada operación acepta
+  // un requestId: repetirla devuelve el mismo resultado sin volver a cobrar ni a entregar.
+  const EVA_BASE=180,ORDER_SECONDS=20,BAG_CAPACITY=12;
+  const WORLD_SCENES=['exterior','zora','invernadero','paneles','crater'];
+  const AV={skin:8,hair:10,style:15,eyes:6,suit:6,emblem:16};
+  const ACCESSORIES=['none','freckles','glasses','beard'],EXPRESSIONS=['neutral','happy','determined'];
+  function ensureWorld(g){
+    g.orders=g.orders||[];g.bag=g.bag||{};g.receipts=g.receipts||{};
+    g.world=g.world||{avatar:null,scene:'exterior',pos:null,clock:0};
+    g.world.suit=g.world.suit||{fill:0,eva:0,evaMax:EVA_BASE,loaded:false,outside:false};
+    if(typeof g.world.clock!=='number')g.world.clock=0;
+    return g;
+  }
+  function replay(original,requestId,action){
+    if(requestId===undefined||requestId===null)return null;
+    if(typeof requestId!=='string'||requestId.length<8||requestId.length>120)throw Error('INVALID_REQUEST_ID');
+    const prev=original.receipts?.[requestId];
+    if(!prev)return null;
+    if(prev.action!==action)throw Error('INVALID_REQUEST_ID');
+    return {state:clone(original),result:{...clone(prev.result),duplicate:true}};
+  }
+  function remember(g,requestId,action,result){
+    if(!requestId)return;
+    g.receipts[requestId]={action,result:clone(result)};
+    const keys=Object.keys(g.receipts);if(keys.length>100)delete g.receipts[keys[0]];
+  }
+  const bagCount=g=>Object.values(g.bag).reduce((a,b)=>a+b,0);
+  function orderItem(original,itemId,{requestId}={}) {
+    assertGame(original);
+    const again=replay(original,requestId,'ORDER');if(again)return again;
+    const item=itemMap.get(itemId);if(!item)throw Error('ITEM_NOT_FOUND');
+    const used=original.inventory[item.id]||0;if(used>=item.limit)throw Error('OUT_OF_STOCK');
+    if(original.coins<item.price)throw Error('INSUFFICIENT_COINS');
+    const g=ensureWorld(clone(original));
+    g.coins-=item.price;g.spent+=item.price;g.inventory[item.id]=used+1;
+    const order={id:`P${(g.orderSeq=(g.orderSeq||0)+1)}`,itemId:item.id,name:item.name,price:item.price,status:'confirmed',
+      day:g.day,turn:g.turn,orderedAt:g.world.clock,readyAt:g.world.clock+ORDER_SECONDS};
+    g.orders.push(order);
+    const result={order:clone(order),coinsAfter:g.coins,day:g.day,turn:g.turn};
+    g.events.push({type:'ORDER_PLACED',orderId:order.id,itemId:item.id,day:g.day,turn:g.turn});
+    remember(g,requestId,'ORDER',result);
+    return {state:g,result};
+  }
+  function tickWorld(original,{seconds=0,outside=false}={}) {
+    assertGame(original);
+    const dt=Math.max(0,Math.min(120,Number(seconds)||0));
+    const g=ensureWorld(clone(original));
+    g.world.clock=Math.round((g.world.clock+dt)*1000)/1000;
+    const ready=[];
+    for(const o of g.orders)if(o.status==='confirmed'&&g.world.clock>=o.readyAt){o.status='ready';ready.push(o.id)}
+    const suit=g.world.suit;let exhausted=false;
+    if(outside&&suit.loaded){
+      suit.eva=Math.max(0,Math.round((suit.eva-dt)*1000)/1000);
+      if(suit.eva<=0&&!suit.exhausted){
+        suit.exhausted=true;exhausted=true;
+        g.metrics.health=clamp(g.metrics.health-8);g.metrics.oxygen=clamp(g.metrics.oxygen-4);add(g,'oxigeno_agotado');
+        g.events.push({type:'EVA_EXHAUSTED',day:g.day,turn:g.turn,delta:{health:-8,oxygen:-4}});
+        if(isCritical(g)){g.phase='completed';g.endingId=endingFor(g);g.currentMissionId=null}
+      }
+    }
+    return {state:g,result:{clock:g.world.clock,ready,exhausted,eva:suit.eva,evaMax:suit.evaMax,loaded:suit.loaded,outside:suit.outside}};
+  }
+  function collectOrders(original,{requestId}={}) {
+    assertGame(original);
+    const again=replay(original,requestId,'COLLECT');if(again)return again;
+    const g=ensureWorld(clone(original));
+    const ready=g.orders.filter(o=>o.status==='ready');
+    if(!ready.length)throw Error('NO_ORDER_READY');
+    const collected=[];
+    for(const o of ready){if(bagCount(g)>=BAG_CAPACITY)break;o.status='collected';o.collectedAt=g.world.clock;g.bag[o.itemId]=(g.bag[o.itemId]||0)+1;collected.push(o.id)}
+    if(!collected.length)throw Error('BAG_FULL');
+    const result={collected,left:ready.length-collected.length,bag:clone(g.bag)};
+    g.events.push({type:'ORDER_COLLECTED',orders:collected,day:g.day,turn:g.turn});
+    remember(g,requestId,'COLLECT',result);
+    return {state:g,result};
+  }
+  function useItem(original,itemId,{requestId}={}) {
+    assertGame(original);
+    const again=replay(original,requestId,'USE_ITEM');if(again)return again;
+    const item=itemMap.get(itemId);if(!item)throw Error('ITEM_NOT_FOUND');
+    const g=ensureWorld(clone(original));
+    if((g.bag[item.id]||0)<1)throw Error('ITEM_NOT_IN_BAG');
+    g.bag[item.id]-=1;if(!g.bag[item.id])delete g.bag[item.id];
+    for(const[k,v]of Object.entries(item.delta))g.metrics[k]=clamp(g.metrics[k]+v);
+    for(const st of item.remove)remove(g,st);
+    const result={itemId:item.id,name:item.name,delta:clone(item.delta),removedStatuses:clone(item.remove),bag:clone(g.bag)};
+    g.events.push({type:'ITEM_USED',itemId:item.id,day:g.day,turn:g.turn});
+    remember(g,requestId,'USE_ITEM',result);
+    return {state:g,result};
+  }
+  // Cada salida de Zora gasta un tanque: hay que llenarlo en los depósitos de soporte vital (cuesta oxígeno de la base).
+  const TANK_COST=3,TANK_MIN_STATION=10;
+  function tankFill(original,percent,{requestId}={}) {
+    assertGame(original);
+    const again=replay(original,requestId,'TANK_FILL');if(again)return again;
+    const p=Number(percent);if(!Number.isFinite(p))throw Error('INVALID_PERCENT');
+    const g=ensureWorld(clone(original));const suit=g.world.suit;
+    if(suit.outside)throw Error('TANK_FILL_OUTSIDE');
+    if(g.metrics.oxygen<TANK_MIN_STATION)throw Error('INSUFFICIENT_STATION_OXYGEN');
+    const fill=Math.round(clamp(p));
+    g.metrics.oxygen=clamp(g.metrics.oxygen-TANK_COST);
+    suit.fill=fill;suit.evaMax=Math.round(EVA_BASE*(0.4+0.6*fill/100));suit.eva=suit.evaMax;suit.exhausted=false;suit.loaded=true;
+    remove(g,'oxigeno_agotado');
+    if(fill<60)add(g,'tanque_incompleto');else remove(g,'tanque_incompleto');
+    const result={fill,evaMax:suit.evaMax,insufficient:fill<60,stationCost:TANK_COST,day:g.day,turn:g.turn};
+    g.events.push({type:'TANK_FILL',...result});
+    remember(g,requestId,'TANK_FILL',result);
+    return {state:g,result};
+  }
+  // Salir de Zora exige un tanque lleno; el tanque se usa (queda en uso hasta volver).
+  function leaveBase(original,{requestId}={}) {
+    assertGame(original);
+    const again=replay(original,requestId,'LEAVE_BASE');if(again)return again;
+    const g=ensureWorld(clone(original));const suit=g.world.suit;
+    if(suit.outside)return {state:g,result:{outside:true,eva:suit.eva,evaMax:suit.evaMax,already:true}};
+    if(!suit.loaded)throw Error('TANK_NOT_LOADED');
+    suit.outside=true;
+    const result={outside:true,eva:suit.eva,evaMax:suit.evaMax,fill:suit.fill};
+    g.events.push({type:'LEAVE_BASE',day:g.day,turn:g.turn,fill:suit.fill});
+    remember(g,requestId,'LEAVE_BASE',result);
+    return {state:g,result};
+  }
+  // Volver a Zora vacía el tanque: para la próxima salida hay que llenar otro.
+  function enterBase(original) {
+    assertGame(original,true);
+    const g=ensureWorld(clone(original));const suit=g.world.suit;
+    const wasOutside=suit.outside;
+    suit.outside=false;suit.loaded=false;suit.eva=0;suit.exhausted=false;
+    if(wasOutside)g.events.push({type:'ENTER_BASE',day:g.day,turn:g.turn});
+    return {state:g,result:{outside:false,loaded:false,wasOutside}};
+  }
+  function setAvatar(original,avatar) {
+    assertGame(original,true);
+    const a=avatar||{};const int=(v,n)=>Number.isInteger(v)&&v>=0&&v<n;
+    if(!int(a.skin,AV.skin)||!int(a.hair,AV.hair)||!int(a.style,AV.style)||!int(a.eyes,AV.eyes)||!int(a.suit,AV.suit)||!int(a.emblem??0,AV.emblem)
+      ||!ACCESSORIES.includes(a.accessory)||!EXPRESSIONS.includes(a.expression))throw Error('INVALID_AVATAR');
+    const name=String(a.name||'').replace(/[^\p{L}\p{N} _-]/gu,'').trim().slice(0,16)||'Astro';
+    const g=ensureWorld(clone(original));
+    g.world.avatar={name,skin:a.skin,hair:a.hair,style:a.style,eyes:a.eyes,suit:a.suit,accessory:a.accessory,expression:a.expression,emblem:a.emblem??0};
+    return {state:g,result:{avatar:clone(g.world.avatar)}};
+  }
+  function setWorldState(original,{scene,pos}={}) {
+    assertGame(original,true);
+    if(!WORLD_SCENES.includes(scene))throw Error('INVALID_SCENE');
+    const ok=pos&&Number.isFinite(pos.x)&&Number.isFinite(pos.y)&&pos.x>=0&&pos.y>=0&&pos.x<=2000&&pos.y<=2000;
+    if(!ok)throw Error('INVALID_POSITION');
+    const g=ensureWorld(clone(original));
+    g.world.scene=scene;g.world.pos={x:Math.round(pos.x*10)/10,y:Math.round(pos.y*10)/10};
+    return {state:g,result:{scene,pos:g.world.pos}};
+  }
+  return {createGame,nextMission,resolveMission,skipMission,purchase,orderItem,tickWorld,collectOrders,useItem,tankFill,leaveBase,enterBase,setAvatar,setWorldState,ensureWorld,sendMessage,respondWeather,repeatDay,npcAsk,report,shop,endingFor,assess,currentMission,challengeMap};
 }

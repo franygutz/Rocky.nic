@@ -7,7 +7,7 @@ const catalog={challenges:data('challenges'),items:data('shop'),endings:data('en
 const core=read('src/core/engine.js').replace('export function createEngine','function createEngine');
 const bridge=read('src/core/frontend-bridge.js').replace('export function createFrontendBridge','function createFrontendBridge');
 const literal=JSON.stringify(catalog).replace(/</g,'\\u003c');
-const script=`/* Moon Survival v0.4.1 — Luna, 50 retos, 10 finales; motor offline + contrato frontend */\n(function(){'use strict';const CATALOG=${literal};\n${core}\n${bridge}\nconst engine={...createEngine(CATALOG),catalog:CATALOG};\nwindow.MoonSurvival=engine;\nwindow.MoonSurvivalFrontend=(options)=>createFrontendBridge(engine,options);\n})();\n`;
+const script=`/* Vita Lunae v0.5.0 — Luna, 50 retos, 10 finales; motor offline + contrato frontend */\n(function(){'use strict';const CATALOG=${literal};\n${core}\n${bridge}\nconst engine={...createEngine(CATALOG),catalog:CATALOG};\nwindow.MoonSurvival=engine;\nwindow.MoonSurvivalFrontend=(options)=>createFrontendBridge(engine,options);\n})();\n`;
 writeFileSync(resolve(root,'public/offline-engine.js'),script);
 const html=read('public/offline-demo.html');
 const single=html.replace('<link rel="manifest" href="./manifest.webmanifest">','').replace('<script src="./offline-engine.js"></script>',`<script>${script.replace(/<\/script/gi,'<\\/script')}</script>`);

@@ -1,4 +1,4 @@
-# Trazabilidad científica (para el jurado) · v0.4.1
+# Trazabilidad científica (para el jurado) · v0.5.0
 
 ## 1. Registros DONKI incluidos (`data/nasa-events.json`)
 

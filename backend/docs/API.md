@@ -1,4 +1,4 @@
-# Moon Survival v0.4.1 — Contrato de API (Sara / Solieth / Farid)
+# Vita Lunae v0.5.0 — Contrato de API (Sara / Solieth / Farid)
 
 Base URL local: `http://127.0.0.1:3001`
 
@@ -37,6 +37,26 @@ JSON en todas las respuestas. Solicitudes POST usan `Content-Type: application/j
 | POST | `/api/v1/games/:id/npc/ask` | `{ "question":"¿Qué es DONKI?", "hint":true }` |
 
 `requestId` opcional, pero **muy recomendado** para botones de compra y resolución: evitamos procesar dos veces una misma acción. Generar identificador único por clic (por ejemplo `crypto.randomUUID()` desde frontend). **No reutilizarlo para otra acción.**
+
+## Mundo jugable (v0.5.0)
+
+El frontend 2D simula el movimiento; el motor decide saldo, pedidos, bolsa, aire del traje y guardado del mundo. Todas las operaciones `POST` aceptan `requestId` (8 a 120 caracteres): repetir el mismo `requestId` devuelve el mismo resultado con `duplicate: true`, sin volver a cobrar, entregar ni aplicar efectos.
+
+| Método | Ruta | Entrada | Resultado |
+| --- | --- | --- | --- |
+| POST | `/api/v1/games/:id/shop/order` | `{ "itemId":"agua", "requestId":"…" }` | Descuenta las monedas una sola vez, cuenta contra el límite del artículo y crea un pedido `confirmed` que estará listo a los 20 s de reloj de mundo. **No** toca la bolsa ni aplica efectos. |
+| POST | `/api/v1/games/:id/world/tick` | `{ "seconds":1, "outside":true }` | Avanza el reloj del mundo (máx. 120 s por llamada). Los pedidos `confirmed` pasan a `ready`. Afuera, con el tanque en uso, se gasta `suit.eva`; al llegar a 0 hay una sola consecuencia (salud −8, oxígeno −4, estado `oxigeno_agotado`). Sin tanque cargado no se gasta nada. |
+| POST | `/api/v1/games/:id/orders/collect` | `{ "requestId":"…" }` | Pasa los pedidos `ready` a `collected` y suma los artículos a la bolsa (capacidad 12). Errores: `NO_ORDER_READY`, `BAG_FULL`. |
+| POST | `/api/v1/games/:id/inventory/use` | `{ "itemId":"agua", "requestId":"…" }` | Aplica el efecto del artículo y lo resta de la bolsa. Error: `ITEM_NOT_IN_BAG`. |
+| POST | `/api/v1/games/:id/world/tank` | `{ "percent":0-100, "requestId":"…" }` | **Llena un tanque** (solo adentro de Zora): cuesta **3 de oxígeno de la base** (mínimo 10 en la base), carga el tanque y fija `evaMax = round(180 × (0.4 + 0.6 × percent/100))` s. Con menos de 60 % queda el estado `tanque_incompleto`. Errores: `TANK_FILL_OUTSIDE`, `INSUFFICIENT_STATION_OXYGEN`. |
+| POST | `/api/v1/games/:id/world/leave` | `{ "requestId":"…" }` | **Salir de Zora**: exige un tanque cargado (`TANK_NOT_LOADED` si no) y lo pone en uso. |
+| POST | `/api/v1/games/:id/world/enter` | `{}` | **Volver a Zora**: el tanque queda **vacío**; para otra salida hay que llenar otro. |
+| POST | `/api/v1/games/:id/world/avatar` | `{ "avatar":{ "name","skin","hair","style","eyes","suit","accessory","expression","emblem" } }` | Guarda el astronauta tras validar rangos (piel 0–7, color de cabello 0–9, peinado 0–14, ojos 0–5, traje 0–5, parche 0–15; accesorio `none/freckles/glasses/beard`; expresión `neutral/happy/determined`). Error: `INVALID_AVATAR`. |
+| POST | `/api/v1/games/:id/world/state` | `{ "scene":"zora", "pos":{ "x":46, "y":186 } }` | Guarda escenario (`exterior`, `zora`, `invernadero`, `paneles`, `crater`) y posición. Errores: `INVALID_SCENE`, `INVALID_POSITION`. |
+
+Campos nuevos de una partida: `orders[]` (`id`, `itemId`, `status` `confirmed|ready|collected`, `readyAt`), `bag{ itemId: cantidad }` y `world{ avatar, scene, pos, clock, suit{ fill, eva, evaMax } }`. Un guardado v0.4 sin esos campos se abre sin pérdida: se crean al primer uso. Repetir un día restaura todo lo del día salvo el avatar, el escenario y la posición, que se conservan.
+
+En el módulo offline son los mismos métodos del puente: `order`, `collect`, `useItem`, `fillTank`, `setAvatar`, `tick(seconds,{outside})` y `checkpoint(scene,pos)`. `purchase`/`buy` (efecto inmediato) sigue disponible por compatibilidad.
 
 ## Ejemplo completo desde PowerShell
 

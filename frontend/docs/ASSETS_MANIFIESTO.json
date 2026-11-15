@@ -1,0 +1,839 @@
+{
+  "descripcion": "Recursos del frontend de Vita Lunae. Los SVG de avatar (capas de piel, cabello, ojos, traje y accesorios) no son archivos: se componen en src/world/avatar.js con las formas del Kit Visual (32×46 px lógicos).",
+  "paleta": "Moon Pop (12 colores) en src/theme.js",
+  "recursos": [
+    {
+      "ruta": "public/assets/iconos/01_oxigeno.svg",
+      "formato": "svg",
+      "bytes": 1944,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/02_agua.svg",
+      "formato": "svg",
+      "bytes": 423,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/03_energia.svg",
+      "formato": "svg",
+      "bytes": 284,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/04_cultivos.svg",
+      "formato": "svg",
+      "bytes": 460,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/05_salud.svg",
+      "formato": "svg",
+      "bytes": 421,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/06_radio.svg",
+      "formato": "svg",
+      "bytes": 460,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/07_proteccion.svg",
+      "formato": "svg",
+      "bytes": 349,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/08_moneda.svg",
+      "formato": "svg",
+      "bytes": 527,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/09_llave.svg",
+      "formato": "svg",
+      "bytes": 317,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/10_muestra.svg",
+      "formato": "svg",
+      "bytes": 427,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/11_estrella.svg",
+      "formato": "svg",
+      "bytes": 340,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/iconos/12_trofeo.svg",
+      "formato": "svg",
+      "bytes": 539,
+      "viewBox": [
+        48.0,
+        52.0
+      ],
+      "uso": "Icono del HUD y de los artículos",
+      "notas": "Pixel art SVG con fondo transparente. Oxígeno, agua, energía, cultivos, salud, radio (comunicación), protección, moneda, llave, muestra (investigación), estrella (moral), trofeo."
+    },
+    {
+      "ruta": "public/assets/kita/arma_robot_spritesheet.png",
+      "formato": "png",
+      "bytes": 6506,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «arma_robot»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/arrastra_bloques_spritesheet.png",
+      "formato": "png",
+      "bytes": 6705,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «arrastra_bloques»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/canta_spritesheet.png",
+      "formato": "png",
+      "bytes": 6359,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «canta»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/caza_bichos_spritesheet.png",
+      "formato": "png",
+      "bytes": 6666,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «caza_bichos»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/choca_cinco_spritesheet.png",
+      "formato": "png",
+      "bytes": 6722,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «choca_cinco»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/dormido_spritesheet.png",
+      "formato": "png",
+      "bytes": 5456,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «dormido»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/en_escritorio_spritesheet.png",
+      "formato": "png",
+      "bytes": 5633,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «en_escritorio»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/error_spritesheet.png",
+      "formato": "png",
+      "bytes": 5592,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «error»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/feliz_spritesheet.png",
+      "formato": "png",
+      "bytes": 5949,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «feliz»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/gana_trofeo_spritesheet.png",
+      "formato": "png",
+      "bytes": 7210,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «gana_trofeo»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/guardado_spritesheet.png",
+      "formato": "png",
+      "bytes": 5605,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «guardado»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/guino_spritesheet.png",
+      "formato": "png",
+      "bytes": 5772,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «guino»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/lee_en_piso_spritesheet.png",
+      "formato": "png",
+      "bytes": 6381,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «lee_en_piso»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/maneja_robot_spritesheet.png",
+      "formato": "png",
+      "bytes": 6598,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «maneja_robot»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/no_encontrado_spritesheet.png",
+      "formato": "png",
+      "bytes": 5453,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «no_encontrado»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/novedades_spritesheet.png",
+      "formato": "png",
+      "bytes": 5611,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «novedades»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/pensando_spritesheet.png",
+      "formato": "png",
+      "bytes": 5603,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «pensando»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/programa_tableta_spritesheet.png",
+      "formato": "png",
+      "bytes": 5436,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «programa_tableta»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/programa_vacio_spritesheet.png",
+      "formato": "png",
+      "bytes": 5306,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «programa_vacio»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/rockea_spritesheet.png",
+      "formato": "png",
+      "bytes": 5966,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «rockea»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/sin_conexion_spritesheet.png",
+      "formato": "png",
+      "bytes": 5537,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «sin_conexion»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/sin_proyectos_spritesheet.png",
+      "formato": "png",
+      "bytes": 5327,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «sin_proyectos»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/taller_vacio_spritesheet.png",
+      "formato": "png",
+      "bytes": 5479,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «taller_vacio»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/ups_spritesheet.png",
+      "formato": "png",
+      "bytes": 5615,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «ups»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/kita/yupi_spritesheet.png",
+      "formato": "png",
+      "bytes": 7790,
+      "ancho": 2064,
+      "alto": 280,
+      "uso": "Kita: animación «yupi»",
+      "cuadros": 6,
+      "cuadro": [
+        344,
+        280
+      ],
+      "fps": 6.67,
+      "repite": true,
+      "transparencia": true,
+      "notas": "Sprite sheet horizontal de 6 cuadros (344×280 px = 86×70 px lógicos ×4). Se anima con CSS steps(6); con «menos movimiento» queda el primer cuadro."
+    },
+    {
+      "ruta": "public/assets/mapas/crater.png",
+      "formato": "png",
+      "bytes": 55503,
+      "ancho": 768,
+      "alto": 576,
+      "uso": "Interior del cráter de exploración",
+      "notas": "Original: Vita_Lunae_Mapa_Crater_PixelArt.svg (256×192 u), 3 px por unidad.",
+      "transparencia": true
+    },
+    {
+      "ruta": "public/assets/mapas/exterior.png",
+      "formato": "png",
+      "bytes": 142884,
+      "ancho": 1704,
+      "alto": 1008,
+      "uso": "Escenario exterior navegable (Zora, invernadero, antena, paneles, plataforma, cráter)",
+      "notas": "Original: Moon_Survival_Exterior_Plataforma_Izquierda.svg (568×336 u). Rasterizado a 3 px por unidad.",
+      "transparencia": false
+    },
+    {
+      "ruta": "public/assets/mapas/invernadero.png",
+      "formato": "png",
+      "bytes": 125014,
+      "ancho": 960,
+      "alto": 720,
+      "uso": "Interior del invernadero",
+      "notas": "Original: Invernadero_Moon_Survival.svg (320×240 u), 3 px por unidad.",
+      "transparencia": true
+    },
+    {
+      "ruta": "public/assets/mapas/paneles-frente.png",
+      "formato": "png",
+      "bytes": 17721,
+      "ancho": 1152,
+      "alto": 240,
+      "uso": "Primer plano de los paneles (y ≥ 208 u): oculta parcialmente al avatar",
+      "notas": "Recorte del mismo SVG a partir de la línea de oclusión (clipPath #occlusion, y = 208).",
+      "transparencia": true
+    },
+    {
+      "ruta": "public/assets/mapas/paneles.png",
+      "formato": "png",
+      "bytes": 141435,
+      "ancho": 1152,
+      "alto": 864,
+      "uso": "Fondo de los paneles solares, SIN personaje",
+      "notas": "Original: Moon_Survival_Paneles_Solares.svg, grupo #escenario (se quitó el grupo #personaje con el avatar incrustado).",
+      "transparencia": true
+    },
+    {
+      "ruta": "public/assets/mapas/zora.png",
+      "formato": "png",
+      "bytes": 95695,
+      "ancho": 1440,
+      "alto": 960,
+      "uso": "Interior de la nave Zora (9 salas y pasillos)",
+      "notas": "Original: Moon_Survival_Nave_Completa.svg (480×320 u), 3 px por unidad.",
+      "transparencia": true
+    },
+    {
+      "ruta": "public/assets/marca/vita-lunae-moon-pop-badge.svg",
+      "formato": "svg",
+      "bytes": 30223,
+      "viewBox": [
+        134.0,
+        132.0
+      ],
+      "uso": "Identidad de marca Vita Lunae (logo, insignia, marca, palabra)"
+    },
+    {
+      "ruta": "public/assets/marca/vita-lunae-moon-pop-lock.svg",
+      "formato": "svg",
+      "bytes": 67737,
+      "viewBox": [
+        270.0,
+        112.0
+      ],
+      "uso": "Identidad de marca Vita Lunae (logo, insignia, marca, palabra)"
+    },
+    {
+      "ruta": "public/assets/marca/vita-lunae-moon-pop-mark.svg",
+      "formato": "svg",
+      "bytes": 4768,
+      "viewBox": [
+        160.0,
+        136.0
+      ],
+      "uso": "Identidad de marca Vita Lunae (logo, insignia, marca, palabra)"
+    },
+    {
+      "ruta": "public/assets/marca/vita-lunae-moon-pop-word.svg",
+      "formato": "svg",
+      "bytes": 64054,
+      "viewBox": [
+        260.0,
+        124.0
+      ],
+      "uso": "Identidad de marca Vita Lunae (logo, insignia, marca, palabra)"
+    },
+    {
+      "ruta": "public/assets/simbolos/01_estrella.svg",
+      "formato": "svg",
+      "bytes": 321,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/02_planeta.svg",
+      "formato": "svg",
+      "bytes": 417,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/03_luna.svg",
+      "formato": "svg",
+      "bytes": 327,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/04_sol.svg",
+      "formato": "svg",
+      "bytes": 772,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/05_cohete.svg",
+      "formato": "svg",
+      "bytes": 437,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/06_satelite.svg",
+      "formato": "svg",
+      "bytes": 390,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/07_cometa.svg",
+      "formato": "svg",
+      "bytes": 415,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/08_ovni.svg",
+      "formato": "svg",
+      "bytes": 559,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/09_astronauta.svg",
+      "formato": "svg",
+      "bytes": 418,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/10_alien.svg",
+      "formato": "svg",
+      "bytes": 465,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/11_telescopio.svg",
+      "formato": "svg",
+      "bytes": 385,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/12_cristal.svg",
+      "formato": "svg",
+      "bytes": 349,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/13_bandera.svg",
+      "formato": "svg",
+      "bytes": 383,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/14_engranaje.svg",
+      "formato": "svg",
+      "bytes": 392,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/15_crater.svg",
+      "formato": "svg",
+      "bytes": 391,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    },
+    {
+      "ruta": "public/assets/simbolos/16_orbita.svg",
+      "formato": "svg",
+      "bytes": 395,
+      "viewBox": [
+        64.0,
+        64.0
+      ],
+      "uso": "Parche de misión del astronauta (y símbolos de pares para puzzles sin depender del color)",
+      "notas": "16 símbolos SVG transparentes (64×64)."
+    }
+  ]
+}

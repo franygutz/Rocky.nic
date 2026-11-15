@@ -1,4 +1,4 @@
-# Moon Survival — Backend v0.4.1
+# Vita Lunae — Backend v0.5.0
 
 **Responsable del backend:** Farid · Proyecto NASA Space Apps Challenge 2026 · reto *Junior Astronaut Mission Trainer*
 
@@ -20,6 +20,7 @@
 - **Repetir día:** vuelve al inicio de cualquier día alcanzado y restaura recursos, compras y semilla.
 - **LUNI v0.4:** mascota educativa por reglas, **sin IA generativa y sin internet**. Saluda, informa el estado de la base, da pistas sin revelar la respuesta, explica **CME, SEP, GST, Kp y DONKI**, busca los registros DONKI guardados, responde con **datos verificados de la Luna** y siempre devuelve `sources` y `suggestions`.
 - **Dos modalidades:** API local Node + SQLite, o módulo offline para HTML/JS/Phaser con `localStorage` (PWA básica opcional).
+- **Mundo jugable (v0.5.0):** pedidos físicos (confirmado → listo → recogido), bolsa de 12 espacios, aire del traje y tanque, avatar y posición guardados; todo con `requestId` idempotente. Detalle en `docs/API.md` y uso en `../frontend/`.
 - **Datos NASA:** 27 registros DONKI archivados y verificables, importador de DONKI, y datos verificados de RadLab y JPL Horizons para la Luna.
 
 ## 2. Instalar y probar
@@ -166,7 +167,7 @@ Una mascota con IA generativa sería otra fase: proveedor y modelo, clave **solo
 
 ## 10. Historial de versiones
 
-- **0.4.1** (pulido): LUNI con glosario de clima espacial y `suggestions`; datos verificados de la Luna (RadLab · LRO CRaTER y JPL Horizons) con su consulta; `/api/v1/science/sources` incluye RadLab y Horizons; `.env.example`; `.gitignore` de la raíz arreglado; versión offline recompilada; caché del service worker renovada; README y docs al día.
+- **0.5.0** (pulido): LUNI con glosario de clima espacial y `suggestions`; datos verificados de la Luna (RadLab · LRO CRaTER y JPL Horizons) con su consulta; `/api/v1/science/sources` incluye RadLab y Horizons; `.env.example`; `.gitignore` de la raíz arreglado; versión offline recompilada; caché del service worker renovada; README y docs al día.
 - **0.4:** puente para el frontend (`frontend-bridge.js`), minijuegos en dos pasos, guardado local compatible con v0.3, importación de 26 registros DONKI de mayo de 2024.
 - **0.3.1:** LUNI distingue saludos, estado de la partida, pistas, temas STEM y preguntas sobre DONKI, y reconoce sus límites.
 
