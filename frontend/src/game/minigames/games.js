@@ -6,6 +6,8 @@ import { C } from '../../theme.js';
 import { MiniGame } from './MiniGame.js';
 import { FONT, FONT_PIX } from '../WorldScene.js';
 import { sfx } from '../sfx.js';
+import { t, tr } from '../../i18n/index.js';
+import { fmtNum } from '../../ui/text.js';
 
 const INK = '#27234C';
 
@@ -37,7 +39,7 @@ function spark(scene, x, y, color, { dx = 0, dy = -30, size = 5, ms = 600 } = {}
 // ── Soporte vital: tapar las fugas del tubo en orden 1, 2, 3… ──
 export class LeakGame extends MiniGame {
   constructor() { super('Leak'); }
-  instructions() { return 'Tapa las fugas en orden: 1, 2, 3… (o pulsa las teclas con su número).'; }
+  instructions() { return t('game.tapa_las_fugas_en_orden'); }
   build() {
     const a = this.area, g = this.add.graphics();
     box(g, a.x, a.y, a.w, a.h, C.mid, { shadow: 0 });
@@ -79,7 +81,7 @@ export class LeakGame extends MiniGame {
     this.refresh();
   }
   refresh() {
-    this.status.setText(`Siguiente: fuga ${Math.min(this.next, this.holes.length)}   Tapadas: ${this.next - 1}/${this.holes.length}`);
+    this.status.setText(t('leakNext', { n: Math.min(this.next, this.holes.length), d: this.next - 1, m: this.holes.length }));
   }
   tick(time) {
     const c = this.holes.find((h) => h.n === this.next);
@@ -90,7 +92,7 @@ export class LeakGame extends MiniGame {
   }
   hit(c) {
     if (this.finished || c.done) return;
-    if (c.n !== this.next) { this.miss(); spark(this, c.x, c.y, C.alert, { dy: -24 }); this.status.setText(`Esa es la fuga ${c.n}: ahora toca la ${this.next}`); this.time.delayedCall(900, () => this.refresh()); return; }
+    if (c.n !== this.next) { this.miss(); spark(this, c.x, c.y, C.alert, { dy: -24 }); this.status.setText(t('leakWrong', { c: c.n, n: this.next })); this.time.delayedCall(900, () => this.refresh()); return; }
     c.done = true; c.steam.remove();
     sfx.tap();
     c.ring.clear();
@@ -109,7 +111,7 @@ export class LeakGame extends MiniGame {
 // ── Energía: limpiar el polvo lunar de los paneles con el cepillo ──
 export class DustGame extends MiniGame {
   constructor() { super('Dust'); }
-  instructions() { return 'Frota el polvo con el cepillo: arrastra, o usa las flechas y mantén Espacio.'; }
+  instructions() { return t('game.frota_el_polvo_con_el'); }
   build() {
     const a = this.area, g = this.add.graphics();
     const cols = 4, rows = 3, gap = 8;
@@ -143,7 +145,7 @@ export class DustGame extends MiniGame {
     this.input.on('pointerdown', (p) => { this.brush = { x: p.x, y: p.y }; this.rub(); });
     this.drawBrush(); this.setPct();
   }
-  setPct() { this.pct.setText(`Panel limpio: ${Math.round(this.progress * 100)} %`); }
+  setPct() { this.pct.setText(t('panelClean', { p: Math.round(this.progress * 100) })); }
   drawBrush() {
     const { x, y } = this.brush, g = this.brushGfx;
     g.clear();
@@ -197,7 +199,7 @@ function glyph(g, i, cx, cy, s, fill) {
 }
 export class WaterGame extends MiniGame {
   constructor() { super('Water'); }
-  instructions() { return 'Mira el orden de las válvulas. Después repítelo (clic, toque o teclas 1 a 4).'; }
+  instructions() { return t('game.mira_el_orden_de_las'); }
   build() {
     const a = this.area, bg = this.add.graphics();
     box(bg, a.x, a.y, a.w, a.h, C.moon, { shadow: 0 });
@@ -208,7 +210,7 @@ export class WaterGame extends MiniGame {
       const gfx = this.add.graphics();
       const zone = this.add.zone(x, y, cw, ch).setOrigin(0).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.press(i));
       const num = this.add.text(x + 10, y + 4, String(i + 1), { fontFamily: FONT_PIX, fontSize: '34px', color: INK });
-      this.add.text(x + cw - 10, y + ch - 8, v.name, { fontFamily: FONT, fontSize: '15px', fontStyle: '700', color: INK }).setOrigin(1, 1);
+      this.add.text(x + cw - 10, y + ch - 8, tr(v.name), { fontFamily: FONT, fontSize: '15px', fontStyle: '700', color: INK }).setOrigin(1, 1);
       const p = { gfx, x, y, cw, ch, i, zone, num };
       this.paint(p, false);
       return p;
@@ -245,16 +247,16 @@ export class WaterGame extends MiniGame {
   play() {
     if (this.finished) return;
     this.listening = false; this.pos = 0; this.drawDots();
-    this.state.setText('Mira…');
+    this.state.setText(t('game.mira'));
     this.seq.forEach((i, k) => this.time.delayedCall(k * 640, () => !this.finished && this.flash(i)));
-    this.time.delayedCall(this.seq.length * 640, () => { if (!this.finished) { this.listening = true; this.state.setText('Tu turno'); } });
+    this.time.delayedCall(this.seq.length * 640, () => { if (!this.finished) { this.listening = true; this.state.setText(t('game.tu_turno')); } });
   }
   press(i) {
     if (!this.listening || this.finished) return;
     this.flash(i, 220);
     if (this.seq[this.pos] !== i) {
       this.miss();
-      this.state.setText('Ups: otra vez');
+      this.state.setText(t('game.ups_otra_vez'));
       this.listening = false;
       this.time.delayedCall(900, () => !this.finished && this.play());
       return;
@@ -270,7 +272,7 @@ export class WaterGame extends MiniGame {
 // La escala es del juego (0 a 30). La lectura normal de referencia en órbita lunar es ≈ 13 μGy/h (NASA RadLab, instrumento CRaTER del LRO).
 export class DoseGame extends MiniGame {
   constructor() { super('Dose'); }
-  instructions() { return 'Pulsa «Leer» (o Espacio) cuando la aguja esté sobre la zona verde. Tres lecturas.'; }
+  instructions() { return t('game.pulsa_leer_o_espacio_cuando'); }
   build() {
     const a = this.area;
     this.cx = a.x + a.w / 2;
@@ -285,12 +287,12 @@ export class DoseGame extends MiniGame {
     this.needle = this.add.graphics();
     this.counter = this.add.graphics();
     this.read = this.add.text(this.cx, this.cy + 10, '', { fontFamily: FONT_PIX, fontSize: '40px', color: INK }).setOrigin(0.5, 0);
-    this.add.text(this.cx, this.cy + 56, 'μGy/h (escala del juego)', { fontFamily: FONT, fontSize: '14px', fontStyle: '700', color: '#4b4380' }).setOrigin(0.5, 0);
-    this.add.text(a.x + 10, a.y + a.h - 22, 'Referencia real: ≈ 13 μGy/h en órbita lunar (NASA RadLab · CRaTER)', { fontFamily: FONT, fontSize: '13px', color: '#4b4380' });
+    this.add.text(this.cx, this.cy + 56, t('game.gy_h_escala_del_juego'), { fontFamily: FONT, fontSize: '14px', fontStyle: '700', color: '#4b4380' }).setOrigin(0.5, 0);
+    this.add.text(a.x + 10, a.y + a.h - 22, t('game.referencia_real_13_gy_h'), { fontFamily: FONT, fontSize: '13px', color: '#4b4380' });
     const tap = () => this.tap();
     const bw = 170, bh = 44, bx = this.cx - bw / 2, by = a.y + 8;
     this.btn = this.add.graphics(); box(this.btn, bx, by, bw, bh, C.brand, { shadow: 4 });
-    this.add.text(this.cx, by + bh / 2, 'Leer  [Espacio]', { fontFamily: FONT_PIX, fontSize: '28px', color: INK }).setOrigin(0.5);
+    this.add.text(this.cx, by + bh / 2, t('game.leer_espacio'), { fontFamily: FONT_PIX, fontSize: '28px', color: INK }).setOrigin(0.5);
     this.add.zone(a.x, a.y, a.w, a.h).setOrigin(0).setInteractive({ useHandCursor: true }).on('pointerdown', tap);
     this.input.keyboard.on('keydown-SPACE', tap);
     this.t0 = performance.now();
@@ -322,7 +324,7 @@ export class DoseGame extends MiniGame {
     this.needle.clear();
     this.needle.lineStyle(7, C.alert, 1).lineBetween(cx, cy, cx - Math.cos(ang) * r * 0.9, cy - Math.sin(ang) * r * 0.9);
     this.needle.fillStyle(C.outline, 1).fillRect(cx - 12, cy - 12, 24, 24);
-    this.read.setText(this.valueOf(ang).toFixed(1).replace('.', ','));
+    this.read.setText(fmtNum(this.valueOf(ang).toFixed(1)));
     const inZone = Math.abs(ang - this.zone) <= this.zoneHalf;
     this.read.setColor(inZone ? '#2f8f3f' : INK);
   }
@@ -342,7 +344,7 @@ export class DoseGame extends MiniGame {
 // ── Comunicaciones: orientar la antena hacia la Tierra y mantenerla alineada ──
 export class AntennaGame extends MiniGame {
   constructor() { super('Antenna'); }
-  instructions() { return 'Gira la antena hacia la Tierra (arrastra, o usa ← → / A D) y mantenla alineada.'; }
+  instructions() { return t('game.gira_la_antena_hacia_la'); }
   build() {
     const a = this.area;
     this.cx = a.x + a.w / 2;
@@ -358,7 +360,7 @@ export class AntennaGame extends MiniGame {
     this.earth = this.add.graphics();
     this.counter = this.add.graphics();
     this.sig = this.add.text(a.x + a.w - 12, a.y + 8, '', { fontFamily: FONT_PIX, fontSize: '28px', color: '#FFF3DC' }).setOrigin(1, 0);
-    this.add.text(a.x + 12, a.y + a.h - 22, 'Señal Tierra–Luna: 1,35 s (NASA/JPL Horizons)', { fontFamily: FONT, fontSize: '13px', color: '#C5D2FF' });
+    this.add.text(a.x + 12, a.y + a.h - 22, t('game.senal_tierra_luna_1_35'), { fontFamily: FONT, fontSize: '13px', color: '#C5D2FF' });
     this.newTarget();
     const zone = this.add.zone(a.x, a.y, a.w, a.h).setOrigin(0).setInteractive({ useHandCursor: true });
     zone.on('pointerdown', (p) => { this.ang = Math.atan2(p.y - this.cy, p.x - this.cx); });
@@ -390,7 +392,7 @@ export class AntennaGame extends MiniGame {
     this.ring.lineStyle(3, C.cream, 1).strokeCircle(cx, cy, r + 8).strokeCircle(cx, cy, r - 8);
     if (on) this.ring.lineStyle(9, C.brand, 1).beginPath().arc(cx, cy, r - 24, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, this.hold / 0.6)).strokePath();
     const strength = Math.max(0, 1 - diff / 1.2);
-    this.sig.setText(`Señal ${Math.round(strength * 5)} de 5`);
+    this.sig.setText(t('signalN', { n: Math.round(strength * 5) }));
     const g = this.dish; g.clear();
     const ex = cx + Math.cos(this.ang) * r * 0.66, ey = cy + Math.sin(this.ang) * r * 0.66;
     g.lineStyle(9, C.cream, 1).lineBetween(cx, cy, ex, ey);

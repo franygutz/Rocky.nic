@@ -7,6 +7,7 @@ import { FONT, FONT_PIX } from '../WorldScene.js';
 import { session } from '../../bus.js';
 import { makePerformance } from '../../rules.js';
 import { sfx } from '../sfx.js';
+import { t } from '../../i18n/index.js';
 
 export class MiniGame extends Phaser.Scene {
   init(data) {
@@ -49,14 +50,14 @@ export class MiniGame extends Phaser.Scene {
     const fs = (n) => Math.round(Math.max(15, Math.min(n, pw / 22))) + 'px';
     this.add.text(px + 20, py + 8, (this.data_.title || '').replace(/^[^\p{L}\p{N}¿¡]+/u, ''), { fontFamily: FONT_PIX, fontSize: '36px', color: '#FFF3DC', stroke: '#27234C', strokeThickness: 4, wordWrap: { width: pw - 200 } });
     this.hint = this.add.text(px + 22, py + 64, this.instructions(), { fontFamily: FONT, fontSize: fs(19), fontStyle: '700', color: '#27234C', wordWrap: { width: pw - 44 } });
-    if (this.tired) this.add.text(px + 22, py + 96, 'Cansancio: este trabajo pide un poco más.', { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700' });
+    if (this.tired) this.add.text(px + 22, py + 96, t('game.cansancio_este_trabajo_pide_un'), { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700' });
 
     // Rendirse: cuenta como reto no terminado.
     const bx = px + pw - 78, by = py + 28;
     const btn = this.add.container(bx, by);
     const bg = this.add.graphics();
     bg.fillStyle(C.white, 1).fillRoundedRect(-62, -20, 124, 40, 6).lineStyle(3, C.outline, 1).strokeRoundedRect(-62, -20, 124, 40, 6);
-    btn.add([bg, this.add.text(0, 0, 'Rendirme', { fontFamily: FONT, fontSize: '17px', fontStyle: '700', color: '#27234C' }).setOrigin(0.5)]);
+    btn.add([bg, this.add.text(0, 0, t('game.rendirme'), { fontFamily: FONT, fontSize: '17px', fontStyle: '700', color: '#27234C' }).setOrigin(0.5)]);
     btn.on('pointerover', () => btn.setScale(1.04)).on('pointerout', () => btn.setScale(1));
     btn.setSize(124, 40).setInteractive({ useHandCursor: true }).on('pointerdown', () => { sfx.tap(); this.end(false); });
 
@@ -98,7 +99,7 @@ export class MiniGame extends Phaser.Scene {
     });
     done ? sfx.good() : sfx.bad();
     const { x, y, w, h } = this.panel;
-    const txt = this.add.text(x + w / 2, y + h / 2, done ? '¡Listo!' : 'Se terminó el tiempo', {
+    const txt = this.add.text(x + w / 2, y + h / 2, done ? t('game.listo') : t('game.se_termino_el_tiempo'), {
       fontFamily: FONT_PIX, fontSize: '60px', color: '#27234C', backgroundColor: done ? '#7ED65B' : '#FF746A', padding: { x: 24, y: 8 }
     }).setOrigin(0.5).setDepth(100);
     if (!this.rm) this.tweens.add({ targets: txt, scale: { from: 0.6, to: 1 }, duration: 260, ease: 'Back.Out' });
