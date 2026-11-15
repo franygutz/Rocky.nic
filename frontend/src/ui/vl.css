@@ -264,5 +264,62 @@ body.reduced .mapimg .you i { animation: none; }
 .vl-more { pointer-events: auto; justify-self: start; margin: 2px 0 4px; background: transparent; color: var(--moon); border: 2px solid var(--glass-line); border-radius: 8px; padding: 2px 10px; font: 700 13px var(--f-body); cursor: pointer; min-height: 30px; }
 .vl-more:hover { color: var(--paper); border-color: var(--paper); }
 .vl-more:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
+
+/* ── Celular ── */
+@media (max-width: 560px) {
+  .vl-act.primary span:not(.kita-ico) { display: none; }
+  .vl-act span.kita-ico { display: inline-block; }
+  .vl-act { padding: 0 11px; min-width: 46px; justify-content: center; }
+  .vl-acts { flex-wrap: nowrap; gap: 6px; }
+}
+@media (max-width: 899px) {
+  #place { top: 168px; }
+  #place span { font-size: 22px; padding: 4px 12px; }
+}
+/* Con controles táctiles, el botón de acción va a la derecha para no chocar con la cruceta, y Kita sube un poco */
+body.touchy #prompt { left: auto; right: 12px; transform: none; bottom: calc(var(--dock-h, 90px) + 14px + var(--safe-b, 0px)); }
+@media (max-width: 899px) {
+  body.touchy .kita { bottom: calc(var(--dock-h, 90px) + 96px); }
+  body.touchy .prompt-btn { min-height: 56px; max-width: calc(100vw - 230px); white-space: normal; text-align: left; line-height: 1.15; }
+}
+@media (max-width: 600px) {
+  .shop.kids { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card-k { padding: 10px 6px 10px; gap: 6px; }
+  .card-k .ic.big { font-size: 40px; }
+  .card-k > b { font-size: 16px; }
+  .card-k .fx { font-size: 16px; }
+  .card-k .buy { min-height: 46px; font-size: 15px; }
+  .wallet-pill { font-size: 20px; padding: 3px 12px; }
+  .shop-lead { font-size: 16px; }
+}
+
+/* En celular, mientras se juega un minijuego, la consola y Kita se apartan para no tapar el juego */
+@media (max-width: 899px) { body.in-mini #hud, body.in-mini .kita { display: none; } }
+
+/* Celular acostado (poca altura): consola en una sola fila, cruceta abajo a la izquierda,
+   botón de acción abajo a la derecha y la barra de abajo solo con íconos. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .vl-top { gap: 5px; }
+  .vl-plate { font-size: 18px; padding: 3px 8px; }
+  .vl-rail { top: 52px; padding: 4px 8px; gap: 4px 10px; grid-template-columns: repeat(3, minmax(70px, 96px)) auto minmax(180px, 1fr); align-items: center; }
+  .vl-rail:not(.collapsed) { grid-template-columns: repeat(5, minmax(60px, 1fr)); }
+  .vl-m .ic { width: 18px; height: 18px; }
+  .vl-val { font-size: 18px; }
+  .vl-more { margin: 0; }
+  .vl-rail.collapsed .vl-tank { grid-column: auto; margin: 0; padding: 0 0 0 10px; border-top: 0; border-left: 2px dashed #5a539c; }
+  .vl-tank-title { font-size: 15px; }
+  .vl-tank-val { font-size: 20px; }
+  #dock { bottom: 6px; gap: 4px; }
+  .vl-bar-row { padding: 4px; }
+  .vl-act { min-height: 40px; padding: 0 9px; }
+  .vl-act span:not(.kita-ico) { display: none; }
+  .vl-act span.kita-ico { display: inline-block; }
+  .vl-hints { display: none; }
+  #touch { bottom: 8px !important; left: 8px; }
+  .pad { grid-template: repeat(3, 44px) / repeat(3, 44px); gap: 3px; }
   body.touchy #prompt { bottom: 10px; right: 10px; }
   body.touchy .prompt-btn { max-width: 230px; min-height: 48px; }
+  .kita { display: none; }
+  #place { top: 112px; }
+  #place span { font-size: 20px; }
+}
