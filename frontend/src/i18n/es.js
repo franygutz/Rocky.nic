@@ -496,4 +496,7 @@ export default {
   "hud.more": "+{n} más",
   "hud.less": "Ver menos",
   "hud.more_label": "Mostrar los otros indicadores",
+  "read.aloud": "🔊 Leer en voz alta",
+  "read.stop": "⏹ Parar",
+  "read.option": "Opción {id}: {label}. {cons}",
 };
