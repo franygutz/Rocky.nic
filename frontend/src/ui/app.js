@@ -357,7 +357,7 @@ function onAction(a, el) {
     case 'glossary': open(scr.glossary()); break;
     case 'teachers': open(scr.teachers()); break;
     case 'settings': confirmErase = false; open(scr.settings()); break;
-    case 'back':
+    case 'back': stopReading();
       back();
       if (!stack.length && session.mode === 'mission') session.mode = 'map';
       if (!stack.length && session.mode === 'menu') replace(scr.menu());
@@ -368,7 +368,7 @@ function onAction(a, el) {
     case 'act': bus.emit('act'); break;
     case 'guideClose': back(); bus.emit('walkToTarget'); break;
     case 'openMission': openMission(); break;
-    case 'choose': sfx.tap(); choose(el.dataset.id); break;
+    case 'choose': stopReading(); sfx.tap(); choose(el.dataset.id); break;
     case 'hint': {
       const r = ask(t('s2'), { hint: true });
       hintsThisMission++;
@@ -448,6 +448,7 @@ function onAction(a, el) {
       measure();
       break;
     }
+    case 'readAloud': readAloud(el); break;
     case 'setLang':
       try { b.setLanguage(el.dataset.lang); } catch (e) { fail(e); break; }
       if (!document.getElementById('drawer').hidden) clearLuni();
