@@ -180,13 +180,19 @@ function meterRow(m, val) {
 }
 
 export function shopGrid(v) {
-  return `<p class="muted">Ganás monedas superando retos. Los pedidos llegan en la nave de carga y se guardan en tu bolsa al recogerlos. <span class="wallet">· 🪙 ${v.coins}</span></p>
-  <div class="shop">${v.shop.map((it) => {
+  return `<div class="shop-top"><p class="shop-lead">${t('shopLead')}</p><span class="wallet-pill" aria-label="${v.coins} ${t('coins')}"><span aria-hidden="true">🪙</span> <b>${v.coins}</b></span></div>
+  <div class="shop kids">${v.shop.map((it) => {
     const [icon, ...rest] = it.name.split(' ');
-    const name = /\p{Extended_Pictographic}/u.test(icon) ? rest.join(' ') : it.name;
-    const pic = /\p{Extended_Pictographic}/u.test(icon) ? icon : '🛒';
-    const why = it.remaining <= 0 ? 'Agotado' : !it.affordable ? `🪙 ${it.price} · faltan monedas` : `Pedir · 🪙 ${it.price}`;
-    return `<div class="item"><span class="ic">${pic}</span><b>${esc(name)}</b><small>${esc(it.desc)}</small>
+    const isEmoji = /\p{Extended_Pictographic}/u.test(icon);
+    const name = isEmoji ? rest.join(' ') : it.name;
+    const pic = isEmoji ? icon : '🛒';
+    const key = Object.keys(it.delta || {})[0];
+    const color = METRIC?.[key]?.color || 'var(--brand)';
+    const need = Math.max(0, it.price - v.coins);
+    const cta = it.remaining <= 0 ? t('soldOut') : !it.affordable ? `🪙 ${it.price}` : `${t('order')} · 🪙 ${it.price}`;
+    const dots = Array.from({ length: it.limit }, (_, i) => `<i class="${i < it.remaining ? 'on' : ''}"></i>`).join('');
+    return `<div class="item card-k ${it.available ? '' : 'off'}" style="--tone:${color}" title="${esc(it.desc)}">
+      <span class="ic big" aria-hidden="true">${pic}</span><b>${esc(name)}</b>
       ${chips(it.delta)}
       ${it.remove?.length ? `<small>Quita: ${esc(it.remove.map(statusName).join(', '))}</small>` : ''}
       <small>Quedan ${it.remaining} de ${it.limit}</small>
@@ -194,14 +200,14 @@ export function shopGrid(v) {
   }).join('')}</div>`;
 }
 
-const ORDER_LABEL = { confirmed: ['📦', 'Confirmado: se está preparando'], ready: ['🚀', 'Listo: recógelo en la nave de carga'], collected: ['✅', 'Recogido'] };
+const ORDER_ICON = { confirmed: '📦', ready: '🚀', collected: '✅' };
 export function ordersHTML(v) {
   const open = (v.orders || []).filter((o) => o.status !== 'collected');
   if (!open.length) return '';
-  return `<h3 class="sub">Tus pedidos</h3><ul class="orders">${open.map((o) => `<li><span>${ORDER_LABEL[o.status][0]}</span><b>${esc(o.name)}</b><small>${ORDER_LABEL[o.status][1]}</small></li>`).join('')}</ul>`;
+  return `<h3 class="sub">${t('yourOrders')}</h3><ul class="orders">${open.map((o) => `<li><span aria-hidden="true">${ORDER_ICON[o.status]}</span><b>${esc(o.name)}</b><small>${t(o.status === 'ready' ? 'ordReady' : 'ordConfirmed')}</small></li>`).join('')}</ul>`;
 }
 export function shopHTML(v) {
-  return `<div class="sheet wide enter">${close}<h2>🛒 Plataforma de entregas</h2>${shopGrid(v)}${ordersHTML(v)}</div>`;
+  return `<div class="sheet wide enter shop-sheet">${close()}<h2>${t('shopTitle')}</h2>${shopGrid(v)}<p class="shop-tip">${t('shopTip')}</p>${ordersHTML(v)}</div>`;
 }
 
 // ── Bolsa (objetos ya recogidos) ──

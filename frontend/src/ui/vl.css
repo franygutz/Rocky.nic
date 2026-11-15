@@ -182,3 +182,22 @@ body.reduced .vl-m[data-level="crit"], body.reduced .prompt-btn { animation: non
 .langs { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
 .langs .btn { min-width: 130px; min-height: 44px; }
 
+/* Tienda para niños: tarjetas grandes, poco texto */
+.shop-sheet h2 { font-size: 30px; }
+.shop-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.shop-lead { margin: 0; font-size: 18px; font-weight: 700; flex: 1 1 200px; }
+.wallet-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 999px; padding: 4px 16px; font-size: 26px; box-shadow: 0 4px 0 var(--ink); }
+.shop.kids { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.card-k { position: relative; gap: 8px; padding: 14px 10px 12px; border: 3px solid var(--ink); border-top: 8px solid var(--tone, var(--brand)); box-shadow: 0 5px 0 var(--ink); transition: transform .12s ease-out; }
+.card-k:hover { transform: translateY(-3px); }
+.card-k.off { opacity: .7; }
+.card-k .ic.big { font-size: 54px; line-height: 1; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .25)); }
+.card-k > b { font-size: 19px; line-height: 1.15; }
+.card-k .fx { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; font-size: 20px; font-weight: 900; }
+.card-k .fx span { background: var(--tone, var(--brand)); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 1px 10px; }
+.card-k .stock { display: flex; justify-content: center; gap: 5px; }
+.card-k .stock i { width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; background: transparent; }
+.card-k .stock i.on { background: var(--ink); }
+.card-k .buy { min-height: 52px; font-size: 17px; width: 100%; }
+.shop-tip { text-align: center; font-weight: 700; margin: 14px 0 0; }
+
