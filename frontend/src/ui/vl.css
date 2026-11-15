@@ -265,5 +265,9 @@ body.reduced .mapimg .you i { animation: none; }
 .vl-more:hover { color: var(--paper); border-color: var(--paper); }
 .vl-more:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
 
-/* En celular, mientras se juega un minijuego, la consola y Kita se apartan para no tapar el juego */
-@media (max-width: 899px) { body.in-mini #hud, body.in-mini .kita { display: none; } }
+/* Celular acostado (poca altura): consola en una sola fila, cruceta abajo a la izquierda,
+   botón de acción abajo a la derecha y la barra de abajo solo con íconos. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .vl-top { gap: 5px; }
+  .vl-plate { font-size: 18px; padding: 3px 8px; }
+}
