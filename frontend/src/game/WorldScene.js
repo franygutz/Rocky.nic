@@ -45,6 +45,7 @@ export class WorldScene extends Phaser.Scene {
     this.sid = data?.id || 'exterior';
     this.startAt = data?.x != null ? { x: data.x, y: data.y } : null;
     this.arrive = !!data?.arrive;
+    this.gen = (this.gen || 0) + 1; // cada reinicio de escena invalida las cargas pendientes de la anterior
     this.nudge = 0;
     this.cfg = SCENES[this.sid];
     this.ready = false;
@@ -388,7 +389,7 @@ export class WorldScene extends Phaser.Scene {
 
   applyFrame() {
     const c = this.cur, sh = this.sheets[c.name];
-    if (!sh || !this.hero) return;
+    if (!sh || !this.hero || !this.hero.scene) return; // el sprite puede estar destruido si la escena se reinició
     const idx = Math.min(sh.frames - 1, Math.floor((c.t / sh.T) * sh.frames));
     this.hero.setTexture(sh.key, (sh.base || 0) + idx).setOrigin(sh.ox / sh.fw, sh.oy / sh.fh);
   }
@@ -529,7 +530,8 @@ export class WorldScene extends Phaser.Scene {
     this.avatar = a;
     this.sheets = {};
     this.avatarLoading = true; // mientras cargan las texturas del avatar nuevo no se arman animaciones
-    this.loadAvatar(a).then(() => { this.avatarLoading = false; if (!this.alive || !this.hero) return; this.ensureAnim('quieto'); this.ensureAnim('trote'); this.play('quieto', { loop: true }); });
+    const gen = this.gen;
+    this.loadAvatar(a).then(() => { this.avatarLoading = false; if (gen !== this.gen || !this.alive || !this.hero || !this.hero.scene) return; this.ensureAnim('quieto'); this.ensureAnim('trote'); this.play('quieto', { loop: true }); });
   }
 
   dispose() {
