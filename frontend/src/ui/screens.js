@@ -1,5 +1,6 @@
 import { kitaIcon, pix } from './pix.js';
 // Pantallas en HTML. Todo texto que viene del motor pasa por esc() o withTerms().
+import { t, tr, lang, trEvent } from '../i18n/index.js';
 import { CATEGORY, METRIC, METRICS, RESULT_LABEL, MESSAGE_TYPES, hasMinigame, minigameSeconds, statusName, GOOD_STATUSES, deltaList, iconUrl, ICON } from '../rules.js';
 import { CATEGORIES, avatarUri, EMBLEM_FILES, EMBLEMS } from '../world/avatar.js';
 import { placeOf, SCENES } from '../world/scenes.js';
@@ -7,7 +8,9 @@ import { taskState, STATE_LABEL } from '../world/tasks.js';
 import { esc, withTerms, fmtDate, fmtNum, safeUrl, GLOSSARY } from './text.js';
 import { catalog } from '../engine.js';
 
-const close = `<button class="btn small close" data-action="back" aria-label="Cerrar">✕</button>`;
+const close = () => `<button class="btn small close" data-action="back" aria-label="${esc(t('close'))}">✕</button>`;
+// Textos del catálogo en el idioma activo (backend/data/i18n); si falta, queda el español.
+const loc = (kind, id, field, fallback) => (lang() === 'en' ? catalog.i18n?.en?.[kind]?.[id]?.[field] : undefined) ?? fallback;
 const sign = (n) => (n > 0 ? '+' : '−') + Math.abs(n);
 
 export function chips(delta, { factorNote = false } = {}) {
@@ -23,7 +26,11 @@ export function langPicker(v) {
   return `<div class="langs" role="group" aria-label="${esc(t('language'))}">${list.map((l) => `<button class="btn small lang ${l.code === lang() ? 'go' : ''}" data-action="setLang" data-lang="${esc(l.code)}" aria-pressed="${l.code === lang()}" ${l.ready ? '' : 'disabled'}><span aria-hidden="true">${l.code === 'en' ? '🇬🇧' : '🇳🇮'}</span> ${esc(l.native)}</button>`).join('')}</div>`;
 }
 
-    <p class="tagline">Dirigí la nave <b>Zora</b> y su base lunar durante 7 días. Cada decisión cambia el aire, la energía, la comida y a tu tripulación.</p>
+// ── Inicio ──
+export function menuHTML({ canContinue, finished, day, view }) {
+  return `<div class="wrap enter">
+    <h1 class="title" aria-label="Vita Lunae"><span>Vita</span><span>Lunae</span></h1>
+    <p class="tagline">${t('tagline')}</p>
     <div class="menu">
       <div class="main">
         ${canContinue ? `<button class="btn go continue" data-action="continue"><span>▶ ${finished ? t('seeEnd') : t('continue')}<small>${finished ? t('missionDone') : t('dayOf', { d: day })}</small></span></button>` : ''}
@@ -38,10 +45,10 @@ export function langPicker(v) {
         <button class="btn" data-action="glossary">${t('glossary')}</button>
         <button class="btn" data-action="teachers">${t('teachers')}</button>
       </div>
+      ${langPicker(view)}
     </div>
   </div>`;
 }
-      ${langPicker(view)}
 
 export function codeHTML(error = '') {
   return `<div class="sheet enter">${close()}
@@ -190,9 +197,8 @@ export function shopGrid(v) {
     return `<div class="item card-k ${it.available ? '' : 'off'}" style="--tone:${color}" title="${esc(it.desc)}">
       <span class="ic big" aria-hidden="true">${pic}</span><b>${esc(name)}</b>
       ${chips(it.delta)}
-      ${it.remove?.length ? `<small>Quita: ${esc(it.remove.map(statusName).join(', '))}</small>` : ''}
-      <small>Quedan ${it.remaining} de ${it.limit}</small>
-      <button class="btn small ${it.available ? 'go' : ''}" data-action="order" data-id="${esc(it.id)}" ${it.available ? '' : 'disabled'}>${esc(why)}</button></div>`;
+      <span class="stock" role="img" aria-label="${esc(t('left', { n: it.remaining, m: it.limit }))}">${dots}</span>
+      <button class="btn buy ${it.available ? 'go' : ''}" data-action="order" data-id="${esc(it.id)}" ${it.affordable ? '' : `title="${esc(t('needCoins', { n: need }))}" aria-label="${esc(`${name}: ${t('needCoins', { n: need })}`)}"`} ${it.available ? '' : 'disabled'}>${esc(cta)}</button></div>`;
   }).join('')}</div>`;
 }
 
@@ -457,32 +463,32 @@ export function teachersHTML(v) {
 }
 
 export function settingsHTML(settings, storageOk, confirming) {
-  const seg = (k, val) => `<span class="seg" role="group">${[[true, 'Sí'], [false, 'No']].map(([x, l]) => `<button data-action="set" data-k="${k}" data-v="${x}" aria-pressed="${val === x}">${l}</button>`).join('')}</span>`;
-  return `<div class="sheet enter">${close}
-    <h2>⚙️ Ajustes</h2>
-    ${storageOk ? '' : `<p class="note">Este navegador no deja guardar la partida. Igual podés jugar.</p>`}
+  const seg = (k, val) => `<span class="seg" role="group">${[[true, t('screen.si')], [false, t('screen.no')]].map(([x, l]) => `<button data-action="set" data-k="${k}" data-v="${x}" aria-pressed="${val === x}">${l}</button>`).join('')}</span>`;
+  return `<div class="sheet enter">${close()}
+    <h2>${t('settings')}</h2>
+    ${storageOk ? '' : `<p class="note">${t('screen.este_navegador_no_deja_guardar')}</p>`}
     <div class="list">
-      <div class="setting"><span>🔊 Sonido</span>${seg('sound', settings.sound)}</div>
-      <div class="setting"><span>🐢 Menos movimiento</span>${seg('reducedMotion', settings.reducedMotion)}</div>
-      <div class="setting"><span>🧭 Flecha de guía</span>${seg('guide', settings.guide)}</div>
+      <div class="setting"><span>${t('screen.sonido')}</span>${seg('sound', settings.sound)}</div>
+      <div class="setting"><span>${t('screen.menos_movimiento')}</span>${seg('reducedMotion', settings.reducedMotion)}</div>
+      <div class="setting"><span>${t('screen.flecha_de_guia')}</span>${seg('guide', settings.guide)}</div>
     </div>
-    <p class="muted">La partida queda guardada en este dispositivo hasta que la borres.</p>
+    <p class="muted">${t('screen.la_partida_queda_guardada_en')}</p>
     ${confirming
-      ? `<p><b>¿Borrar la partida y el álbum de este dispositivo?</b></p><div class="row"><button class="btn danger" data-action="eraseYes">Sí, borrar</button><button class="btn" data-action="eraseNo">Cancelar</button></div>`
-      : `<div class="row"><button class="btn danger" data-action="erase">🗑️ Borrar mi progreso</button></div>`}
+      ? `<p><b>${t('screen.borrar_la_partida_y_el')}</b></p><div class="row"><button class="btn danger" data-action="eraseYes">${t('screen.si_borrar')}</button><button class="btn" data-action="eraseNo">${t('screen.cancelar')}</button></div>`
+      : `<div class="row"><button class="btn danger" data-action="erase">${t('screen.borrar_mi_progreso')}</button></div>`}
   </div>`;
 }
 
 export function pauseHTML(v) {
   return `<div class="sheet enter" style="text-align:center">
-    <h2>⏸ En pausa</h2>
+    <h2>${t('paused')}</h2>
     <div class="list" style="margin-top:14px">
-      <button class="btn go" data-action="back">▶ Seguir</button>
-      ${v?.phase === 'active' ? '<button class="btn" data-action="repeatMenu">↺ Repetir un día</button>' : ''}
-      <button class="btn" data-action="glossary">🔎 Glosario</button>
-      <button class="btn" data-action="sources">📚 Datos y fuentes</button>
-      <button class="btn" data-action="settings">⚙️ Ajustes</button>
-      <button class="btn" data-action="menu">Menú principal</button>
+      <button class="btn go" data-action="back">${t('resume')}</button>
+      ${v?.phase === 'active' ? `<button class="btn" data-action="repeatMenu">${t('repeatDay')}</button>` : ''}
+      <button class="btn" data-action="glossary">${t('glossary')}</button>
+      <button class="btn" data-action="sources">${t('sources')}</button>
+      <button class="btn" data-action="settings">${t('settings')}</button>
+      <button class="btn" data-action="menu">${t('mainMenu')}</button>
     </div>
     ${langPicker(v)}
     <p class="muted small" style="margin-top:12px">${t('pauseHelp')}</p></div>`;
@@ -491,18 +497,18 @@ export function pauseHTML(v) {
 export { METRIC };
 
 // ── Ficha científica: cada equipo del mundo explica el dato real que lo respalda ──
-const KIND = { dato_verificado: ['Dato verificado de la NASA', 'ok'], hecho_cientifico: ['Hecho científico documentado', 'ok'], explicacion_educativa: ['Explicación educativa', 'calm'], metodologia: ['Cómo separamos datos y juego', 'calm'] };
+const KIND = { dato_verificado: ['Dato verificado de la NASA', 'ok'], hecho_cientifico: ['Hecho científico documentado', 'ok'], explicacion_educativa: ['Explicación educativa', 'calm'], metodologia: ['Cómo separamos datos y juego', 'calm'] }; // las etiquetas se traducen al mostrar
 export function fichaHTML(fact, point, v) {
   const url = safeUrl(fact.sourceUrl);
   const [kind, tone] = KIND[fact.kind] || ['Ficha', 'calm'];
   const m = v.mission, pl = m ? placeOf(m) : null;
-  return `<div class="sheet enter ficha">${close}
-    <p class="badge-k ${tone}">${esc(kind)}</p>
-    <h2>${esc(point.label)}</h2>
-    <p class="say">${withTerms(fact.answer)}</p>
-    <p class="muted small">Fuente: ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(fact.source)}</a>` : esc(fact.source)}</p>
-    ${m && pl ? `<div class="note">Tu reto actual, <b>${esc(m.name)}</b>, está en ${esc(pl.label)} (${esc(SCENES[pl.scene].name)}).</div>` : ''}
-    <div class="row">${m && pl ? '<button class="btn go" data-action="guideClose">Guíame al reto</button>' : ''}<button class="btn" data-action="back" autofocus>Seguir explorando</button></div>
+  return `<div class="sheet enter ficha">${close()}
+    <p class="badge-k ${tone}">${esc(tr(kind))}</p>
+    <h2>${esc(tr(point.label))}</h2>
+    <p class="say">${withTerms(loc('facts', fact.id, 'answer', fact.answer))}</p>
+    <p class="muted small">${t('screen.fuente')}: ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(tr(fact.source))}</a>` : esc(tr(fact.source))}</p>
+    ${m && pl ? `<div class="note">${t('currentTask', { n: esc(m.name), l: esc(tr(pl.label)), s: esc(tr(SCENES[pl.scene].name)) })}</div>` : ''}
+    <div class="row">${m && pl ? `<button class="btn go" data-action="guideClose">${t('screen.guiame_al_reto')}</button>` : ''}<button class="btn" data-action="back" autofocus>${t('screen.seguir_explorando')}</button></div>
   </div>`;
 }
 
