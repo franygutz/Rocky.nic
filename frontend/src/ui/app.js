@@ -2,8 +2,8 @@
 // menú → informe → mapa → reto → (minijuego) → resultado → [fin del día] → … → final
 import { bus, session } from '../bus.js';
 import { createBridge } from '../engine.js';
-import { hasMinigame, minigameSeconds, suitFactor, isTired, randomCode, cleanCode, CATEGORY, setStatusNames } from '../rules.js';
-import { renderHud, renderDock, resetHud, setSuit } from './hud.js';
+import { hasMinigame, minigameSeconds, suitFactor, isTired, randomCode, cleanCode, CATEGORY, METRICS, setStatusNames } from '../rules.js';
+import { renderHud, renderDock, resetHud, setSuit, CORE } from './hud.js';
 import { SCENES, OUTSIDE, placeOf, POINTS, nextHop } from '../world/scenes.js';
 import { defaultAvatar, normalizeAvatar, PRESETS, CATEGORIES } from '../world/avatar.js';
 import { createKita } from '../game/kita.js';
