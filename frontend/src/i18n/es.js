@@ -493,4 +493,7 @@ export default {
   "map.hint": "Tab o Esc para cerrar",
   "map.places": "Lugares de la base",
   "map.open": "Abrir el mapa (Tab)",
+  "hud.more": "+{n} más",
+  "hud.less": "Ver menos",
+  "hud.more_label": "Mostrar los otros indicadores",
 };
