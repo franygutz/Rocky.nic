@@ -1,30 +1,31 @@
 // Reglas de PRESENTACIÓN del frontend (no cambian las reglas del motor).
 // Puras y probadas en tests/rules.test.js.
 import { statusNames } from './engine.js';
+import { t } from './i18n/index.js';
 
 // Cada categoría de reto vive en una sala de Luna-7.
 export const ROOM_OF = { life: 'lifeSupport', radiation: 'shelter', energy: 'solar', food: 'greenhouse', comms: 'habitat' };
 export const CATEGORY_OF_ROOM = Object.fromEntries(Object.entries(ROOM_OF).map(([c, r]) => [r, c]));
 
 export const CATEGORY = {
-  life: { label: 'Soporte vital', icon: '🫁', color: 'var(--tech)' },
-  radiation: { label: 'Radiación', icon: '☢️', color: 'var(--cool)' },
-  energy: { label: 'Energía', icon: '⚡', color: 'var(--brand)' },
-  food: { label: 'Alimentos', icon: '🌱', color: 'var(--life)' },
-  comms: { label: 'Comunicaciones', icon: '📡', color: 'var(--mid)' }
+  life: { get label() { return t('rules.soporte_vital'); }, icon: '🫁', color: 'var(--tech)' },
+  radiation: { get label() { return t('rules.radiacion'); }, icon: '☢️', color: 'var(--cool)' },
+  energy: { get label() { return t('rules.energia'); }, icon: '⚡', color: 'var(--brand)' },
+  food: { get label() { return t('rules.alimentos'); }, icon: '🌱', color: 'var(--life)' },
+  comms: { get label() { return t('rules.comunicaciones'); }, icon: '📡', color: 'var(--mid)' }
 };
 
 // Los 9 indicadores del motor (0–100).
 export const METRICS = [
-  { key: 'oxygen', file: '01_oxigeno', label: 'Oxígeno', icon: '🫁', color: 'var(--tech)' },
-  { key: 'water', file: '02_agua', label: 'Agua', icon: '💧', color: 'var(--sky)' },
-  { key: 'energy', file: '03_energia', label: 'Energía', icon: '⚡', color: 'var(--brand)' },
-  { key: 'food', file: '04_cultivos', label: 'Comida', icon: '🌱', color: 'var(--life)' },
-  { key: 'shield', file: '07_proteccion', label: 'Protección', icon: '🛡️', color: 'var(--cool)' },
-  { key: 'comms', file: '06_radio', label: 'Comunicación', icon: '📡', color: 'var(--mid)' },
-  { key: 'health', file: '05_salud', label: 'Salud', icon: '❤️', color: 'var(--alert)' },
-  { key: 'morale', file: '11_estrella', label: 'Moral', icon: '🤝', color: 'var(--warm)' },
-  { key: 'research', file: '10_muestra', label: 'Investigación', icon: '🔬', color: 'var(--moon)' }
+  { key: 'oxygen', file: '01_oxigeno', get label() { return t('rules.oxigeno'); }, icon: '🫁', color: 'var(--tech)' },
+  { key: 'water', file: '02_agua', get label() { return t('rules.agua'); }, icon: '💧', color: 'var(--sky)' },
+  { key: 'energy', file: '03_energia', get label() { return t('rules.energia'); }, icon: '⚡', color: 'var(--brand)' },
+  { key: 'food', file: '04_cultivos', get label() { return t('rules.comida'); }, icon: '🌱', color: 'var(--life)' },
+  { key: 'shield', file: '07_proteccion', get label() { return t('rules.proteccion'); }, icon: '🛡️', color: 'var(--cool)' },
+  { key: 'comms', file: '06_radio', get label() { return t('rules.comunicacion'); }, icon: '📡', color: 'var(--mid)' },
+  { key: 'health', file: '05_salud', get label() { return t('rules.salud'); }, icon: '❤️', color: 'var(--alert)' },
+  { key: 'morale', file: '11_estrella', get label() { return t('rules.moral'); }, icon: '🤝', color: 'var(--warm)' },
+  { key: 'research', file: '10_muestra', get label() { return t('rules.investigacion'); }, icon: '🔬', color: 'var(--moon)' }
 ];
 export const ICON = { coin: '08_moneda', key: '09_llave', sample: '10_muestra', star: '11_estrella', trophy: '12_trofeo' };
 export const iconUrl = (file) => `${import.meta.env.BASE_URL}assets/iconos/${file}.svg`;
@@ -62,11 +63,13 @@ export function makePerformance({ done, progress = 0, timeLeftFrac = 0, mistakes
 // Si la tripulación está cansada o mareada, los minijuegos piden un poco más.
 export const isTired = (statuses = []) => statuses.includes('fatiga') || statuses.includes('mareos');
 
+export let liveStatusNames = null;
+export const setStatusNames = (m) => { liveStatusNames = m && Object.keys(m).length ? m : null; };
 export function statusName(key) {
-  if (statusNames[key]) return statusNames[key];
+  if ((liveStatusNames || statusNames)[key]) return (liveStatusNames || statusNames)[key];
   const m = /^reparacion_pendiente_(\w+)$/.exec(key);
-  if (m) return `Reparación pendiente: ${CATEGORY[m[1]]?.label?.toLowerCase() || m[1]}`;
-  const map = { plan_rescate: 'Plan de rescate confirmado' };
+  if (m) return t('repairPending', { c: CATEGORY[m[1]]?.label?.toLowerCase() || m[1] });
+  const map = { plan_rescate: t('rules.plan_de_rescate_confirmado') };
   if (map[key]) return map[key];
   const s = key.replace(/_/g, ' ');
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -76,16 +79,16 @@ export function statusName(key) {
 export const GOOD_STATUSES = ['plan_rescate'];
 
 export const RESULT_LABEL = {
-  completed: { text: '¡Reto superado!', icon: '✅', cls: 'up' },
-  partial: { text: 'Reto a medias', icon: '🟡', cls: 'warn' },
-  failed: { text: 'No salió esta vez', icon: '❌', cls: 'down' },
-  missed: { text: 'Reto omitido', icon: '⏭️', cls: 'down' }
+  completed: { get text() { return t('rOk'); }, icon: '✅', cls: 'up' },
+  partial: { get text() { return t('rules.reto_a_medias'); }, icon: '🟡', cls: 'warn' },
+  failed: { get text() { return t('rules.no_salio_esta_vez'); }, icon: '❌', cls: 'down' },
+  missed: { get text() { return t('rules.reto_omitido'); }, icon: '⏭️', cls: 'down' }
 };
 
 export const MESSAGE_TYPES = [
-  { id: 'status_report', label: 'Reporte de estado', icon: '📋', hint: 'Avisa cómo está la base. Quita "Reporte pendiente".' },
-  { id: 'science_report', label: 'Reporte científico', icon: '🔬', hint: 'Comparte lo que investigaron.' },
-  { id: 'rescue_request', label: 'Pedir ayuda', icon: '🆘', hint: 'Si la Tierra confirma, queda un plan de rescate.' }
+  { id: 'status_report', get label() { return t('rules.reporte_de_estado'); }, icon: '📋', get hint() { return t('rules.avisa_como_esta_la_base'); } },
+  { id: 'science_report', get label() { return t('rules.reporte_cientifico'); }, icon: '🔬', get hint() { return t('rules.comparte_lo_que_investigaron'); } },
+  { id: 'rescue_request', get label() { return t('rules.pedir_ayuda'); }, icon: '🆘', get hint() { return t('rules.si_la_tierra_confirma_queda'); } }
 ];
 
 export function deltaList(delta = {}) {
