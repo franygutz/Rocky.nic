@@ -34,8 +34,8 @@ export const SCENES = {
       plataforma: { rect: [76, 247, 158, 292], outer: [60, 235, 172, 306], label: 'Plataforma de entregas' },
     },
     doors: [
-      { id: 'zora', rect: [268, 196, 308, 208], label: 'Entrar a la nave Zora', to: { scene: 'zora', x: 46, y: 186 }, anchor: [288, 200] },
-      { id: 'invernadero', rect: [94, 148, 108, 174], label: 'Entrar al invernadero', to: { scene: 'invernadero', x: 160, y: 190 }, anchor: [98, 161] },
+      { id: 'zora', rect: [268, 196, 308, 208], label: 'Entrar a la nave Zora', to: { scene: 'zora', x: 46, y: 186 }, anchor: [288, 200], fx: { box: [275.5, 174, 293, 192.5], dir: 'up', kind: 'double' } },
+      { id: 'invernadero', rect: [94, 148, 108, 174], label: 'Entrar al invernadero', to: { scene: 'invernadero', x: 160, y: 190 }, anchor: [98, 161], fx: { box: [80, 162, 90.5, 181], dir: 'left', kind: 'single' } },
       { id: 'paneles', rect: [462, 66, 510, 80], label: 'Ir a los paneles solares', to: { scene: 'paneles', x: 14, y: 190 }, anchor: [486, 72] },
       { id: 'crater', rect: [446, 242, 520, 258], label: 'Bajar al cráter', to: { scene: 'crater', x: 148, y: 62 }, anchor: [482, 250] },
     ],
@@ -96,7 +96,7 @@ export const SCENES = {
     spawn: { x: 46, y: 186 },
     bed: { x: +(240 / ZK).toFixed(1), y: +(468 / ZK).toFixed(1) }, // pasillo entre las literas: aquí despierta la tripulación cada día nuevo
     doors: [
-      { id: 'salida', rect: px(ZK, [[28, 262, 124, 318]])[0], label: 'Salir al exterior', to: { scene: 'exterior', x: 288, y: 211 }, anchor: [46, 186], mode: 'point', needsTank: true },
+      { id: 'salida', rect: px(ZK, [[28, 262, 124, 318]])[0], label: 'Salir al exterior', to: { scene: 'exterior', x: 288, y: 211 }, anchor: [46, 186], mode: 'point', needsTank: true, fx: { box: [36, 151.5, 59, 175], dir: 'up', kind: 'double' } },
     ],
     points: px(ZK, [
       [128, 78, 0], [60, 92, 0], [312, 98, 0], [392, 102, 0], [590, 106, 0], [528, 102, 0],
@@ -134,7 +134,7 @@ export const SCENES = {
     ]),
     spawn: { x: 160, y: 190 },
     doors: [
-      { id: 'salida', rect: [138, 200, 182, 222], label: 'Salir al exterior', to: { scene: 'exterior', x: 100, y: 164 }, anchor: [160, 204] },
+      { id: 'salida', rect: [138, 200, 182, 222], label: 'Salir al exterior', to: { scene: 'exterior', x: 100, y: 164 }, anchor: [160, 204], fx: { box: [148.5, 208, 172, 225], dir: 'down', kind: 'double' } },
     ],
     points: [
       { id: 'inv-bandeja-1', x: 120, y: 78, r: 30, kind: 'task', cat: 'food', label: 'Bandeja de cultivo 1', tray: 0 },

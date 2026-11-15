@@ -13,6 +13,7 @@ import { buildWalkSheet, WALK_FRAMES, WALK_FPS, WALK_W, WALK_H, WALK_OX, WALK_OY
 import { cliffCanvas, mapSampler, CLIFF_COLORS } from '../world/cliff.js';
 import { irisClose, irisOpen } from '../ui/iris.js';
 import { sfx } from './sfx.js';
+import { doorNear, exitThrough, enterFrom } from './doors.js';
 import { C } from '../theme.js';
 
 export const FONT = '"Atkinson Hyperlegible", ui-rounded, system-ui, sans-serif';
@@ -44,8 +45,9 @@ export class WorldScene extends Phaser.Scene {
   init(data) {
     this.sid = data?.id || 'exterior';
     this.startAt = data?.x != null ? { x: data.x, y: data.y } : null;
-    this.arrive = !!data?.arrive;
     this.gen = (this.gen || 0) + 1; // cada reinicio de escena invalida las cargas pendientes de la anterior
+    this.arrive = !!data?.arrive;
+    this.cut = false; this.cutMoving = false;
     this.nudge = 0;
     this.cfg = SCENES[this.sid];
     this.ready = false;
@@ -127,6 +129,7 @@ export class WorldScene extends Phaser.Scene {
     this.ensureAnim('quieto'); this.ensureAnim('trote');
     this.hero = this.add.image(0, 0, this.sheets.quieto.key, 0).setOrigin(0.5, 1).setScale(s.avatarScale * U);
     this.play('quieto', { loop: true });
+    this.doorGfx = this.add.graphics();
     this.markers = this.add.container(0, 0).setDepth(2e6);
     this.arrow = this.add.graphics().setDepth(2e6);
     this.nameTag = this.add.text(0, 0, this.avatar.name, { fontFamily: FONT, fontSize: '15px', fontStyle: '800', color: '#FFF3DC', stroke: '#27234C', strokeThickness: 4 }).setOrigin(0.5, 1).setDepth(2e6).setVisible(false);
@@ -140,7 +143,9 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.fadeIn(calm ? 1 : 200, 23, 20, 38);
     { const [hx, hy] = this.heroScreen(); if (calm) irisOpen(hx, hy, 1); else this.time.delayedCall(60, () => { const [ax, ay] = this.heroScreen(); sfx.door(); irisOpen(ax, ay - 30, 520); }); }
     // Entrada: el personaje aparece por la puerta con un pequeño paso hacia adentro.
-    if (this.arrive && !calm) {
+    const arrDoor = this.arrive && !calm ? doorNear(this.cfg, this.pos.x, this.pos.y) : null;
+    if (arrDoor) enterFrom(this, arrDoor, this.pos.x, this.pos.y);
+    else if (this.arrive && !calm) {
       const sx = this.hero.scaleX, sy = this.hero.scaleY;
       this.nudge = 6;
       this.hero.setAlpha(0).setScale(sx * 0.82, sy * 0.82);
@@ -314,7 +319,7 @@ export class WorldScene extends Phaser.Scene {
   update(time, delta) {
     if (!this.ready) return;
     const dt = Math.min(delta, 50) / 1000; // el movimiento no depende de los fotogramas por segundo ni de pestañas dormidas
-    const free = canWalk() && time >= this.lockUntil && !this.special;
+    const free = canWalk() && time >= this.lockUntil && !this.special && !this.cut;
     this.running = !!(free && ((this.keys.SHIFT && this.keys.SHIFT.isDown) || this.route.length > 6));
     let [vx, vy] = free ? this.inputVector() : [0, 0];
     this.keyDir = [vx, vy];
@@ -341,6 +346,7 @@ export class WorldScene extends Phaser.Scene {
       if (this.pose === 'side' && Math.abs(dx) > 0.05) this.facing = dx > 0 ? 1 : -1;
       if (!this.moving) this.route = [];
     }
+    if (this.cut) this.moving = this.cutMoving;
     this.animate(dt);
     this.placeHero();
     if (free) this.checkSpots(dt);
@@ -475,7 +481,7 @@ export class WorldScene extends Phaser.Scene {
   // ── Cambios de escenario ────────────────────────────────────────────────────
   useDoor(d) {
     if (d.needsTank) { bus.emit('exitRequest', d); return; } // la esclusa pide un tanque lleno: lo decide el motor
-    this.goTo(d.to.scene, d.to.x, d.to.y);
+    this.goTo(d.to.scene, d.to.x, d.to.y, false, d);
   }
 
   // Posición del personaje en la pantalla (para centrar la cortina circular).
@@ -484,7 +490,7 @@ export class WorldScene extends Phaser.Scene {
     return [(this.hero.x - v.x) * cam.zoom, (this.hero.y - v.y) * cam.zoom];
   }
 
-  goTo(sceneId, x, y, instant = false) {
+  goTo(sceneId, x, y, instant = false, door = null) {
     if (!SCENES[sceneId] || this.time.now < this.lockUntil) return;
     this.lockUntil = this.time.now + 700; // bloqueo breve contra entradas repetidas
     this.route = [];
@@ -497,6 +503,10 @@ export class WorldScene extends Phaser.Scene {
     sfx.tap();
     if (instant || session.settings.reducedMotion) { done(); return; }
     // Salida: el personaje cruza la puerta (se achica y se desvanece) mientras la cámara se oscurece.
+    if (door?.fx) {
+      exitThrough(this, door, sfx).then(() => { const [hx, hy] = this.heroScreen(); return irisClose(hx, hy - 30, 360); }).then(done);
+      return;
+    }
     sfx.door();
     this.tweens.add({ targets: [this.hero, this.shadow], alpha: 0, scaleX: '*=0.7', scaleY: '*=0.7', duration: 300, delay: 120, ease: 'Sine.easeIn' });
     const [hx, hy] = this.heroScreen();
