@@ -31,7 +31,7 @@ function build() {
       <button class="vl-btn" data-action="pause" aria-label="${esc(t('hud.pausa'))}">${pix('pause')}</button>
     </div>
     <div class="vl-rail" role="group" aria-label="${esc(t('hud.indicadores_de_la_base'))}">
-      ${METRICS.map((m) => `<div class="vl-m" data-m="${m.key}" role="meter" aria-label="${esc(m.label)}" aria-valuemin="0" aria-valuemax="100" title="${esc(m.label)}">
+      ${[...METRICS.filter((m) => CORE.includes(m.key)).sort((a, b) => CORE.indexOf(a.key) - CORE.indexOf(b.key)), ...METRICS.filter((m) => !CORE.includes(m.key))].map((m) => `<div class="vl-m ${CORE.includes(m.key) ? 'core' : 'extra'}" data-m="${m.key}" role="meter" aria-label="${esc(m.label)}" aria-valuemin="0" aria-valuemax="100" title="${esc(m.label)}">
         ${icon(m.file)}<span class="vl-name">${esc(m.label)}</span>
         <span class="vl-bar"><i style="--c:${m.color}"></i></span><b class="vl-val"></b><em class="vl-flag" aria-hidden="true"></em></div>`).join('')}
       <div class="vl-tank" data-m="suit" role="meter" aria-label="${esc(t('hud.tanque_del_traje'))}" aria-valuemin="0" aria-valuemax="100">
