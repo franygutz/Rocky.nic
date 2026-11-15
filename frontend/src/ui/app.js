@@ -2,7 +2,7 @@
 // menú → informe → mapa → reto → (minijuego) → resultado → [fin del día] → … → final
 import { bus, session } from '../bus.js';
 import { createBridge } from '../engine.js';
-import { hasMinigame, minigameSeconds, suitFactor, isTired, randomCode, cleanCode, CATEGORY } from '../rules.js';
+import { hasMinigame, minigameSeconds, suitFactor, isTired, randomCode, cleanCode, CATEGORY, setStatusNames } from '../rules.js';
 import { renderHud, renderDock, resetHud, setSuit } from './hud.js';
 import { SCENES, OUTSIDE, placeOf, POINTS, nextHop } from '../world/scenes.js';
 import { defaultAvatar, normalizeAvatar, PRESETS, CATEGORIES } from '../world/avatar.js';
@@ -67,8 +67,8 @@ const closeAll = () => { stack = []; render(); };
 const topIs = (id) => stack[stack.length - 1]?.id === id;
 
 const scr = {
-  menu: () => ({ id: 'menu', cls: 'start', html: () => { const v = view(); return S.menuHTML({ canContinue: v.phase !== 'not_started', finished: v.phase === 'completed', day: v.day }); } }),
-  code: () => ({ id: 'code', html: () => S.codeHTML(codeError) }),
+  menu: () => ({ id: 'menu', cls: 'start', html: () => { const v = view(); return S.menuHTML({ canContinue: v.phase !== 'not_started', finished: v.phase === 'completed', day: v.day, view: v }); } }),
+  code: () => ({ id: 'code', html: () => S.codeHTML(codeError ? t(codeError) : '') }),
   briefing: () => ({ id: 'briefing', html: () => S.briefingHTML(view()) }),
   mission: () => ({ id: 'mission', html: () => S.missionHTML(view(), { hint: hintText, factor: suitFactor(view().world?.suit, view().mission?.category) }) }),
   skip: () => ({ id: 'skip', html: () => S.skipConfirmHTML(view()) }),
@@ -101,30 +101,31 @@ const scr = {
 function tankMenuHTML(gate = false) {
   const v = view(), su = v.world?.suit || {};
   const loaded = !!su.loaded;
-  return `<div class="sheet enter tank-card"><button class="btn small close" data-action="back" aria-label="Cerrar">✕</button>
-    <h2>${gate ? 'La esclusa no abre' : 'Depósitos de soporte vital'}</h2>
-    <p>${gate ? 'Para salir de Zora el traje necesita un <b>tanque lleno</b>. Cada salida usa uno: al volver, el tanque queda vacío.' : 'Aquí se llenan los tanques del traje. Cada llenado gasta <b>3 de oxígeno de la base</b>.'}</p>
+  return `<div class="sheet enter tank-card"><button class="btn small close" data-action="back" aria-label="${t('close')}">✕</button>
+    <h2>${gate ? t('ui.la_esclusa_no_abre') : t('ui.depositos_de_soporte_vital')}</h2>
+    <p>${gate ? t('ui.para_salir_de_zora_el') : t('ui.aqui_se_llenan_los_tanques')}</p>
     <div class="facts-grid">
-      <div class="stat"><span>Tanque</span><b>${loaded ? `Lleno (${su.fill}%)` : 'Vacío'}</b></div>
-      <div class="stat"><span>Aire para afuera</span><b>${loaded ? su.evaMax + ' s' : '—'}</b></div>
-      <div class="stat"><span>Oxígeno de la base</span><b>${Math.round(v.metrics.oxygen)}</b></div>
+      <div class="stat"><span>${t('ui.tanque')}</span><b>${loaded ? t('tankFull', { p: su.fill }) : t('ui.vacio')}</b></div>
+      <div class="stat"><span>${t('ui.aire_para_afuera')}</span><b>${loaded ? su.evaMax + ' s' : '—'}</b></div>
+      <div class="stat"><span>${t('ui.oxigeno_de_la_base')}</span><b>${Math.round(v.metrics.oxygen)}</b></div>
     </div>
-    <div class="list"><button class="btn go" data-action="fillTank" autofocus>${loaded ? 'Volver a llenar el tanque' : 'Llenar el tanque'}</button><button class="btn" data-action="back">Ahora no</button></div></div>`;
+    <div class="list"><button class="btn go" data-action="fillTank" autofocus>${loaded ? t('ui.volver_a_llenar_el_tanque') : t('ui.llenar_el_tanque')}</button><button class="btn" data-action="back">${t('ui.ahora_no')}</button></div></div>`;
 }
 
 function refresh() {
   const v = session.view;
+  setStatusNames(v?.statusNames);
   renderHud(v);
   renderDock(v);
   measure();
   renderPrompt(lastPrompt);
+  document.documentElement.lang = lang();
+  $('#dock')?.setAttribute('aria-label', t('ui.acciones')); $('#drawer')?.setAttribute('aria-label', t('ui.panel'));
+  $('#kita .spr')?.setAttribute('aria-label', t('openKita'));
   const touch = $('#touch');
   if (touch) touch.hidden = !(session.mode === 'map' && !session.overlay);
   const root = $('#kita');
   if (root) {
-  document.documentElement.lang = lang();
-  $('#dock')?.setAttribute('aria-label', t('ui.acciones')); $('#drawer')?.setAttribute('aria-label', t('ui.panel'));
-  $('#kita .spr')?.setAttribute('aria-label', t('openKita'));
     const show = !!v && v.phase !== 'not_started' && !['menu', 'create', 'briefing', 'ending'].includes(session.mode);
     root.hidden = !show;
     kita?.setBase({ view: v, paused: topIs('pause'), working: session.mode === 'minigame' });
@@ -190,8 +191,6 @@ function openCreator(isEditing) {
 }
 
 // Lleva el mundo a donde quedó la partida guardada (escenario y posición seguros).
-function placeWorld() {
-  const w = view().world;
 // Cada día nuevo empieza en los dormitorios de Zora: si estaba afuera, vuelve a la base con el tanque vacío.
 // Cartel con el nombre del lugar al entrar: aparece, se queda un momento y se va.
 let placeTimer = null;
@@ -212,6 +211,8 @@ function wakeUp() {
   bus.emit('teleport', { scene: 'zora', x: bed.x, y: bed.y });
 }
 
+function placeWorld() {
+  const w = view().world;
   const cur = session.world;
   let sc = w?.scene && SCENES[w.scene] ? w.scene : 'exterior';
   let pos = w?.pos || SCENES[sc].spawn;
@@ -286,9 +287,9 @@ function showResult(res) {
   lastRes = res;
   session.mode = 'result';
   const st = res.result?.status;
-  if (st === 'completed') { sfx.good(); kita?.react('success', '¡Reto superado!'); }
-  else if (st === 'partial') kita?.react('hello', 'Salió a medias…');
-  else if (st === 'failed' || st === 'missed') { sfx.bad(); kita?.react('fail', 'Ups… sigamos'); }
+  if (st === 'completed') { sfx.good(); kita?.react('success', t('rOk')); }
+  else if (st === 'partial') kita?.react('hello', t('rHalf'));
+  else if (st === 'failed' || st === 'missed') { sfx.bad(); kita?.react('fail', t('rFail')); }
   saveWorld();
   replace(scr.result());
 }
@@ -297,6 +298,7 @@ function afterResult() {
   const v = view();
   const dayChanged = before && v.daysCompleted > before.daysCompleted && v.phase === 'active';
   before = null;
+  session.finaleNext = v.phase === 'completed'; // el cierre solo sale al terminar jugando, no al reabrir el final
   if (lastRes?.result?.status === 'completed') setTimeout(() => bus.emit('playAnim', { name: 'salto', rate: 1.15 }), 250);
   if (dayChanged) { session.newDay = true; session.mode = 'day'; kita?.react('trophy', t('rDay')); replace(scr.day()); return; }
   route();
@@ -319,9 +321,8 @@ const ERR = {
   INSUFFICIENT_STATION_OXYGEN: 'La base casi no tiene oxígeno para llenar un tanque.'
 };
 function fail(e) {
-  session.finaleNext = v.phase === 'completed'; // el cierre solo sale al terminar jugando, no al reabrir el final
   const code = String(e?.message || '').split(':')[0];
-  toast(ERR[code] || 'Algo no salió. Probá otra vez.');
+  toast(tr(ERR[code] || 'Algo no salió. Probá otra vez.'));
   sfx.bad();
 }
 
@@ -352,7 +353,7 @@ function onAction(a, el) {
     case 'openMission': openMission(); break;
     case 'choose': sfx.tap(); choose(el.dataset.id); break;
     case 'hint': {
-      const r = ask('¿Qué hago en este reto?', { hint: true });
+      const r = ask(t('s2'), { hint: true });
       hintsThisMission++;
       hintText = r?.hint || r?.answer || '';
       render();
@@ -375,11 +376,11 @@ function onAction(a, el) {
       break;
     }
     case 'order':
-      try { const r = b.order(el.dataset.id, { requestId: rid() }); sfx.coin(); toast(`Pedido confirmado: ${r.result.order.name.replace(/^\S+\s/, '')}. Llega en la nave de carga.`); kita?.react('saved', 'Pedido en camino'); saveWorld(); } catch (e) { fail(e); }
+      try { const r = b.order(el.dataset.id, { requestId: rid() }); sfx.coin(); toast(t('toastOrder', { n: r.result.order.name.replace(/^\S+\s/, '') })); kita?.react('saved', t('rOrder')); saveWorld(); } catch (e) { fail(e); }
       render();
       break;
     case 'use':
-      try { const r = b.useItem(el.dataset.id, { requestId: rid() }); sfx.good(); toast(`Usaste ${r.result.name.replace(/^\S+\s/, '')}.`); } catch (e) { fail(e); }
+      try { const r = b.useItem(el.dataset.id, { requestId: rid() }); sfx.good(); toast(t('used', { n: r.result.name.replace(/^\S+\s/, '') })); } catch (e) { fail(e); }
       render();
       break;
     case 'bag': open(scr.bag()); break;
@@ -403,22 +404,22 @@ function onAction(a, el) {
     }
     case 'saveAvatar': {
       const a = normalizeAvatar(draft);
-      if (!a) { toast('Ese astronauta no es válido.'); break; }
+      if (!a) { toast(t('ui.ese_astronauta_no_es_valido')); break; }
       try { b.setAvatar(a); } catch (e) { fail(e); break; }
       bus.emit('poseChanged');
       sfx.good();
-      if (editing) { editing = false; back(); toast('Astronauta guardado.'); render(); }
+      if (editing) { editing = false; back(); toast(t('ui.astronauta_guardado')); render(); }
       else { session.mode = 'briefing'; replace(scr.briefing()); }
       break;
     }
     case 'comms': open(scr.comms()); break;
     case 'send':
-      try { b.sendMessage(el.dataset.type); sfx.message(); toast('Mensaje enviado a la Tierra.'); } catch (e) { fail(e); }
+      try { b.sendMessage(el.dataset.type); sfx.message(); toast(t('ui.mensaje_enviado_a_la_tierra')); } catch (e) { fail(e); }
       render();
       break;
     case 'statuses': open(scr.statuses()); break;
-    case 'luni': openLuni(); break;
     case 'map': if (topIs('map')) onAction('back'); else if (session.mode === 'map' && !session.overlay) open(scr.map()); break;
+    case 'luni': openLuni(); break;
     case 'closeLuni': closeLuni(); break;
     case 'luniAsk': ask(el.dataset.q); break;
     case 'setLang':
@@ -429,7 +430,7 @@ function onAction(a, el) {
     case 'pause': if (!topIs('pause')) { saveWorld(); open(scr.pause()); kita?.react('saved', t('rSaved')); } break;
     case 'repeatMenu': open(scr.repeat()); break;
     case 'repeat':
-      try { b.repeatDay(Number(el.dataset.day)); toast(`Volviste al inicio del día ${el.dataset.day}.`); } catch (e) { fail(e); break; }
+      try { b.repeatDay(Number(el.dataset.day)); toast(t('backToDay', { d: el.dataset.day })); } catch (e) { fail(e); break; }
       before = null;
       route();
       break;
@@ -448,7 +449,7 @@ function onAction(a, el) {
       album = { endings: [], missions: 0 };
       try { localStorage.removeItem(ALBUM_KEY); } catch { /* nada */ }
       clearLuni();
-      toast('Se borró tu progreso.');
+      toast(t('ui.se_borro_tu_progreso'));
       toMenu();
       break;
   }
@@ -473,7 +474,7 @@ function showTerm(btn) {
   const g = TERM[btn.dataset.term];
   if (!g) return;
   const pop = $('#pop');
-  pop.innerHTML = `<b>${esc(g.term)}</b>${esc(g.def)}`;
+  pop.innerHTML = `<b>${esc(tr(g.term))}</b>${esc(tr(g.def))}`;
   pop.hidden = false;
   const r = btn.getBoundingClientRect();
   const w = pop.offsetWidth, h = pop.offsetHeight;
@@ -497,12 +498,12 @@ function measure() {
   const bottom = dock.hidden ? (shown ? 12 : 0) : Math.min(260, dockH + 8);
   document.documentElement.style.setProperty('--dock-h', (dock.hidden ? 16 : Math.max(60, dockH)) + 'px');
   $('#toast').style.bottom = (dock.hidden ? 40 : bottom + 12) + 'px';
-  const ins = session.insets;
-  if (t0 !== ins.top || b0 !== ins.bottom || l0 !== (ins.left || 0)) {
-    session.insets = { top: t0, bottom: b0, left: l0 };
   // El mapa ocupa toda la pantalla: la placa, el riel y la barra de abajo se dibujan encima.
   void top; void bottom; void left;
   const [t0, b0, l0] = [0, 0, 0];
+  const ins = session.insets;
+  if (t0 !== ins.top || b0 !== ins.bottom || l0 !== (ins.left || 0)) {
+    session.insets = { top: t0, bottom: b0, left: l0 };
     bus.emit('insets', session.insets);
   }
 }
@@ -514,7 +515,7 @@ function onExitRequest(door) {
     session.bridge.leaveBase({ requestId: rid() });
   } catch (e) {
     const code = String(e?.message || '').split(':')[0];
-    if (code === 'TANK_NOT_LOADED') { sfx.bad(); kita?.react('fail', 'Falta el tanque'); open(scr.tankGate()); return; }
+    if (code === 'TANK_NOT_LOADED') { sfx.bad(); kita?.react('fail', t('rTank')); open(scr.tankGate()); return; }
     fail(e); return;
   }
   bus.emit('teleport', { scene: door.to.scene, x: door.to.x, y: door.to.y });
@@ -535,10 +536,10 @@ function onInteract(d) {
     case 'storage': open(scr.bag()); break;
     case 'luni': openLuni(); break;
     case 'statuses': open(scr.statuses()); break;
-    case 'info': toast(pt.info || pt.label); break;
+    case 'info': toast(tr(pt.info || pt.label)); break;
     case 'task': {
       const fact = catalog.facts.find((f) => f.id === FACT_OF[pt.cat]);
-      if (!fact) { toast(`${pt.label}: aquí no hay trabajo pendiente.`); break; }
+      if (!fact) { toast(t('noWork', { l: tr(pt.label) })); break; }
       const show = () => { fichaFact = fact; fichaPoint = pt; open(scr.ficha()); };
       // En el cráter, mirar una muestra primero: el astronauta se arrodilla y la recoge (animación de Artemis).
       if (pt.cat === 'radiation' && d.scene === 'crater' && session.worldScene) bus.emit('playAnim', { name: 'muestra', rate: 1.9, onDone: show });
@@ -552,8 +553,8 @@ function collectOrders() {
   try {
     const r = session.bridge.collect({ requestId: rid() });
     sfx.good();
-    toast(`Recogiste ${r.result.collected.length} pedido${r.result.collected.length > 1 ? 's' : ''}. Ya están en tu bolsa.`);
-    kita?.react('delivery', '¡Entrega recibida!');
+    toast(r.result.collected.length > 1 ? t('pickedN', { n: r.result.collected.length }) : t('pickedOne'));
+    kita?.react('delivery', t('rDeliv'));
     saveWorld();
   } catch (e) { fail(e); }
 }
@@ -563,13 +564,13 @@ function startTank() {
   session.mode = 'minigame';
   closeAll();
   bus.emit('playMinigame', {
-    category: 'radiation', seconds: 20, tired: false, hintsUsed: 0, title: '🫁 Llenar el tanque del traje',
+    category: 'radiation', seconds: 20, tired: false, hintsUsed: 0, title: '🫁 ' + t('ui.llenar_el_tanque_del_traje'),
     onDone: (perf) => {
       const pct = Math.max(0, Math.min(100, Math.round(perf.accuracy - perf.mistakes * 4)));
       try { const r = session.bridge.fillTank(pct, { requestId: rid() }); lastFill = r.result; } catch (e) { fail(e); route(); return; }
       session.mode = 'map';
       open(scr.tank());
-      lastFill.insufficient ? kita?.react('fail', 'Ups, quedó incompleto') : kita?.react('success', '¡Tanque listo!');
+      lastFill.insufficient ? kita?.react('fail', t('rTankHalf')) : kita?.react('success', t('rTankOk'));
       saveWorld();
     }
   });
@@ -581,7 +582,7 @@ function renderPrompt(p) {
   lastPrompt = p;
   const el = $('#prompt');
   if (!p || session.mode !== 'map' || session.overlay) { el.hidden = true; return; }
-  el.innerHTML = `<button class="btn go prompt-btn" data-action="act"><kbd>E</kbd> ${esc(p.label)}</button>`;
+  el.innerHTML = `<button class="btn go prompt-btn" data-action="act"><kbd>E</kbd> ${esc(tr(p.label))}</button>`;
   el.hidden = false;
 }
 
@@ -607,7 +608,7 @@ function startClock() {
 
 function onExhausted() {
   sfx.alert();
-  kita?.react('fail', 'Se acabó el aire');
+  kita?.react('fail', t('rAir'));
   const v = view();
   if (v.phase === 'completed') { route(); return; }
   session.nextAnim = 'caida'; // al llegar a Zora se cae y se levanta
@@ -631,10 +632,10 @@ export function boot() {
     refresh();
     bus.emit('view', v);
     const ready = (v.orders || []).filter((o) => o.status === 'ready').length;
-    if (ready > prevReady) { toast('📦 Tu pedido está listo: recógelo en la nave de carga de la plataforma.'); kita?.react('news', '¡Llegó tu pedido!'); }
+    if (ready > prevReady) { toast(t('toastReady')); kita?.react('news', t('rArrived')); }
     prevReady = ready;
   });
-  if (session.bridge.getView().storage?.available === false) setTimeout(() => toast('Este navegador no deja guardar. Igual podés jugar.'), 800);
+  if (session.bridge.getView().storage?.available === false) setTimeout(() => toast(t('ui.este_navegador_no_deja_guardar')), 800);
 
   const delegate = (root) => root.addEventListener('click', (e) => {
     const b = e.target.closest('[data-action]');
@@ -650,7 +651,7 @@ export function boot() {
     e.preventDefault();
     if (f.dataset.form === 'code') {
       const code = cleanCode(new FormData(f).get('code'));
-      if (!code) { codeError = 'Usá de 3 a 20 letras o números, por ejemplo AULA-1.'; render(); return; }
+      if (!code) { codeError = 'codeErr'; render(); return; }
       newGame(code);
     } else if (f.dataset.form === 'luni') {
       const q = new FormData(f).get('q');
@@ -663,13 +664,13 @@ export function boot() {
     if (!e.target.closest('#pop')) $('#pop').hidden = true;
   }, true);
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab' && stack.length) {
     // Tab abre y cierra el mapa mientras se juega (con una pantalla abierta, Tab sigue moviendo el foco).
     if (e.key === 'Tab' && !e.ctrlKey && !e.altKey && !e.metaKey && (topIs('map') || (session.mode === 'map' && !session.overlay && !luniOpen() && !/INPUT|TEXTAREA/.test(document.activeElement?.tagName || '')))) {
       e.preventDefault();
       onAction('map');
       return;
     }
+    if (e.key === 'Tab' && stack.length) {
       const f = [...$('#screen').querySelectorAll('button, a[href], input, summary, [tabindex]:not([tabindex="-1"])')].filter((n) => !n.disabled && n.offsetParent !== null);
       if (f.length) {
         const first = f[0], lastEl = f[f.length - 1];
@@ -692,10 +693,11 @@ export function boot() {
   bus.on('prompt', renderPrompt);
   bus.on('exitRequest', onExitRequest);
   bus.on('sceneChange', (d) => {
+    showPlace(d.to);
     // Entrar a Zora vacía el tanque: para la próxima salida hay que llenar otro.
     if (d.to === 'zora' && d.from !== 'zora') { try { session.bridge.enterBase(); } catch { /* sin partida */ } }
     saveWorld();
-    if (OUTSIDE.has(d.to) && !OUTSIDE.has(d.from)) { const s = view().world?.suit; toast(`Afuera: te quedan ${Math.ceil(s?.eva ?? 0)} s de aire en el traje.`); }
+    if (OUTSIDE.has(d.to) && !OUTSIDE.has(d.from)) { const s = view().world?.suit; toast(t('afterOut', { n: Math.ceil(s?.eva ?? 0) })); }
   });
   bus.on('openLuni', () => openLuni());
   kita = createKita($('#kita'), { reducedMotion: () => !!session.settings.reducedMotion });
@@ -704,7 +706,6 @@ export function boot() {
 
   new ResizeObserver(measure).observe($('#hud'));
   new ResizeObserver(measure).observe($('#dock'));
-    showPlace(d.to);
   window.addEventListener('resize', measure);
   toMenu();
 
