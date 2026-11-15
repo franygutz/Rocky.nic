@@ -200,7 +200,7 @@ export default {
   "screen.lo_que_dice_la_ciencia": "Lo que dice la ciencia",
   "screen.el_tanque_del_traje_quedo": "El tanque del traje quedó incompleto: este reto de afuera da menos tiempo.",
   "screen.decision_rapida": "Decisión rápida",
-  "screen.en_un_minijuego_si_te": "🎮 En un minijuego, si te sale bien recibís todo lo bueno. Si sale a medias, la mitad. Los costos se pagan igual.",
+  "screen.en_un_minijuego_si_te": "🎮 Minijuego: si te sale bien, ganas todo.",
   "screen.pedir_una_pista_a_kita": "Pedir una pista a Kita",
   "screen.omitir_reto": "⏭️ Omitir reto",
   "screen.omitir_este_reto": "⏭️ ¿Omitir este reto?",

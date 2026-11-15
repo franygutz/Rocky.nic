@@ -200,7 +200,7 @@ export default {
   "screen.lo_que_dice_la_ciencia": "What science says",
   "screen.el_tanque_del_traje_quedo": "The suit tank is not full: this outdoor task gives you less time.",
   "screen.decision_rapida": "Quick decision",
-  "screen.en_un_minijuego_si_te": "🎮 In a minigame, if you do well you get all the good stuff. If it goes half way, you get half. You pay the costs either way.",
+  "screen.en_un_minijuego_si_te": "🎮 Minigame: do well to win it all.",
   "screen.pedir_una_pista_a_kita": "Ask Kita for a hint",
   "screen.omitir_reto": "⏭️ Skip task",
   "screen.omitir_este_reto": "⏭️ Skip this task?",
