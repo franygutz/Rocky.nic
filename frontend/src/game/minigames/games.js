@@ -297,7 +297,7 @@ export class DoseGame extends MiniGame {
     this.speed = this.tired ? 2.3 : 1.8;
     this.drawDial();
   }
-  newZone() { this.zone = Math.PI * (0.2 + Math.random() * 0.6); }
+  newZone() { this.zone = Math.PI * (0.42 + Math.random() * 0.16); } // la zona verde queda arriba, en el centro del dial
   angle() { const t = (performance.now() - this.t0) / 1000; return Math.PI * (0.5 - 0.5 * Math.cos(t * this.speed)); }
   valueOf(ang) { return (ang / Math.PI) * 30; }
   drawDial() {
