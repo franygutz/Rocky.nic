@@ -493,4 +493,7 @@ export default {
   "map.hint": "Press Tab or Esc to close",
   "map.places": "Places on the base",
   "map.open": "Open the map (Tab)",
+  "hud.more": "+{n} more",
+  "hud.less": "Show less",
+  "hud.more_label": "Show the other meters",
 };
