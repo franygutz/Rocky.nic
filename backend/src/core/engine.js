@@ -409,8 +409,8 @@ export function createEngine(catalog) {
       const ofType=term==='DONKI'?archived:archived.filter(e=>e.type===(term==='KP'?'GST':term));
       if(ofType.length){
         const e=ofType[0];
-        observation={id:e.id,type:e.type,title:e.title,observedAt:e.observedAt,source:e.source,sourceUrl:e.sourceUrl,disclaimer:e.note||'No mide la dosis lunar.'};
-        answer+=`\n\nEn esta partida hay ${ofType.length} registro${ofType.length===1?'':'s'} ${term==='DONKI'?'de DONKI':e.type} guardado${ofType.length===1?'':'s'}; el más reciente es del ${String(e.observedAt||'').slice(0,10)}. Son registros de archivo, no una consulta NASA en vivo.`;
+        observation={id:e.id,type:e.type,title:e.title,observedAt:e.observedAt,source:e.source,sourceUrl:e.sourceUrl,disclaimer:evText(e.note||'No mide la dosis lunar.')};
+        answer+=EN?`\n\nIn this game there ${ofType.length===1?'is':'are'} ${ofType.length} saved ${term==='DONKI'?'DONKI':e.type} record${ofType.length===1?'':'s'}; the latest is from ${String(e.observedAt||'').slice(0,10)}. They are archive records, not a live NASA query.`:`\n\nEn esta partida hay ${ofType.length} registro${ofType.length===1?'':'s'} ${term==='DONKI'?'de DONKI':e.type} guardado${ofType.length===1?'':'s'}; el más reciente es del ${String(e.observedAt||'').slice(0,10)}. Son registros de archivo, no una consulta NASA en vivo.`;
         source(e.source,e.sourceUrl,'registro_nasa_descargado');
       }
     }else if(nasaAsk&&(any('nasa','donki','evento','eventos','solar','solares','tormenta','tormentas','sep','cme','gst','kp','clima espacial'))){
@@ -420,8 +420,8 @@ export function createEngine(catalog) {
       source(f?.source||'NASA DONKI',f?.sourceUrl||'https://ccmc.gsfc.nasa.gov/tools/DONKI/','hecho_cientifico');
       if(event){
         const date=String(event.observedAt||'fecha no disponible').slice(0,10);
-        observation={id:event.id,type:event.type,title:event.title,observedAt:event.observedAt,source:event.source,sourceUrl:event.sourceUrl,disclaimer:event.note||'No mide la dosis lunar.'};
-        answer+=`\n\nDe los ${archived.length} registros guardados en esta partida, encontré: ${event.title} (${event.type}), con fecha ${date}. ${event.summary||''}`;
+        observation={id:event.id,type:event.type,title:event.title,observedAt:event.observedAt,source:event.source,sourceUrl:event.sourceUrl,disclaimer:evText(event.note||'No mide la dosis lunar.')};
+        answer+=EN?`\n\nOf the ${archived.length} records saved in this game, I found: ${event.title} (${event.type}), dated ${date}. ${evText(event.summary)||''}`:`\n\nDe los ${archived.length} registros guardados en esta partida, encontré: ${event.title} (${event.type}), con fecha ${date}. ${event.summary||''}`;
         source(event.source,event.sourceUrl,'registro_nasa_descargado');
       }else answer+=archived.length?'\n\nNo hay eventos guardados del tipo o año solicitado.':'\n\nNo hay eventos DONKI cargados en esta partida.';
       answer+='\n\nLos registros son de archivo, no una consulta NASA en vivo ni mediciones de radiación en la base lunar.';

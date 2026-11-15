@@ -99,12 +99,20 @@ export function createFrontendBridge(engine, {
     return getView();
   }
   function getState() { return game ? clone(game) : null; }
+  const localWeather = w => { const c = clone(w); if (typeof engine.evLocal === 'function') { if (c.event) c.event = engine.evLocal(c.event); if (c.note) c.note = engine.evText(c.note); } return c; };
+  const localScience = sc => { const c = clone(sc); if (typeof engine.evLocal === 'function') { if (c.registeredEvent) c.registeredEvent = engine.evLocal(c.registeredEvent); } return c; };
+  const localEvents = list => { const c = clone(list); if (typeof engine.evText === 'function') for (const e of c) { if (e.explanation) e.explanation = engine.evText(e.explanation); if (e.note) e.note = engine.evText(e.note); } return c; };
+  const localResult = r => deepEv(clone(r));
+  // Traduce los textos de los registros DONKI en cualquier parte de un objeto (solo cambia de idioma si está en inglés).
+  const EV_KEYS = new Set(['note', 'location', 'summary', 'explanation', 'disclaimer']);
+  const deepEv = o => { if (typeof engine.evText !== 'function' || !o || typeof o !== 'object') return o;
+    for (const [k, v] of Object.entries(o)) { if (typeof v === 'string' && EV_KEYS.has(k)) o[k] = engine.evText(v); else if (v && typeof v === 'object') deepEv(v); } return o; };
   function getView() {
     if (!game) return {phase:'not_started', ...langInfo(), storage:{available:storageAvailable,error:storageError}};
     const next = engine.nextMission(game).next;
     let ending = null;
     if (game.phase === 'completed') {
-      try { ending = engine.report(game); } catch { ending = null; }
+      try { ending = engine.report(game); ending = deepEv(ending); } catch { ending = null; }
     }
     return {
       gameId:game.id, phase:game.phase, scene:game.phase==='completed'?'ending':game.weather?.pending?'weather':'mission',
@@ -118,11 +126,11 @@ export function createFrontendBridge(engine, {
           delta:clone(choice.delta), risk:choice.risk
         })), modifiers:clone(next.modifiers)}:null,
       pendingChoice,
-      weather:game.weather?clone(game.weather):null,
-      science:clone(game.science),
-      messages:clone(game.messages), events:clone(game.events),
+      weather:game.weather?localWeather(game.weather):null,
+      science:localScience(game.science),
+      messages:clone(game.messages), events:localEvents(game.events),
       performance:clone(game.performance),
-      lastResult:lastResult?clone(lastResult):null,
+      lastResult:lastResult?localResult(lastResult):null,
       lastLuni:lastLuni?clone(lastLuni):null,
       orders:clone(game.orders||[]), bag:clone(game.bag||{}), world:clone(game.world||{avatar:null,scene:'exterior',pos:null,clock:0}),
       ending, ...langInfo(),
