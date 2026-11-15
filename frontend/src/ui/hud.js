@@ -1,6 +1,7 @@
 // Marco del juego como "consola del casco": placa de misión, monedas y avisos arriba; indicadores y tanque del traje a un lado;
 // acciones abajo. Los valores son los reales del motor y los avisos usan símbolo y texto, no solo color.
 import { t, tr, lang } from '../i18n/index.js';
+import { isFull, isStandalone } from './fullscreen.js';
 import { session } from '../bus.js';
 import { METRICS, CATEGORY, ICON, iconUrl } from '../rules.js';
 import { placeOf, SCENES, OUTSIDE } from '../world/scenes.js';
@@ -28,6 +29,7 @@ function build() {
       <div class="vl-plate vl-coins" role="group" aria-label="${esc(t('coins'))}">${icon(ICON.coin)}<b data-ref="coins"></b></div>
       <button class="vl-btn" data-action="statuses" data-ref="alerts" aria-label="${esc(t('hud.alertas_de_la_base'))}"></button>
       <button class="vl-btn" data-action="map" aria-label="${esc(t('map.open'))}" title="${esc(t('map.open'))}">${pix('map')}</button>
+      ${isStandalone() ? '' : `<button class="vl-btn vl-full" data-action="fullscreen" data-ref="full" aria-label="${esc(t('fs.label'))}" title="${esc(t('fs.label'))}">${pix(isFull() ? 'unfull' : 'full')}</button>`}
       <button class="vl-btn" data-action="pause" aria-label="${esc(t('hud.pausa'))}">${pix('pause')}</button>
     </div>
     <div class="vl-rail ${session.showAllMetrics ? '' : 'collapsed'}" role="group" aria-label="${esc(t('hud.indicadores_de_la_base'))}">
@@ -146,3 +148,9 @@ export function renderDock(v) {
   dock.innerHTML = (hints.length ? `<div class="vl-hints" role="status">${hints.join('')}</div>` : '') + `<div class="vl-bar-row">${parts.join('')}</div>`;
 }
 void OUTSIDE;
+
+// Cambia el ícono del botón de pantalla completa cuando se entra o se sale.
+export function syncFullButton() {
+  const b = document.querySelector('[data-ref="full"]');
+  if (b) b.innerHTML = pix(isFull() ? 'unfull' : 'full');
+}
