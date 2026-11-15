@@ -57,7 +57,7 @@ export class MiniGame extends Phaser.Scene {
     while (tt.width > titleRoom && title.length > 4) { title = title.slice(0, -2); tt.setText(title.trimEnd() + '…'); }
     this.hint = this.add.text(px + 18, py + 62, this.instructions(), { fontFamily: FONT, fontSize: fs(19), fontStyle: '700', color: '#27234C', wordWrap: { width: pw - 36 } });
     let below = this.hint.y + this.hint.height + 8;
-    if (this.tired) this.add.text(px + 22, py + 96, t('game.cansancio_este_trabajo_pide_un'), { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700' });
+    if (this.tired) { const tx = this.add.text(px + 18, below, t('game.cansancio_este_trabajo_pide_un'), { fontFamily: FONT, fontSize: fs(15), color: '#8D6FC1', fontStyle: '700', wordWrap: { width: pw - 36 } }); below = tx.y + tx.height + 6; }
 
     // Rendirse: cuenta como reto no terminado.
     const bx = px + pw - 78, by = py + 28;
