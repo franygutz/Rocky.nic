@@ -1,0 +1,16 @@
+{
+  "name": "Vita Lunae",
+  "short_name": "Vita Lunae",
+  "description": "Run a Moon base for 7 days. Every choice has a cost.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#27234C",
+  "theme_color": "#27234C",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
