@@ -304,7 +304,9 @@ export class WorldScene extends Phaser.Scene {
     return len > 1 ? [x / len, y / len] : [x, y]; // la diagonal no es más rápida
   }
 
-  speed() { return 2.2 * PXM * this.cfg.avatarScale; }
+  // Afuera la gravedad es 1/6 de la terrestre y el traje pesa: se avanza despacio y con saltitos largos. Dentro de Zora se camina normal.
+  mps(running) { return OUTSIDE.has(this.sid) ? (running ? 1.9 : 1.2) : (running ? 3.4 : 2.2); }
+  speed() { return this.mps(false) * PXM * this.cfg.avatarScale; }
 
   walkTo(pt) { this.route = findPath(this.sid, this.pos, pt); }
 
@@ -403,8 +405,8 @@ export class WorldScene extends Phaser.Scene {
       if (this.moving) {
         // Física de verdad: la velocidad sale de m/s reales (≈ 2,2 al trote y 3,4 al esquí, como los astronautas del Apolo) y de la escala del
         // sprite (1 m = 22 px lógicos); el ritmo de los pasos = velocidad / velocidad de la animación, así los pies no patinan.
-        const sh = this.sheets[want], mps = this.running ? 3.4 : 2.2;
-        this.cur.rate = Math.max(0.8, Math.min(2.4, mps / sh.v));
+        const sh = this.sheets[want], mps = this.mps(this.running);
+        this.cur.rate = Math.max(0.4, Math.min(2.4, mps / sh.v));
         this.effSpeed = this.cur.rate * sh.v * PXM * sc;
       }
     }
