@@ -1,11 +1,43 @@
 // Motor puro, sin Node, HTTP, base de datos ni conexión. Reutilizable en navegador.
 export function createEngine(catalog) {
-  const challenges = catalog.challenges;
-  const items = catalog.items;
-  const endings = catalog.endings;
-  const facts = catalog.facts || [];
-  const challengeMap = new Map(challenges.map(c => [c.id, c]));
-  const itemMap = new Map(items.map(i => [i.id, i]));
+  // Idiomas: el catálogo base está en español; catalog.i18n = { en: { shop, status, endings, facts, challenges } }.
+  // Lo que falta en un idioma cae al español (nunca queda un texto vacío).
+  const LANGUAGES = [{code:'es',name:'Español',native:'Español'},{code:'en',name:'English',native:'English'}];
+  const baseCatalog = catalog;
+  const merge = (a,b) => (b && typeof b==='object' && !Array.isArray(b)) ? Object.assign({},a,Object.fromEntries(Object.entries(b).filter(([,v])=>v!==undefined&&v!==null&&v!==''))) : a;
+  function localize(lang='es') {
+    const ov = lang==='es' ? null : baseCatalog.i18n?.[lang];
+    if (!ov) return {challenges:baseCatalog.challenges,items:baseCatalog.items,endings:baseCatalog.endings,facts:baseCatalog.facts||[],statusNames:baseCatalog.statusNames||{},lang:'es'};
+    return {lang,
+      challenges:baseCatalog.challenges.map(c=>{const t=ov.challenges?.[c.id];if(!t)return c;
+        const {choices:tc,...rest}=t;return {...merge(c,rest),choices:c.choices.map((ch,i)=>merge(ch,tc?.[i]))}}),
+      items:baseCatalog.items.map(i=>merge(i,ov.shop?.[i.id])),
+      endings:Object.fromEntries(Object.entries(baseCatalog.endings).map(([k,v])=>[k,merge(v,ov.endings?.[k])])),
+      facts:(baseCatalog.facts||[]).map(f=>merge(f,ov.facts?.[f.id])),
+      statusNames:{...(baseCatalog.statusNames||{}),...(ov.status||{})}};
+  }
+  let lang = 'es';
+  // Textos de los registros DONKI (vienen en español en nasa-events.json): se traducen por patrón.
+  const MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'],MONTHS_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const NOTE_EN={'La actividad registrada NO representa una dosis de radiación lunar. Los efectos del videojuego son simulados.':'The recorded activity does NOT show a Moon radiation dose. The game effects are simulated.','Kp describe actividad geomagnética cerca de la Tierra. No mide directamente la radiación de una base lunar.':'Kp describes geomagnetic activity near Earth. It does not directly measure radiation at a Moon base.','Escenario ficticio de entrenamiento inspirado en observaciones. No es pronóstico de riesgo lunar.':'Made-up training scenario inspired by real observations. It is not a Moon risk forecast.','No mide la dosis lunar.':'It does not measure the Moon dose.','Magnetosfera terrestre':'Earth magnetosphere','Observación solar':'Solar observation','Evento histórico como referencia, riesgo y efectos son hipotéticos; no se calculan dosis lunares.':'Historical event as a reference; the risk and effects are made up, and no Moon doses are calculated.','Consecuencias numéricas ficticias, no cálculo de dosis NASA.':'Made-up numeric effects, not a NASA dose calculation.'};
+  const evText=(x)=>{
+    if(lang!=='en'||typeof x!=='string')return x;
+    if(NOTE_EN[x])return NOTE_EN[x];
+    let m;
+    if((m=/^Registro (\w+) de DONKI\.(?: Índices Kp observados: (.*))?$/.exec(x)))return `DONKI ${m[1]} record.${m[2]?` Observed Kp values: ${m[2]}`:''}`;
+    if((m=/^DONKI registró Kp ([\d.]+) en la magnetosfera terrestre durante el intervalo (.+?) UTC del (\d+) de (\w+) de (\d+)\.$/.exec(x))){const mo=MONTHS_EN[MONTHS_ES.indexOf(m[4])]||m[4];return `DONKI recorded Kp ${m[1]} in Earth's magnetosphere between ${m[2]} UTC on ${mo} ${m[3]}, ${m[5]}.`}
+    return x;
+  };
+  const evLocal=(e)=>e&&lang==='en'?{...e,summary:evText(e.summary),note:evText(e.note),location:evText(e.location)}:e;
+  let challenges, items, endings, facts, statusNames, challengeMap, itemMap;
+  function setLanguage(code) {
+    if (!LANGUAGES.some(l=>l.code===code)) throw new Error('INVALID_LANGUAGE');
+    const L = localize(code);
+    challenges=L.challenges; items=L.items; endings=L.endings; facts=L.facts; statusNames=L.statusNames; lang=L.lang===code?code:'es';
+    challengeMap=new Map(challenges.map(c=>[c.id,c])); itemMap=new Map(items.map(i=>[i.id,i]));
+    return lang;
+  }
+  setLanguage('es');
   const clamp = (n, min=0, max=100) => Math.max(min, Math.min(max, n));
   const has = (g, key) => g.statuses.includes(key);
   const add = (g,key) => {if (!has(g,key)) g.statuses.push(key)};
@@ -574,5 +606,5 @@ export function createEngine(catalog) {
     g.world.scene=scene;g.world.pos={x:Math.round(pos.x*10)/10,y:Math.round(pos.y*10)/10};
     return {state:g,result:{scene,pos:g.world.pos}};
   }
-  return {createGame,nextMission,resolveMission,skipMission,purchase,orderItem,tickWorld,collectOrders,useItem,tankFill,leaveBase,enterBase,setAvatar,setWorldState,ensureWorld,sendMessage,respondWeather,repeatDay,npcAsk,report,shop,endingFor,assess,currentMission,challengeMap};
+  return {evText,evLocal,setLanguage,getLanguage:()=>lang,languages:()=>LANGUAGES.map(l=>({...l,ready:l.code==='es'||!!baseCatalog.i18n?.[l.code]})),localize,statusNames:()=>({...statusNames}),createGame,nextMission,resolveMission,skipMission,purchase,orderItem,tickWorld,collectOrders,useItem,tankFill,leaveBase,enterBase,setAvatar,setWorldState,ensureWorld,sendMessage,respondWeather,repeatDay,npcAsk,report,shop,endingFor,assess,currentMission,challengeMap};
 }
