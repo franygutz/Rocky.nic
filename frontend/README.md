@@ -81,3 +81,7 @@ Capas del mundo (profundidad): fondo → decoración → avatar y objetos ordena
 ## Créditos
 
 Arte y animaciones: carpeta de diseño del equipo (paleta Moon Pop, mapas, 16 astronautas, mascota Kita, iconos y símbolos). Proyecto conceptual del equipo, sin patrocinio oficial de NASA.
+
+## Idiomas (i18n)
+
+Los textos viven en `src/i18n/es.js` y `src/i18n/en.js` (misma lista de claves; `{nombre}` es una variable). En el código: `t('clave', { n: 3 })`. Para textos que llegan como dato en español (nombres de lugares, fuentes) se usa `tr('texto en español')`, que busca su clave. El idioma activo lo guarda el backend (`bridge.setLanguage`). `tests/i18n.test.js` falla si falta una clave o una variable en algún idioma. Para agregar un idioma: crear `src/i18n/<código>.js`, registrarlo en `src/i18n/index.js` y en el backend (ver `backend/docs/API.md`).
