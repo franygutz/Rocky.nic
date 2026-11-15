@@ -8,9 +8,13 @@ import {mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {createEngine} from './core/engine.js';
 const read=(name)=>JSON.parse(readFileSync(new URL(`../data/${name}`,import.meta.url),'utf8'));
-const catalog={challenges:read('challenges.json'),items:read('shop.json'),endings:read('endings.json'),facts:read('science-facts.json')};
+const readOpt=(name)=>{try{return read(name)}catch{return null}};
+const catalog={challenges:read('challenges.json'),items:read('shop.json'),endings:read('endings.json'),facts:read('science-facts.json'),statusNames:read('status-names.json'),i18n:{en:readOpt('i18n/en.json')}};
 export const curatedEvents=read('nasa-events.json');
 export const engine=createEngine(catalog);
+// Un motor por idioma: el idioma sale de ?lang=en (o la cabecera Accept-Language); si no existe, español.
+const engines={es:engine};
+export const engineFor=(code)=>{if(!code||code==='es')return engine;if(!engines[code]){const ok=engine.languages().some(l=>l.code===code&&l.ready);if(!ok)return engine;const e=createEngine(catalog);e.setLanguage(code);engines[code]=e}return engines[code]};
 export function openDatabase(file=process.env.DATABASE_PATH||'./data/moon-v03.sqlite'){
   if(file!==':memory:')mkdirSync(dirname(resolve(file)),{recursive:true});
   const db=new DatabaseSync(file);
@@ -68,15 +72,17 @@ export function createApp({db=openDatabase(':memory:'),allowedOrigins=origins}={
     if(req.method==='OPTIONS'){res.writeHead(origin&&!allowedOrigins.includes(origin)?403:204);res.end();return}
     try{
       const url=new URL(req.url,'http://127.0.0.1');const path=url.pathname;
+      const reqLang=(url.searchParams.get('lang')||String(req.headers['accept-language']||'').slice(0,2)).toLowerCase();const engine=engineFor(reqLang);const L=engine.localize(engine.getLanguage());
       if(req.method==='GET'&&(path==='/'||path==='/health'))return send(res,200,{ok:true,service:'moon-survival-backend',version:'0.5.0',api:'/api/v1',offline:'public/offline-demo.html'});
+      if(req.method==='GET'&&path==='/api/v1/languages')return send(res,200,{current:engine.getLanguage(),languages:engine.languages(),use:'?lang=en o cabecera Accept-Language; lo que no esté traducido sale en español'});
       if(req.method==='GET'&&path==='/api/v1/catalog')return send(res,200,{missions:catalog.challenges.length,shop:catalog.items.length,endings:Object.keys(catalog.endings).length,scienceEvents:scienceEvents(db).length});
       if(req.method==='GET'&&path==='/api/v1/missions'){
         const difficulty=url.searchParams.get('difficulty');const category=url.searchParams.get('category');
-        const list=catalog.challenges.filter(c=>(!difficulty||String(c.difficulty)===difficulty)&&(!category||c.category===category));return send(res,200,{total:list.length,missions:list});
+        const list=L.challenges.filter(c=>(!difficulty||String(c.difficulty)===difficulty)&&(!category||c.category===category));return send(res,200,{total:list.length,missions:list});
       }
-      if(req.method==='GET'&&path==='/api/v1/shop')return send(res,200,{items:catalog.items});
+      if(req.method==='GET'&&path==='/api/v1/shop')return send(res,200,{items:L.items});
       if(req.method==='GET'&&path==='/api/v1/science-events')return send(res,200,{events:scienceEvents(db),disclaimer:'Son registros NASA históricos, no lecturas del hábitat lunar; efectos del juego simulados.'});
-      if(req.method==='GET'&&path==='/api/v1/science/facts')return send(res,200,{facts:catalog.facts});
+      if(req.method==='GET'&&path==='/api/v1/science/facts')return send(res,200,{facts:L.facts});
       if(req.method==='GET'&&path==='/api/v1/science/sources')return send(res,200,{sources:[{name:'NASA CCMC DONKI',url:'https://ccmc.gsfc.nasa.gov/tools/DONKI/'},{name:'NASA Open APIs',url:'https://api.nasa.gov/'},{name:'NASA OSDR',url:'https://science.nasa.gov/biological-physical/data/osdr/'},{name:'NASA OSDR RadLab (LRO CRaTER, órbita lunar)',url:'https://visualization.osdr.nasa.gov/radlab/gui/data-api/'},{name:'NASA/JPL Horizons (distancia Tierra–Luna)',url:'https://ssd.jpl.nasa.gov/horizons/'},{name:'CSA Food Production',url:'https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/'}]});
       if(req.method==='POST'&&path==='/api/v1/games'){
         const b=await body(req);if(b.seed!==undefined&&!['string','number'].includes(typeof b.seed))throw Error('BAD_JSON');
