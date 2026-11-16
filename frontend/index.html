@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#27234C">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Vita Lunae">
+  <meta name="description" content="Vita Lunae: dirigí la nave Zora y su base lunar durante 7 días. Juego gratis en el navegador para 7 a 12 años, con registros reales de NASA DONKI.">
+  <title>Vita Lunae</title>
+</head>
+<body>
+  <div id="app">
+    <div id="stage" aria-hidden="true"></div>
+    <header id="hud" hidden></header>
+    <nav id="dock" hidden aria-label="Acciones"></nav>
+    <aside id="drawer" hidden aria-label="Panel"></aside>
+    <div id="screen"></div>
+    <div id="prompt" hidden></div>
+    <div id="kita" class="kita" hidden></div>
+    <div id="touch" hidden></div>
+    <div id="pop" role="dialog" hidden></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="place" role="status" aria-live="polite"></div>
+  </div>
+  <noscript>Vita Lunae necesita JavaScript. / Vita Lunae needs JavaScript.</noscript>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

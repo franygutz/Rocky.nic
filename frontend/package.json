@@ -1,0 +1,27 @@
+{
+  "name": "vita-lunae-frontend",
+  "private": true,
+  "version": "0.5.0",
+  "type": "module",
+  "description": "Frontend de Vita Lunae (Rocky.nic): mundo 2D de la nave Zora, avatar por capas, tareas, tienda con entrega física y Kita, conectado al motor de backend/",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "docs": "GEN_DOCS=1 vitest run tests/docs.test.js"
+  },
+  "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/jersey-10": "^5.3.0",
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.8",
+    "vite-plugin-singlefile": "2.3.4",
+    "vitest": "5.1.0"
+  }
+}

@@ -1,0 +1,95 @@
+[
+  {
+    "id": "agua",
+    "name": "💧 Reserva de agua",
+    "price": 35,
+    "desc": "+18 agua; ayuda a recuperar un depósito.",
+    "delta": {
+      "water": 18
+    },
+    "remove": [
+      "deshidratacion"
+    ],
+    "limit": 3
+  },
+  {
+    "id": "bateria",
+    "name": "🔋 Batería portátil",
+    "price": 42,
+    "desc": "+20 energía para sistemas esenciales.",
+    "delta": {
+      "energy": 20
+    },
+    "remove": [
+      "energia_comprometida"
+    ],
+    "limit": 3
+  },
+  {
+    "id": "oxigeno",
+    "name": "🫁 Cartucho de oxígeno",
+    "price": 49,
+    "desc": "+20 oxígeno; ayuda ante niveles bajos.",
+    "delta": {
+      "oxygen": 20
+    },
+    "remove": [
+      "aire_sin_revisar"
+    ],
+    "limit": 3
+  },
+  {
+    "id": "botiquin",
+    "name": "🧰 Botiquín médico",
+    "price": 58,
+    "desc": "+18 salud; alivia fatiga y mareos.",
+    "delta": {
+      "health": 18
+    },
+    "remove": [
+      "fatiga",
+      "mareos"
+    ],
+    "limit": 2
+  },
+  {
+    "id": "escudo",
+    "name": "🛡️ Kit de refugio",
+    "price": 72,
+    "desc": "+22 protección; repara fallas preventivas.",
+    "delta": {
+      "shield": 22
+    },
+    "remove": [
+      "refugio_incompleto"
+    ],
+    "limit": 2
+  },
+  {
+    "id": "comms",
+    "name": "📡 Módulo de antena",
+    "price": 55,
+    "desc": "+20 comunicaciones; resuelve saturación.",
+    "delta": {
+      "comms": 20
+    },
+    "remove": [
+      "enlace_saturado"
+    ],
+    "limit": 2
+  },
+  {
+    "id": "huerto",
+    "name": "🌿 Kit hidropónico",
+    "price": 46,
+    "desc": "+17 alimentos y +3 investigación.",
+    "delta": {
+      "food": 17,
+      "research": 3
+    },
+    "remove": [
+      "cultivo_retrasado"
+    ],
+    "limit": 2
+  }
+]

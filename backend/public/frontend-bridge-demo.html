@@ -1,0 +1,46 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vita Lunae · Prueba puente frontend</title><style>
+:root{font:16px system-ui;background:#0d1828;color:#ebf4ff}body{max-width:920px;margin:auto;padding:18px}h1{font-size:25px}section{border:1px solid #365470;background:#182a42;border-radius:12px;padding:14px;margin:12px 0}button{background:#1e5575;color:#fff;border:1px solid #74d8d0;border-radius:8px;padding:10px;margin:3px;cursor:pointer}button:disabled{opacity:.5}input{background:#102038;color:#fff;padding:11px;border:1px solid #5e8ca9;border-radius:7px}small{color:#bbd0e6}.grid{display:flex;flex-wrap:wrap;gap:7px}.pill{background:#203d5b;border-radius:8px;padding:8px;min-width:105px}.source{color:#9fedd5}#answer{white-space:pre-wrap;line-height:1.6}#status{font-size:13px;color:#ffdb9e;white-space:pre-wrap}label{display:inline-block;margin:5px}@media(max-width:600px){input{max-width:95%}}
+</style></head><body>
+<h1>🌕 Vita Lunae — Integración HTML + JavaScript</h1><p>Prueba técnica del contrato para el frontend. La estética final, el mapa lunar y las animaciones corresponden al equipo de interfaz.</p>
+<section><div id="top"></div><div class="grid" id="metrics"></div><small id="storage"></small></section>
+<section><h2>Reto actual</h2><div id="card"></div><label>Precisión simulada del minijuego <input id="acc" type="number" min="0" max="100" value="88" style="width:65px"></label><div id="controls"></div></section>
+<section><h2>🤖 LUNI y NASA</h2><input id="question" value="¿Qué significa CME?" style="width:65%"><button id="ask">Preguntar</button><div id="answer"></div><div id="sources" class="source"></div></section>
+<section><h2>🛒 Tienda lunar</h2><div id="shop"></div></section>
+<section><button id="repeat">Repetir día</button><button id="new">Nueva partida</button><button id="clear">Borrar progreso</button><div id="status"></div></section>
+<script src="./offline-engine.js"></script>
+<script>
+'use strict';
+const UI=window.MoonSurvivalFrontend();const el=id=>document.getElementById(id);
+const button=(label,run,disabled=false)=>{const b=document.createElement('button');b.textContent=label;b.disabled=disabled;b.addEventListener('click',()=>{try{run()}catch(e){el('status').textContent=e.message}});return b};
+function draw(v){
+ el('top').textContent=v.phase==='not_started'?'Sin partida':`Día ${v.day}/7 · Turno ${v.turn}/14 · Dificultad adaptativa ${v.skill}/10 · ${v.coins} monedas`;
+ el('metrics').replaceChildren();el('card').replaceChildren();el('controls').replaceChildren();el('shop').replaceChildren();
+ if(v.phase==='not_started'){el('controls').append(button('Comenzar',()=>UI.newGame()));return;}
+ el('storage').textContent=v.storage.available?'✓ Guardado local disponible':'Aviso: el navegador no deja guardar. Se puede seguir jugando.';
+ for(const [k,n] of Object.entries(v.metrics)){const span=document.createElement('span');span.className='pill';span.textContent=`${k}: ${n}/100`;el('metrics').append(span)}
+ if(v.scene==='weather'){
+   el('card').textContent='Aviso solar histórico de entrenamiento. No es una medición lunar actual.';
+   el('controls').append(button('Entrar al refugio',()=>UI.respondWeather('shelter')),button('Continuar EVA',()=>UI.respondWeather('continue_eva')));
+ }else if(v.scene==='ending'){
+   const p=document.createElement('p');p.textContent=`Final: ${v.ending?.ending?.title||'Completado'}. ${v.ending?.why?.evidence?.join(' ')||''}`;el('card').append(p);
+ }else if(v.mission){
+   const p=document.createElement('p');p.textContent=`#${v.mission.id} · ${v.mission.name} (nivel ${v.mission.difficulty}) — ${v.mission.intro}`;el('card').append(p);
+   if(v.pendingChoice){
+     el('controls').append(button(`Finalizar minijuego (elección ${v.pendingChoice})`,()=>{
+       const acc=Number(el('acc').value);UI.finishMinigame({completed:acc>=40,accuracy:acc,mistakes:0,hintsUsed:0});
+     }));
+   }else{
+     for(const option of v.mission.options){
+       el('controls').append(button(`${option.id}: ${option.label} [Solo decisión]`,()=>UI.chooseCard(option.id)));
+       el('controls').append(button(`Jugar minijuego con opción ${option.id}`,()=>UI.prepareMinigame(option.id)));
+     }
+     el('controls').append(button('Omitir reto',()=>UI.skipCard()));
+   }
+ }
+ for(const i of v.shop){el('shop').append(button(`${i.name} (${i.price} monedas)`,()=>UI.buy(i.id),!i.available))}
+}
+UI.subscribe(draw);
+el('ask').addEventListener('click',()=>{try{const r=UI.askLuni(el('question').value);el('answer').textContent=r.answer+(r.hint?'\n\n'+r.hint:'');el('sources').replaceChildren();for(const s of r.sources||[]){const a=document.createElement('a');if(!/^https?:\/\//i.test(s.url||''))continue;a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=(s.title||'NASA')+' · ';el('sources').append(a)}}catch(e){el('status').textContent=e.message}});
+el('repeat').onclick=()=>{try{UI.repeatDay()}catch(e){el('status').textContent=e.message}};
+el('new').onclick=()=>UI.newGame();el('clear').onclick=()=>UI.clearProgress();
+</script></body></html>
